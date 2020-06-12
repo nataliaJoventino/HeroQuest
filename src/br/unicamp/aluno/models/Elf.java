@@ -1,6 +1,6 @@
 package br.unicamp.aluno.models;
 
-public class Elf extends Hero {
+public class Elf extends MisticHero {
 	
 	public Elf(String name) {
 		//Chamando o construtor da super classe

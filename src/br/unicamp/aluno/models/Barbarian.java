@@ -13,7 +13,8 @@ public class Barbarian extends Hero {
 		this.setInteligencePoints(2);
 		
 		//Adicionar arma segundo as regras do jogo
-		//Ainda não adicionei pq precisa criar lá nos itens
+		this.holdWithRightHand(new LongSword());
+		
 		
 		
 	}

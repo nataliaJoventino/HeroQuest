@@ -11,6 +11,7 @@ public class Hero extends Traceable{
 	private int inteligencePoints;
 	private Item rightHand;
 	private Item leftHand;
+	private Item armor;
 	private ArrayList<Item> backpack;
 	
 	//Construtor de Heroi
@@ -98,10 +99,12 @@ public class Hero extends Traceable{
 			System.out.println("Você não possui esse item!");
 			return;
 		}
+		//Tirando o item atual da maneira certa primeiro
+		unequipTheItemFromRightHand();
 		
 		//Caso tenha pode retirar da mochila e usar normalmente
 		this.backpack.remove(item);
-		this.rightHand = item;
+		this.rightHand = item.equipTheHero(this);
 	}
 	
 	//Colocar item na mão esquerda
@@ -112,9 +115,28 @@ public class Hero extends Traceable{
 			return;
 		}
 		
-		//Caso tenha pode retirar da mochila e usar normalmente
+		//Tirando o item atual da maneira certa primeiro
+		unequipTheItemFromLeftHand();
+		
+		//Agora ele pode retirar o item desejado da mochila e usar normalmente
 		this.backpack.remove(item);
 		this.leftHand = item;
+	}
+	
+	//Desequipando e guardando na mochila o item da mão direita
+	private void unequipTheItemFromRightHand() {
+		Item item = this.getRightHand();
+		storeInBackpack(item);
+		item.unequipTheHero(this);
+	}
+	
+	//Desequipando e guardando na mochila o item da mão esquerda
+	private void unequipTheItemFromLeftHand() {
+		
+		//Talvez tenha que colocar uns instanceof aqui nath, eu nn lembro e to cansado kkkkkkkk (Mesma coisa no equipar item)
+		Item item = this.getLeftHand();
+		item.unequipTheHero(this);
+		storeInBackpack(item);
 	}
 
 	//Colocar item na mochila
@@ -122,5 +144,24 @@ public class Hero extends Traceable{
 		this.backpack.add(item);
 	}
 	
+	//Obtem qual é o item que o heroi está segurando na mão direita
+	public Item getRightHand() {
+		return rightHand;
+	}
 	
+	//Obtem a armadura usada
+	public Item getArmor() {
+		return armor;
+	}
+	
+	//Obtem qual é o item que o heroi está segurando na mão esquerda
+	public Item getLeftHand() {
+		return leftHand;
+	}
+	
+	//Veste a armadura
+	public void wearArmor(Armor newArmor) {
+		//Armaduras antigas serão destruidas quando trocadas
+		armor = newArmor;
+	}
 }

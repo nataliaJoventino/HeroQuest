@@ -1,6 +1,6 @@
 package br.unicamp.aluno.models;
 
-public class Wizard extends Hero {
+public class Wizard extends MisticHero {
 
 	public Wizard(String name) {
 		super(name);
