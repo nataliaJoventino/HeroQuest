@@ -4,17 +4,23 @@ import java.util.Random;
 
 public class Dice {
     private final int BOUND_DICE = 6;
+    private final int MAX_REDDICE = 2;
     private Random dice;
 
     public Dice(){
         dice = new Random();
     }
 
-    public int redDice(){
-        return (dice.nextInt(BOUND_DICE) + 1);
+    public int redDice(){ // fazer o uso de dois dados direto aqui na clase ou na de quem vai usar?
+        int sum = 0;
+
+        for (int i = 0; i < MAX_REDDICE; i++)
+            sum += (dice.nextInt(BOUND_DICE) + 1);
+
+        return sum;
     }
 
-    public String combatDice(){
+    public String combatDice(){ //retornar uma lista com os resultados a a partir da quantidade de estatistica recebido por parametro ou deixar para a classe que vai usar fazer isso?
         String diceResult = "";
         int diceNumber = dice.nextInt(BOUND_DICE) + 1;
 
@@ -26,7 +32,7 @@ public class Dice {
             diceResult = SideDice.HERO_SHIELD.toString();
 
         else
-            diceResult = SideDice.MONSTER.toString();
+            diceResult = SideDice.MONSTER_SHIELD.toString();
 
         return diceResult;
     }

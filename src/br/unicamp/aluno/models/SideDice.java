@@ -1,7 +1,7 @@
 package br.unicamp.aluno.models;
 
 public enum SideDice {
-    SKULL, HERO_SHIELD, MONSTER;
+    SKULL, HERO_SHIELD, MONSTER_SHIELD;
 
     public String toString(){
         String dice = "";
@@ -14,8 +14,8 @@ public enum SideDice {
                 dice = "Hero Shield";
                 break;
 
-            case MONSTER:
-                dice = "Monster";
+            case MONSTER_SHIELD:
+                dice = "Monster Shield";
                 break;
         }
 

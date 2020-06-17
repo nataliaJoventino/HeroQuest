@@ -15,6 +15,11 @@ public abstract class Traceable {
 	public int getPositionY() {
 		return positionY;
 	}
+
+	public void updatePosition(int x, int y){
+		this.positionX = x;
+		this.positionY = y;
+	}
 	
 	
 }
