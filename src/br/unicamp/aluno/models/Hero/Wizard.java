@@ -1,4 +1,4 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.Hero;
 
 public class Wizard extends MisticHero {
 

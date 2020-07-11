@@ -1,6 +1,6 @@
 package br.unicamp.aluno.models;
 
-public abstract class Traceable {
+public class Traceable {
 	private int positionX;
 	private int positionY;
 	

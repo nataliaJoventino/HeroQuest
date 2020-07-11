@@ -1,8 +1,12 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.Hero;
+
+import br.unicamp.aluno.models.Item.Armor;
+import br.unicamp.aluno.models.Item.Item;
+import br.unicamp.aluno.models.Traceable;
 
 import java.util.ArrayList;
 
-public class Hero extends Traceable{
+public class Hero extends Traceable {
 	private String name;
 	private int quantityOfDices;
 	private int quantityOfAttackDices;

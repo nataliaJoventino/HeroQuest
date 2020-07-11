@@ -1,4 +1,6 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.Item;
+
+import br.unicamp.aluno.models.Hero.Hero;
 
 public class LongSword extends Weapon{
 	

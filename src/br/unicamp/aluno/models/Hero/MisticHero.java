@@ -1,4 +1,6 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.Hero;
+
+import br.unicamp.aluno.models.Item.Spell;
 
 //Os herois misticos podem dominar os 4 elementos e lançar magias
 public class MisticHero extends Hero {

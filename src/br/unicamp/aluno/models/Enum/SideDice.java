@@ -1,4 +1,4 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.Enum;
 
 public enum SideDice {
     SKULL, HERO_SHIELD, MONSTER_SHIELD;

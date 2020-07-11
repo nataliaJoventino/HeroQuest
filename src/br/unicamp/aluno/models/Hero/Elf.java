@@ -1,19 +1,19 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.Hero;
 
-public class Dwarf extends Hero {
+public class Elf extends MisticHero {
 	
-	public Dwarf(String name) {
+	public Elf(String name) {
 		//Chamando o construtor da super classe
 		super(name);
 		//Pontos de vida, inteligencia e defesa padrões
 		this.setQuantityOfAttackDices(2);
 		this.setQuantityOfDefenceDices(2);
-		this.setLifePoints(7);
-		this.setInteligencePoints(3);
+		this.setLifePoints(4);
+		this.setInteligencePoints(6);
 		
 		//Adicionar arma segundo as regras do jogo
 		//Ainda não adicionei pq precisa criar lá nos itens
-		
+				
 	}
-
+	
 }

@@ -1,4 +1,6 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.Hero;
+
+import br.unicamp.aluno.models.Item.LongSword;
 
 public class Barbarian extends Hero {
 

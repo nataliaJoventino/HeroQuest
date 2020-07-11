@@ -1,5 +1,7 @@
 package br.unicamp.aluno.models;
 
+import br.unicamp.aluno.models.Enum.SideDice;
+
 import java.util.Random;
 
 public class Dice {
