@@ -6,10 +6,12 @@ public enum Direction {
     UP,DOWN,RIGHT,LEFT;
 
     public Traceable getTraceable(){
+    	//Por que precisa instanciar?
         Traceable coordinate = null;
 
         switch (this){
             case UP:
+            	//Esse new traceble não seria na verdade um updatePosition?
                 coordinate = new Traceable(0, -1);
                 break;
 

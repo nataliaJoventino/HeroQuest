@@ -15,4 +15,8 @@ public class Goblin extends Monster {
         // retorna punha
     }
 
+    @Override
+	public String toString() {
+		return "G";
+	}
 }

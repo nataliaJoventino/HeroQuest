@@ -8,5 +8,10 @@ public class Skeleton extends Monster {
         super(x, y);
         setWeapon(weapon); // recebe qualquer arma
     }
+    
+    @Override
+	public String toString() {
+		return "S";
+	}
 
 }

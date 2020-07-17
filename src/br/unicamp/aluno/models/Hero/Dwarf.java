@@ -15,5 +15,10 @@ public class Dwarf extends Hero {
 		//Ainda não adicionei pq precisa criar lá nos itens
 		
 	}
+	
+	@Override
+	public String toString() {
+		return "D";
+	}
 
 }

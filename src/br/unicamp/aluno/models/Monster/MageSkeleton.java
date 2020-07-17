@@ -10,6 +10,9 @@ public class MageSkeleton extends Monster {
         setWeapon(magicMissile); // não achei informação sobre usar punhos no pdf, será que era para ser punhais?
     }
 
-
+    @Override
+	public String toString() {
+		return "M";
+	}
 
 }

@@ -17,8 +17,11 @@ public class Barbarian extends Hero {
 		//Adicionar arma segundo as regras do jogo
 		this.holdWithRightHand(new LongSword());
 		
-		
-		
+	}
+	
+	@Override
+	public String toString() {
+		return "B";
 	}
 	
 }

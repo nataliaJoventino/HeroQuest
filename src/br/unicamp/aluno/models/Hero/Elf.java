@@ -12,8 +12,12 @@ public class Elf extends MisticHero {
 		this.setInteligencePoints(6);
 		
 		//Adicionar arma segundo as regras do jogo
-		//Ainda não adicionei pq precisa criar lá nos itens
-				
+		//Ainda não adicionei pq precisa criar lá nos itens			
+	}
+	
+	@Override
+	public String toString() {
+		return "E";
 	}
 	
 }

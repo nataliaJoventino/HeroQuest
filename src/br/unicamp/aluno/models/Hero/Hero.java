@@ -6,7 +6,7 @@ import br.unicamp.aluno.models.Traceable;
 
 import java.util.ArrayList;
 
-public class Hero extends Traceable {
+public abstract class Hero extends Traceable {
 	private String name;
 	private int quantityOfDices;
 	private int quantityOfAttackDices;
@@ -168,4 +168,5 @@ public class Hero extends Traceable {
 		//Armaduras antigas serão destruidas quando trocadas
 		armor = newArmor;
 	}
+	
 }

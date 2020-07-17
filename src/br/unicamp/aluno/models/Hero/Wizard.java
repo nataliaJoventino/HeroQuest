@@ -15,4 +15,8 @@ public class Wizard extends MisticHero {
 		//Não adicionei pq ainda não as criei
 	}
 	
+	@Override
+	public String toString() {
+		return "W";
+	}
 }
