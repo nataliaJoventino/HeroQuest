@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 //Oi Sra.Joventino
 public abstract class Hero extends Traceable {
+	//oi andrey
 	private String name;
 	private int quantityOfDices;
 	private int quantityOfAttackDices;
