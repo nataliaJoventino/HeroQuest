@@ -7,6 +7,7 @@ import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 
 import java.util.ArrayList;
 
+//Oi Sra.Joventino
 public abstract class Hero extends Traceable {
 	private String name;
 	private int quantityOfDices;
