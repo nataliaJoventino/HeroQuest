@@ -3,6 +3,7 @@ package br.unicamp.aluno.models.Hero;
 import br.unicamp.aluno.models.Item.Armor;
 import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 
 import java.util.ArrayList;
 
@@ -83,15 +84,8 @@ public abstract class Hero extends Traceable {
 	//Remove uma certa quantidade de vida do personagem
 	public void removeLifePoints(int value) {
 		this.lifePoints -= value;
-	}
-		
-	//Verifica se o personagem está vivo
-	public boolean isAlive() {
-		if(lifePoints > 0) {
-			return true;
-		}
-		else {
-			return false;
+		if(lifePoints <= 0) {
+			throw new YouAreDeadException();
 		}
 	}
 

@@ -3,6 +3,9 @@ package br.unicamp.aluno;
 import java.util.ArrayList;
 
 import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.Trap;
+import br.unicamp.aluno.models.Exceptions.TrapsHurtMeException;
+import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 import br.unicamp.aluno.models.Hero.Hero;
 
 public class Game {
@@ -13,6 +16,7 @@ public class Game {
 
 	private int xMapSize;
 	private int yMapSize;
+	private Hero hero;
 
 	// Construtor do Jogo
 	public Game(Hero player, int xSize, int ySize) {
@@ -23,6 +27,7 @@ public class Game {
 			this.map = new String[xSize][ySize];
 			this.xMapSize = xSize;
 			this.yMapSize = ySize;
+			this.hero = player;
 
 			//Iniciando a variável de localizaveis no mapa
 			this.traceablesOnMap = new ArrayList<Traceable>();
@@ -35,7 +40,7 @@ public class Game {
 			}
 
 			//Adicionando o Player no mapa
-			this.map[player.getPositionX()][player.getPositionY()] = player.toString();
+			this.map[hero.getPositionX()][hero.getPositionY()] = hero.toString();
 
 		}
 
@@ -53,7 +58,7 @@ public class Game {
 			
 		}
 
-		// Registra as Joias que estão no mapa
+		// Registra os traceables que estão no mapa
 		private void addTraceablesOnGame(Traceable traceable) {
 			this.traceablesOnMap.add(traceable);
 		}
@@ -66,16 +71,16 @@ public class Game {
 		// verifica a possibilidade e caminha com o player para a posição
 		// xNow e yNow dizem a posição atual do player
 		// xRequested e yRequested dizem a posiçao solicitada pelo usuário
-		public boolean canIWalk(Hero player, int xRequested, int yRequested) {
+		public boolean canIWalk(int xRequested, int yRequested) {
 
-			int xNow = player.getPositionX();
-			int yNow = player.getPositionY();
+			int xNow = hero.getPositionX();
+			int yNow = hero.getPositionY();
 
 			// caso tiver o espaço desejado caminharemos com o player
 			if (this.map[xRequested][yRequested].equals("--")) {
 
 				// Andando com o player
-				this.map[xRequested][yRequested] = player.toString();
+				this.map[xRequested][yRequested] = hero.toString();
 				this.map[xNow][yNow] = "--";
 
 				return true;
@@ -97,7 +102,52 @@ public class Game {
 				System.out.println("");
 			}
 		}
-
 		
+		//Verifica se o heroi pisou em alguma armadilha e retira vida dele
+		private void amIOnSomeTrap() {
+			for (Traceable traceable : traceablesOnMap) {
+				//Caso a posição do herói seja a mesma que a da armadilha:
+				if(hero.getPositionX() == traceable.getPositionX() && hero.getPositionY() == traceable.getPositionY() && traceable instanceof Trap) {
+					//Cast
+					Trap trap = (Trap)traceable;
+					
+					//Ativando a armadilha
+					trap.active(hero);
+					
+					//Encerrando o turno do jogador com uma mensagem de erro
+					throw new TrapsHurtMeException();
+					
+				}
+			}
+		}
+		
+		//Iniciando o jogo/turno
+		public void start() {
+			
+			boolean exit = false;
+			System.out.println("Game started!");
+			
+			//Ciclo do jogo
+			while(!exit) {
+				
+				//Acontecimentos do jogo
+				try {
+				
+					
+				}
+				
+				//Tratamento de excessões que possam surgir
+				catch(TrapsHurtMeException e) {
+					System.out.println(e.getMessage());
+				}
+				catch(YouAreDeadException e) {
+					System.out.println(e.getMessage());
+					exit = true;
+				}
+			}
+			
+			System.out.println("Game termined. Bye!");
+			
+		}
 
 	}

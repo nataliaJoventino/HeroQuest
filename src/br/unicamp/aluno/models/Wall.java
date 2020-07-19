@@ -8,6 +8,12 @@ public class Wall extends Traceable {
 		super(x, y);
 	}
 	
+	//ToString
+	@Override
+	public String toString() {
+		return "#";
+	}
+	
 	
 
 }
