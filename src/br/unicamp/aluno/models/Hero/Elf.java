@@ -17,7 +17,7 @@ public class Elf extends MisticHero {
 	
 	@Override
 	public String toString() {
-		return "E";
+		return "EL";
 	}
 	
 }

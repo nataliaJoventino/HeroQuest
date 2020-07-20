@@ -7,9 +7,7 @@ import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 
 import java.util.ArrayList;
 
-//Oi Sra.Joventino
 public abstract class Hero extends Traceable {
-	//oi andrey
 	private String name;
 	private int quantityOfDices;
 	private int quantityOfAttackDices;
@@ -23,8 +21,8 @@ public abstract class Hero extends Traceable {
 	
 	//Construtor de Heroi
 	public Hero(String name) {
-		//O heroi sempre nasce no (0,0) por enquanto
-		super(0, 0);
+		//O heroi sempre nasce no (18,2) por enquanto
+		super(18, 2);
 		this.name = name;
 		this.backpack = new ArrayList<Item>();
 	}

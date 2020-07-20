@@ -18,7 +18,7 @@ public class Dwarf extends Hero {
 	
 	@Override
 	public String toString() {
-		return "D";
+		return "DW";
 	}
 
 }

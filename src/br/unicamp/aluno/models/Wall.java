@@ -11,7 +11,7 @@ public class Wall extends Traceable {
 	//ToString
 	@Override
 	public String toString() {
-		return "#";
+		return "##";
 	}
 	
 	

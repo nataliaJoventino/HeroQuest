@@ -21,7 +21,7 @@ public class Barbarian extends Hero {
 	
 	@Override
 	public String toString() {
-		return "B";
+		return "BA";
 	}
 	
 }

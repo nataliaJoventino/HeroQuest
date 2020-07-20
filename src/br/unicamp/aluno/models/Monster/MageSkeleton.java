@@ -12,7 +12,7 @@ public class MageSkeleton extends Monster {
 
     @Override
 	public String toString() {
-		return "M";
+		return "MS";
 	}
 
 }

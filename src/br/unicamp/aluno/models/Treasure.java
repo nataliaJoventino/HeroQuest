@@ -21,7 +21,7 @@ public class Treasure extends Traceable {
 	//ToString
 	@Override
 	public String toString() {
-		return "T";
+		return "TS";
 	}
 
 }

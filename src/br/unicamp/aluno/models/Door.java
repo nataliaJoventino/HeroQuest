@@ -30,7 +30,7 @@ public class Door extends Traceable{
 		}
 		//Caso a porta esteja fechada
 		else {
-			return "U";
+			return "UU";
 		}
 	}
 

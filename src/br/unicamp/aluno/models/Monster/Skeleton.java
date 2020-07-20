@@ -11,7 +11,7 @@ public class Skeleton extends Monster {
     
     @Override
 	public String toString() {
-		return "S";
+		return "SK";
 	}
 
 }
