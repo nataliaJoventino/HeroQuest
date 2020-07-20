@@ -6,7 +6,7 @@ import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Trap;
 import br.unicamp.aluno.models.Exceptions.TrapsHurtMeException;
 import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
-import br.unicamp.aluno.models.Hero.Hero;
+import br.unicamp.aluno.models.Character.Hero.Hero;
 
 public class Game {
 

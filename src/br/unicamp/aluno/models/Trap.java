@@ -1,6 +1,6 @@
 package br.unicamp.aluno.models;
 
-import br.unicamp.aluno.models.Hero.Hero;
+import br.unicamp.aluno.models.Character.Hero.Hero;
 
 //Armadilha
 public class Trap extends Traceable {
