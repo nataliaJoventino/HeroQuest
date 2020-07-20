@@ -1,6 +1,6 @@
 package br.unicamp.aluno;
 
-import br.unicamp.aluno.models.Hero.Wizard;
+import br.unicamp.aluno.models.Character.Hero.Wizard;
 
 public class Main {
 

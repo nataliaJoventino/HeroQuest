@@ -13,11 +13,15 @@ public class Dice {
         dice = new Random();
     }
 
-    public int redDice(){ // fazer o uso de dois dados direto aqui na clase ou na de quem vai usar?
+    public int normalDice(){
+        return (dice.nextInt(BOUND_DICE) + 1);
+    }
+
+    public int redDice(){ // lança 2 dados de 6 faces
         int sum = 0;
 
         for (int i = 0; i < MAX_REDDICE; i++)
-            sum += (dice.nextInt(BOUND_DICE) + 1);
+            sum += normalDice();
 
         return sum;
     }

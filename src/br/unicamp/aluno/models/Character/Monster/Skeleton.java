@@ -1,12 +1,12 @@
-package br.unicamp.aluno.models.Monster;
+package br.unicamp.aluno.models.Character.Monster;
 
 import br.unicamp.aluno.models.Item.Weapon;
 
 public class Skeleton extends Monster {
 
     public Skeleton(int x, int y, Weapon weapon) {
-        super(x, y);
-        setWeapon(weapon); // recebe qualquer arma
+        super(x, y, 0,0,0,0); //definir pontos com zero
+        super.storeInBackpack(weapon); // gerar aleatóriamente aqui?
     }
     
     @Override
