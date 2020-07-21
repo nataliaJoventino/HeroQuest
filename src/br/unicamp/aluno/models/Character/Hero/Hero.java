@@ -44,7 +44,9 @@ public abstract class Hero extends Character {
 	//Veste a armadura
 	public void wearArmor(Armor newArmor) {
 		//Armaduras antigas serão destruidas quando trocadas
+		removeBonus(armor);
 		armor = newArmor;
+		addBonus(armor);
 	}
 
 	public void equip(Item item, Hand hand){ // quem chama verifica se o item deve ser segurado com as duas mão quando equipado
@@ -61,7 +63,7 @@ public abstract class Hero extends Character {
 		addBonus(item);
 	}
 
-	protected void addBonus(Item item){
+	private void addBonus(Item item){
 		try{
 			Weapon weapon = (Weapon) item; // converte para tipo weapon e pega bonus de ataque
 			super.addAttackDice(weapon.getAttackBonus());
@@ -75,12 +77,17 @@ public abstract class Hero extends Character {
 		}
 	}
 
-	private void removeAttackBonus(Item item){
+	private void removeBonus(Item item){
 		try{
 			Weapon weapon = (Weapon) item; // converte para tipo weapon e pega bonus de ataque
 			super.removeAttackDice(weapon.getAttackBonus());
 		}catch (ClassCastException e){
-			System.out.println("Item não é uma arma");
+			try{
+				Armor armor = (Armor) item; // converte para tipo armor e pega bonus de defesa
+				super.removeDefenceDice(armor.getDefenseBonus());
+			}catch (ClassCastException m){
+				System.out.println("Item não possui bonus");
+			}
 		}
 	}
 
@@ -104,7 +111,7 @@ public abstract class Hero extends Character {
 			return;
 		}
 
-		if (rightHand == leftHand){ // se item da mão direita for igua a da mão esquerda, é item que usa duas mãos
+		if (rightHand == leftHand){ // se item da mão direita for igual a da mão esquerda, é item que usa duas mãos
 			unequipTheItemFromLeftHand();
 			unequipTheItemFromRightHand();
 		} else if (rightHand != null) //Tirando o item atual da maneira certa primeiro
@@ -122,7 +129,8 @@ public abstract class Hero extends Character {
 			System.out.println("Você não possui esse item!");
 			return;
 		}
-		if (rightHand == leftHand){ // se item da mão direita for igua a da mão esquerda, é item que usa duas mãos
+
+		if (rightHand == leftHand){ // se item da mão direita for igual a da mão esquerda, é item que usa duas mãos
 			unequipTheItemFromLeftHand();
 			unequipTheItemFromRightHand();
 		} else if (leftHand != null) //Tirando o item atual da maneira certa primeiro
@@ -137,7 +145,7 @@ public abstract class Hero extends Character {
 	private void unequipTheItemFromRightHand() {
 		Item item = rightHand;
 		rightHand = null;
-		removeAttackBonus(item);
+		removeBonus(item);
 		storeInBackpack(item);
 	}
 	
@@ -147,7 +155,7 @@ public abstract class Hero extends Character {
 		//Talvez tenha que colocar uns instanceof aqui nath, eu nn lembro e to cansado kkkkkkkk (Mesma coisa no equipar item)
 		Item item = leftHand;
 		leftHand = null; // esvazia mão
-		removeAttackBonus(item);
+		removeBonus(item);
 		storeInBackpack(item);
 	}
 
@@ -160,5 +168,7 @@ public abstract class Hero extends Character {
 
 		return cont;
 	}
+
+//	public void searchTreasure(); // ainda não pensei como vai ser essa busca
 
 }

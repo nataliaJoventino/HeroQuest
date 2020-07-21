@@ -16,7 +16,7 @@ public abstract class Character extends Traceable {
     private int inteligencePoints;
     private ArrayList<Item> backpack;
 
-    public Character(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) { //recebe via contrutor todas a informações
+    public Character(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) { //recebe via contrutor todas as informações
         super(x, y);
         this.quantityOfAttackDices = quantityOfAttackDices;
         this.quantityOfDefenceDices = quantityOfDefenceDices;
@@ -113,7 +113,5 @@ public abstract class Character extends Traceable {
     }
 
     protected abstract int hitDefence(Dice dice); //quanto de lifepoints vai ser defendido de ataque do inimigo dado dados
-
-//    public abstract void searchTreasure(); // ainda não pensei como vai ser essa busca
 
 }

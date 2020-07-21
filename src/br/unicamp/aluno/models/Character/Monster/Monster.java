@@ -15,7 +15,7 @@ public class Monster extends Character {
 	}
 
 	// gera uma direção aleatória
-	private Direction randomDirection() {
+	public Direction randomDirection() {
 		Random randomDirection = new Random();
 
 		switch (randomDirection.nextInt(4)) {
@@ -33,11 +33,11 @@ public class Monster extends Character {
 		return null;
 	}
 
-	//Movimenta aleatoriamente
-	public void move() {
-		Direction dir = randomDirection();
-		move(dir);
-	}
+//	//Movimenta aleatoriamente; Mapa não consegue verificar se tem obstaculos a frente do monstro
+//	public void move() {
+//		Direction dir = randomDirection();
+//		move(dir);
+//	}
 
 	public int hitDefence(Dice dice){
 		int cont = 0;
