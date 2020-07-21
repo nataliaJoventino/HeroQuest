@@ -17,6 +17,6 @@ public class Teleport extends Spell {
 
     @Override
     public void cast(Character character) {
-        character.updatePosition(newPosition.getPositionX(), newPosition.getPositionY());
+        character.move(newPosition);
     }
 }

@@ -3,6 +3,7 @@ package br.unicamp.aluno.models.Character.Monster;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Dice;
 import br.unicamp.aluno.models.Enum.Direction;
+import br.unicamp.aluno.models.Enum.SideDice;
 import br.unicamp.aluno.models.Traceable;
 
 import java.util.Random;
@@ -32,27 +33,20 @@ public class Monster extends Character {
 		return null;
 	}
 
-	//Dada uma direção lança os dados e movimenta
-	private void move(Direction dir) {
-		Traceable dirCoordinate = dir.getTraceable();
-
-		Dice dice = new Dice();
-		int diceNum = dice.redDice();
-
-		int x = getPositionX() + (diceNum * dirCoordinate.getPositionX());
-		int y = getPositionY() + (diceNum * dirCoordinate.getPositionY());
-
-		updatePosition(x, y);
-	}
-
 	//Movimenta aleatoriamente
 	public void move() {
 		Direction dir = randomDirection();
 		move(dir);
 	}
 
-	protected void action() {
-		// Implementação de attack
-		// não entendi muito bem como vai funcionar o ataque e os dados de combate K
+	public int hitDefence(Dice dice){
+		int cont = 0;
+		for (int i = 0; i < getQuantityOfDefenceDices(); i++)
+			if(dice.combatDice() == SideDice.MONSTER_SHIELD){
+				cont++;
+			}
+
+		return cont;
 	}
+
 }

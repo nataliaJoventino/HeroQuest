@@ -1,5 +1,8 @@
 package br.unicamp.aluno.models.Character;
 
+import br.unicamp.aluno.models.Dice;
+import br.unicamp.aluno.models.Enum.Direction;
+import br.unicamp.aluno.models.Enum.SideDice;
 import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Traceable;
@@ -46,6 +49,12 @@ public abstract class Character extends Traceable {
         }
     }
 
+    private void removeLifePoints(int value, Dice dice){ // remove pontos de vida descontando pontos de defesa
+        int totalHit = value - hitDefence(dice); // remove hits de defesa
+        if (totalHit > 0)
+            removeLifePoints(totalHit);
+    }
+
     protected void addAttackDice(int value){ // adiciona x dados de ataque
         this.quantityOfAttackDices += value;
     }
@@ -83,12 +92,28 @@ public abstract class Character extends Traceable {
             System.out.println(""+ i +" "+backpack.get(i).toString()); // item deve ter nome?
     }
 
-    protected abstract void move(); // personagem deve implementar sua movimentação
-    protected abstract void action(); // personagem deve implementar sua ação
+    public void move(Traceable traceable){ //recebe nova direção e altera (para o teleporte)
+        super.updatePosition(traceable.getPositionX(), traceable.getPositionY());
+    }
 
+    public void move(Direction direction) { // anda uma posição dada a direção
+        int x = super.getPositionX() + direction.getTraceable().getPositionX(); // coordenada x
+        int y = super.getPositionY() + direction.getTraceable().getPositionY(); // cooredenada y
 
+        super.updatePosition(x,y);
+    }
 
+    public void hit(Character character, Dice dice){ //quanto de lifepoints vai ser tirado do inimigo dado dados (1 caveira = 1 hit)
+        int cont = 0;
+        for (int i = 0; i < quantityOfAttackDices; i++) // looping para quantidade de dados para ataque
+            if(dice.combatDice() == SideDice.SKULL){
+                cont++;
+            }
+        character.removeLifePoints(cont, dice); // remove life points
+    }
 
+    protected abstract int hitDefence(Dice dice); //quanto de lifepoints vai ser defendido de ataque do inimigo dado dados
 
+//    public abstract void searchTreasure(); // ainda não pensei como vai ser essa busca
 
 }

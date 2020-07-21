@@ -1,10 +1,14 @@
 package br.unicamp.aluno.models.Character.Hero;
 
 import br.unicamp.aluno.models.Character.Character;
+import br.unicamp.aluno.models.Dice;
+import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
+import br.unicamp.aluno.models.Enum.SideDice;
 import br.unicamp.aluno.models.Item.Armor;
 import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Item.Weapon;
+import br.unicamp.aluno.models.Traceable;
 
 public abstract class Hero extends Character {
 	private String name;
@@ -43,7 +47,7 @@ public abstract class Hero extends Character {
 		armor = newArmor;
 	}
 
-	public void equip(Item item, Hand hand){ // quem cham verifica se o item deve ser segurado com as duas mão quando equipado
+	public void equip(Item item, Hand hand){ // quem chama verifica se o item deve ser segurado com as duas mão quando equipado
 		if (hand == Hand.LEFT)
 			holdWithLeftHand(item);
 		else if (hand == Hand.RIGHT)
@@ -147,13 +151,14 @@ public abstract class Hero extends Character {
 		storeInBackpack(item);
 	}
 
-	@Override
-	protected void move() {
+	public int hitDefence(Dice dice){ //quanto vai dfender de ataque do inimigo
+		int cont = 0;
+		for (int i = 0; i < getQuantityOfDefenceDices(); i++)
+			if(dice.combatDice() == SideDice.HERO_SHIELD){
+				cont++;
+			}
 
+		return cont;
 	}
 
-	@Override
-	protected void action() {
-
-	}
 }

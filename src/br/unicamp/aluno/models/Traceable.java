@@ -22,7 +22,7 @@ public class Traceable {
 	}
 
 	//Alterando a posição do traceable
-	public void updatePosition(int x, int y){
+	protected void updatePosition(int x, int y){
 		this.positionX = x;
 		this.positionY = y;
 	}

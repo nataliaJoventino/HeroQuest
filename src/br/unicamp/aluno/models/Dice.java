@@ -26,19 +26,19 @@ public class Dice {
         return sum;
     }
 
-    public String combatDice(){ //retornar uma lista com os resultados a a partir da quantidade de estatistica recebido por parametro ou deixar para a classe que vai usar fazer isso?
-        String diceResult = "";
+    public SideDice combatDice(){ //retornar uma lista com os resultados a a partir da quantidade de estatistica recebido por parametro ou deixar para a classe que vai usar fazer isso?
+        SideDice diceResult;
         int diceNumber = dice.nextInt(BOUND_DICE) + 1;
 
 
         if (diceNumber >= 1 && diceNumber <= 3)
-            diceResult = SideDice.SKULL.toString();
+            diceResult = SideDice.SKULL;
 
         else if (diceNumber >= 4 && diceNumber <= 5)
-            diceResult = SideDice.HERO_SHIELD.toString();
+            diceResult = SideDice.HERO_SHIELD;
 
         else
-            diceResult = SideDice.MONSTER_SHIELD.toString();
+            diceResult = SideDice.MONSTER_SHIELD;
 
         return diceResult;
     }
