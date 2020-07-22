@@ -230,7 +230,7 @@ public class Game {
 	}
 
 	// Printa todo conteúdo do mapa
-	public void printMap() {
+	public void printAllMap() {
 
 		for (int i = 0; i < this.xMapSize; i++) {
 			for (int j = 0; j < this.yMapSize; j++) {
@@ -239,6 +239,48 @@ public class Game {
 			System.out.println("");
 		}
 	}
+	
+	// Printa todo conteúdo do mapa que é visível ao player
+		public void printMap() {
+			int heroX = hero.getPositionX();
+			int heroY = hero.getPositionY();
+			
+			//Variáveis que irão verificar até onde nosso personagem consegue ver
+			int yVision = heroY; 
+			int xVision = heroX;
+			
+			//Para a visão efetuaremos uma dupla checagem
+			//Primeiro será checado começando pelo eixo X e depois seguiremos para o Y
+			//A segunda checagem será inversa, começando pelo Y e terminando pelo X, pois teremos diferença
+			//Isso está melhor desenhado e explicadp no nosso relatório
+			
+			//Buscando o canto superior esquerdo -------------------------
+			
+			//Verificando o máximo que conseguimos ver acima do personagem
+			while(map[heroX][yVision].equals("--") || map[heroX][yVision].equals(">>")) {
+				yVision--;
+			}
+			//Verificando no maximoY qual seria o menor X visível
+			while(map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+				xVision--;
+			}
+			
+			//Guardando a coordenada X do canto superior esquerdo
+			int topLeftCornerX = xVision; 
+			//Guardando a coordenada Y do canto superior esquerdo
+			int topLeftCornerY = yVision;
+			
+			//Buscando o canto superior direito -------------------------
+			
+			
+			for (int i = 0; i < this.xMapSize; i++) {
+				for (int j = 0; j < this.yMapSize; j++) {
+					System.out.print(this.map[i][j]);
+				}
+				System.out.println("");
+			}
+		}
+	
 
 	// Verifica se o heroi pisou em alguma armadilha e retira vida dele
 	private void amIOnSomeTrap() {
@@ -359,9 +401,22 @@ public class Game {
 			}
 			//Fluxo normal
 			catch(ClassCastException e){
-				int newX = traceable.getPositionX();
-				int newY = traceable.getPositionY();
-				map[newX][newY] = traceable.toString();
+				try {
+					Treasure treasure = (Treasure)traceable;
+					if(treasure.isVisible()) {
+						int x = treasure.getPositionX();
+						int y = treasure.getPositionY();
+						map[x][y] = traceable.toString();
+					}
+					else {
+						//Mantendo o tesouro escondido
+						continue;
+					}
+				}catch(ClassCastException ex) {
+					int newX = traceable.getPositionX();
+					int newY = traceable.getPositionY();
+					map[newX][newY] = traceable.toString();					
+				}
 			}
 			
 		}
