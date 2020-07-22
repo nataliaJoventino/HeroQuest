@@ -10,17 +10,38 @@ import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Item.Weapon;
 import br.unicamp.aluno.models.Traceable;
 
+import java.util.ArrayList;
+
 public abstract class Hero extends Character {
 	private String name;
 	private Item rightHand;
 	private Item leftHand;
 	private Item armor;
+	private ArrayList<Item> backpack;
 	
 	//Construtor de Heroi
 	public Hero(String name, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
 		//O heroi sempre nasce no (18,2) por enquanto
 		super(18, 2, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
 		this.name = name;
+		this.backpack = new ArrayList();
+	}
+
+	protected void storeInBackpack(Item item){ //Colocar item na mochila
+		backpack.add(item);
+	}
+
+	protected void removeFromBackpack(Item item){ //remove item da mochila
+		backpack.remove(item);
+	}
+
+	protected boolean isInBackpack(Item item){  //verifica se item existe na mochila
+		return backpack.contains(item);
+	}
+
+	public void printBackpack(){ // printa itens da mochila na tela com seu index
+		for (int i = 0; i < backpack.size(); i++)
+			System.out.println(""+ i +" "+backpack.get(i).toString()); // item deve ter nome?
 	}
 
 	//Obter nome
@@ -55,12 +76,12 @@ public abstract class Hero extends Character {
 		else if (hand == Hand.RIGHT)
 			holdWithRightHand(item);
 
-		addBonus(item);
+//		addBonus(item);
 	}
 
 	public void equip(Item item){ // equipa o item escolhido
 		holdItem(item);
-		addBonus(item);
+//		addBonus(item);
 	}
 
 	private void addBonus(Item item){
@@ -145,7 +166,7 @@ public abstract class Hero extends Character {
 	private void unequipTheItemFromRightHand() {
 		Item item = rightHand;
 		rightHand = null;
-		removeBonus(item);
+//		removeBonus(item);
 		storeInBackpack(item);
 	}
 	
@@ -155,8 +176,29 @@ public abstract class Hero extends Character {
 		//Talvez tenha que colocar uns instanceof aqui nath, eu nn lembro e to cansado kkkkkkkk (Mesma coisa no equipar item)
 		Item item = leftHand;
 		leftHand = null; // esvazia mão
-		removeBonus(item);
+//		removeBonus(item);
 		storeInBackpack(item);
+	}
+
+	public void hit(Character character, Dice dice){ //quanto de lifepoints vai ser tirado do inimigo dado dados (1 caveira = 1 hit)
+		int cont = 0;
+		addBonus(leftHand); // para quando item ocupa duas mãos
+		super.hit(character, dice);
+		removeBonus(leftHand);
+	}
+
+	public void hit(Character character, Dice dice, Hand hand){ //quanto de lifepoints vai ser tirado do inimigo dado dados (1 caveira = 1 hit)
+		Item item = null;
+		int cont = 0;
+
+		if (hand == Hand.LEFT)
+			item = leftHand;
+		else if (hand == Hand.RIGHT)
+			item =  rightHand;
+
+		addBonus(item);
+		super.hit(character, dice);
+		removeBonus(item);
 	}
 
 	public int hitDefence(Dice dice){ //quanto vai dfender de ataque do inimigo
@@ -167,6 +209,46 @@ public abstract class Hero extends Character {
 			}
 
 		return cont;
+	}
+
+	private Weapon isWeapon(Item item){
+		try{
+			Weapon weapon = (Weapon) item; // converte para tipo weapon e pega bonus de ataque
+			return weapon;
+		}catch (ClassCastException e){
+			return  null;
+		}
+	}
+
+	@Override
+	public boolean isOnSight(Character character) { // para arma que ocupa duas mãos
+		int x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * isWeapon(leftHand).getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
+		int y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * isWeapon(leftHand).getWeaponReach());
+
+		if (character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) //verifica se personagem esta a frente de monstro ou no alcance da arma em x
+			if (character.getPositionY() > this.getPositionY() && character.getPositionY() <= y)
+				return  true;
+
+		return false;
+	}
+	
+	public boolean isOnSight(Character character, Hand hand) {
+		Weapon weapon;
+		int x, y;
+
+		if (hand == Hand.LEFT)
+			weapon = isWeapon(leftHand);
+		else
+			weapon = isWeapon(rightHand);
+
+		x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
+		y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * weapon.getWeaponReach());
+
+		if (character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) //verifica se personagem esta a frente de monstro ou no alcance da arma em x
+			if (character.getPositionY() > this.getPositionY() && character.getPositionY() <= y)
+				return  true;
+
+		return false;
 	}
 
 //	public void searchTreasure(); // ainda não pensei como vai ser essa busca

@@ -1,14 +1,17 @@
 package br.unicamp.aluno.models.Character.Monster;
 
 import br.unicamp.aluno.models.Character.Character;
+import br.unicamp.aluno.models.Character.Hero.Hero;
 import br.unicamp.aluno.models.Dice;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.SideDice;
 import br.unicamp.aluno.models.Traceable;
 
+import java.util.ArrayList;
 import java.util.Random;
 
-public class Monster extends Character {
+public abstract class Monster extends Character {
+	private ArrayList<Traceable> adjacent;
 
 	public Monster(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
 		super(x, y, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
@@ -33,12 +36,6 @@ public class Monster extends Character {
 		return null;
 	}
 
-//	//Movimenta aleatoriamente; Mapa não consegue verificar se tem obstaculos a frente do monstro
-//	public void move() {
-//		Direction dir = randomDirection();
-//		move(dir);
-//	}
-
 	public int hitDefence(Dice dice){
 		int cont = 0;
 		for (int i = 0; i < getQuantityOfDefenceDices(); i++)
@@ -48,5 +45,30 @@ public class Monster extends Character {
 
 		return cont;
 	}
+
+	private void listAdjacent(Character character){ // gera lista com todas as adjacencias
+		setAdjacent(character, Direction.UP);
+		setAdjacent(character, Direction.DOWN);
+		setAdjacent(character, Direction.RIGHT);
+		setAdjacent(character, Direction.LEFT);
+	}
+
+	private void setAdjacent(Character character, Direction direction){ // pega adjacencias de personagem
+		int x = character.getPositionX() + direction.getTraceable().getPositionX(); // soma direção com posição atual da personagem para pegar adjacente
+		int y = character.getPositionY() + direction.getTraceable().getPositionY();
+		Traceable traceable = new Traceable(x,y);
+		adjacent.add(traceable);
+	}
+
+	public boolean isHeroAround(Hero hero){ // verifica se heroi está nas adjacencias
+		listAdjacent(this);
+
+		for (Traceable traceable : adjacent){
+			if (hero.getPositionX() == traceable.getPositionX() && hero.getPositionY() == traceable.getPositionY())
+				return true;
+		}
+		return false;
+	} // é necessario se tem isOnSight?
+
 
 }

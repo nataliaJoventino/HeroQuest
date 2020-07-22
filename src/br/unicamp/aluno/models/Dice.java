@@ -26,7 +26,7 @@ public class Dice {
         return sum;
     }
 
-    public SideDice combatDice(){ //retornar uma lista com os resultados a a partir da quantidade de estatistica recebido por parametro ou deixar para a classe que vai usar fazer isso?
+    public SideDice combatDice(){ //retornar uma lista com os resultados a partir da quantidade de estatistica recebido por parametro ou deixar para a classe que vai usar fazer isso?
         SideDice diceResult;
         int diceNumber = dice.nextInt(BOUND_DICE) + 1;
 

@@ -14,7 +14,7 @@ public abstract class Character extends Traceable {
     private int quantityOfDefenceDices;
     private int lifePoints;
     private int inteligencePoints;
-    private ArrayList<Item> backpack;
+    private Direction currentDirection;
 
     public Character(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) { //recebe via contrutor todas as informações
         super(x, y);
@@ -22,21 +22,9 @@ public abstract class Character extends Traceable {
         this.quantityOfDefenceDices = quantityOfDefenceDices;
         this.lifePoints = lifePoints;
         this.inteligencePoints = inteligencePoints;
-        this.backpack = new ArrayList();
+
     }
 
-
-    protected void storeInBackpack(Item item){ //Colocar item na mochila
-        backpack.add(item);
-    }
-
-    protected void removeFromBackpack(Item item){ //remove item da mochila
-        backpack.remove(item);
-    }
-
-    protected boolean isInBackpack(Item item){  //verifica se item existe na mochila
-        return backpack.contains(item);
-    }
 
     public void addLifePoints(int value){ // adiciona quantidade vida ao personagem
         this.lifePoints += value; // value deve ser sempre positiva, fazer exceção?
@@ -49,7 +37,7 @@ public abstract class Character extends Traceable {
         }
     }
 
-    private void removeLifePoints(int value, Dice dice){ // remove pontos de vida descontando pontos de defesa
+    public void removeLifePoints(int value, Dice dice){ // remove pontos de vida descontando pontos de defesa
         int totalHit = value - hitDefence(dice); // remove hits de defesa
         if (totalHit > 0)
             removeLifePoints(totalHit);
@@ -87,9 +75,12 @@ public abstract class Character extends Traceable {
         return inteligencePoints;
     }
 
-    public void printBackpack(){ // printa itens da mochila na tela com seu index
-        for (int i = 0; i < backpack.size(); i++)
-            System.out.println(""+ i +" "+backpack.get(i).toString()); // item deve ter nome?
+    public Direction getCurrentDirection() {
+        return currentDirection;
+    }
+
+    public void setCurrentDirection(Direction currentDirection) {
+        this.currentDirection = currentDirection;
     }
 
     public void move(Traceable traceable){ //recebe nova direção e altera (para o teleporte)
@@ -113,5 +104,6 @@ public abstract class Character extends Traceable {
     }
 
     protected abstract int hitDefence(Dice dice); //quanto de lifepoints vai ser defendido de ataque do inimigo dado dados
+    public abstract boolean isOnSight(Character character);// verifica se personagem está em alcance da arma
 
 }
