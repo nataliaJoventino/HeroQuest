@@ -29,13 +29,6 @@ public class Trap extends Traceable {
 	//ToString
 	@Override
 	public String toString() {
-		//Caso estiver visível
-		if(isVisible()) {
 			return "§§";			
-		}
-		//Caso ainda não tenha sido detectada
-		else {
-			return "--";
-		}
 	}
 }
