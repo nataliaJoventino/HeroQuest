@@ -1,5 +1,6 @@
 package br.unicamp.aluno.models.Item;
 
+import br.unicamp.aluno.Game;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Traceable;
@@ -9,11 +10,13 @@ import java.util.ArrayList;
 public class Fireball extends Spell{
     private final int DAMAGE_TARGET = 6;
     private final int DAMAGE_ADJACENT = 3;
-    ArrayList<Traceable> adjacent;
+    private ArrayList<Traceable> adjacent;
+    private Game map;
 
 
-    public Fireball(String name) { // vai precisar receber o mapa para encontrar adjacentes
+    public Fireball(String name, Game map) { // vai precisar receber o mapa para encontrar adjacentes
         super(name, true);
+        this.map = map;
     }
 
     @Override
@@ -21,7 +24,7 @@ public class Fireball extends Spell{
         character.removeLifePoints(DAMAGE_TARGET);
         listAdjacent(character);
 
-        // precisa receber o mapa para ver causar danos na adjacencias, precisa de petodo em mapa que retorne objeto dada posição, caso seja item;
+        // precisa receber o mapa para causar danos na adjacencias, precisa de metodo em mapa que retorne objeto dada posição, caso seja item;
 
     }
 

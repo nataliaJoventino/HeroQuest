@@ -88,7 +88,7 @@ public class Game {
 			}
 
 			// inserindo os esqueletos magos
-			MageSkeleton mageSkeleton = new MageSkeleton(randomX, randomY);
+			MageSkeleton mageSkeleton = new MageSkeleton(randomX, randomY, 0); // gerar numero aleatório de punhais
 			monstersOnMap.add(mageSkeleton);
 		}
 
