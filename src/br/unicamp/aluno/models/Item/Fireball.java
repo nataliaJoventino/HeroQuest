@@ -16,8 +16,8 @@ public class Fireball extends Spell{
     private Game map;
 
 
-    public Fireball(String name, Game map) { // vai precisar receber o mapa para encontrar adjacentes
-        super(name, true);
+    public Fireball(Game map) { // vai precisar receber o mapa para encontrar adjacentes
+        super(true);
         this.map = map;
     }
 
@@ -48,5 +48,10 @@ public class Fireball extends Spell{
         int y = character.getPositionY() + direction.getTraceable().getPositionY();
         Traceable traceable = new Traceable(x,y);
         adjacent.add(traceable);
+    }
+    
+    @Override
+    public String toString() {
+    	return "Fire Ball";
     }
 }

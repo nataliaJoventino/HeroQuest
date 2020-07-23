@@ -6,8 +6,8 @@ import br.unicamp.aluno.models.Traceable;
 public class Teleport extends Spell {
     private Traceable newPosition;
 
-    public Teleport(String name) {
-        super(name, false);
+    public Teleport() {
+        super(false);
         newPosition = new Traceable(0,0);
     }
 
@@ -18,5 +18,10 @@ public class Teleport extends Spell {
     @Override
     public void cast(Character character) {
         character.move(newPosition);
+    }
+    
+    @Override
+    public String toString() {
+    	return "Teleport";
     }
 }

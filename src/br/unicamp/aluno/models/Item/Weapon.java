@@ -1,13 +1,12 @@
 package br.unicamp.aluno.models.Item;
 
-public abstract class Weapon extends Item {
+public abstract class Weapon implements Item {
 	private boolean isDestroyed;
 	private boolean bothHands;
 	private int weaponReach;
 	private int attackBonus;
 
-	public Weapon(String name, boolean isDestroyed, boolean bothHands, int weaponReach, int attackBonus) {
-		super(name);
+	public Weapon(boolean isDestroyed, boolean bothHands, int weaponReach, int attackBonus) {
 		this.isDestroyed = isDestroyed;
 		this.bothHands = bothHands;
 		this.weaponReach = weaponReach;

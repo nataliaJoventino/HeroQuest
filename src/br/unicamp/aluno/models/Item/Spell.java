@@ -3,11 +3,10 @@ package br.unicamp.aluno.models.Item;
 import br.unicamp.aluno.models.Character.Character;
 
 //Classe mãe dos feitiços
-public abstract class Spell extends Item {
+public abstract class Spell implements Item {
 	private boolean isDestroyed;
 
-	public Spell(String name, boolean isDestroyed) {
-		super(name);
+	public Spell(boolean isDestroyed) {
 		this.isDestroyed = isDestroyed;
 	}
 	

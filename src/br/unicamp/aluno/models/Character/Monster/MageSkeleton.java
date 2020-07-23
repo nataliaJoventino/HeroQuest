@@ -14,7 +14,7 @@ public class MageSkeleton extends Monster {
     private Spell spell;
     public MageSkeleton(int x, int y, int numDagger) {
         super(x, y, 2,2,4,2); //definir pontos com zero
-        MagicMissile magicMissile = new MagicMissile("Stander Magic Missile");
+        MagicMissile magicMissile = new MagicMissile();
         spell = magicMissile;
         daggers = new ArrayList();
         for (int i = 0; i < numDagger; i++)
