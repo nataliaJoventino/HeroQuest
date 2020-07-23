@@ -52,6 +52,10 @@ public abstract class Hero extends Character {
 		return backpack.contains(item);
 	}
 
+	public Item getInBackpack(int index){ //Colocar item na mochila
+		return backpack.get(index);
+	}
+
 	public void printBackpack(){ // printa itens da mochila na tela com seu index
 		for (int i = 0; i < backpack.size(); i++)
 			System.out.println(""+ i +" "+backpack.get(i).toString()); // item deve ter nome?

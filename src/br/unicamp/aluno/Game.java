@@ -186,6 +186,10 @@ public class Game {
 		return monstersOnMap;
 	}
 
+	public Hero getHero() {
+		return hero;
+	}
+
 	// Adiciona localizaveis no nosso mapa
 	public void addTreaceables(Traceable traceable) {
 		// Obtendo a localização do localizavel
