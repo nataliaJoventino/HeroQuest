@@ -25,7 +25,7 @@ public abstract class Hero extends Character {
 	//Construtor de Heroi
 	public Hero(String name, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
 		//O heroi sempre nasce no (18,2) por enquanto
-		super(18, 2, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
+		super(8, 18, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
 		this.name = name;
 		this.backpack = new ArrayList();
 		firstSquareVision = new SquareVision();

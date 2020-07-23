@@ -10,6 +10,8 @@ public class Main {
 		
 		Game game = new Game(hero, 21, 23);
 		
+		game.printAllMap();
+		System.out.println("");
 		game.printMap();
 
 	}

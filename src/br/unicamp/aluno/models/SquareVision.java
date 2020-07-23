@@ -19,36 +19,44 @@ public class SquareVision {
 	// Canto inferior direito
 	private Point bottomRightCorner;
 
+	// Centro superior do eixo X
+	private Point topCenter;
+
+	// Centro inferior do eixo X
+	private Point bottomCenter;
+
 	// Quadrado em si - A nossa cruz mencionada no relatório
 	private Point lowerX;
 	private Point greaterX;
 	private Point lowerY;
 	private Point greaterY;
 
-	//Construtor
+	// Construtor
 	public SquareVision() {
-		//Instanciando os pontos
-		topLeftCorner = new Point(0,0);
-		topRightCorner = new Point(0,0);
-		middleLeftCorner = new Point(0,0);
-		middleRightCorner = new Point(0,0);
-		bottomLeftCorner = new Point(0,0);
-		bottomRightCorner = new Point(0,0);
-		
-		lowerX = new Point(0,0);
-		lowerY = new Point(0,0);
-		greaterX = new Point(0,0);
-		greaterY = new Point(0,0);
+		// Instanciando os pontos
+		topLeftCorner = new Point(0, 0);
+		topRightCorner = new Point(0, 0);
+		middleLeftCorner = new Point(0, 0);
+		middleRightCorner = new Point(0, 0);
+		bottomLeftCorner = new Point(0, 0);
+		bottomRightCorner = new Point(0, 0);
+		topCenter = new Point(0, 0);
+		bottomCenter = new Point(0, 0);
+
+		lowerX = new Point(0, 0);
+		lowerY = new Point(0, 0);
+		greaterX = new Point(0, 0);
+		greaterY = new Point(0, 0);
 	}
-	
+
 	// Obtendo o nosso menor X
 	public Point getLowerX() {
 
-		if (bottomLeftCorner.getPositionX() <= middleLeftCorner.getPositionX()
-				&& bottomLeftCorner.getPositionX() <= topLeftCorner.getPositionX()) {
+		if (bottomLeftCorner.getPositionX() >= middleLeftCorner.getPositionX()
+				&& bottomLeftCorner.getPositionX() >= topLeftCorner.getPositionX()) {
 			lowerX = bottomLeftCorner;
-		} else if (middleLeftCorner.getPositionX() <= bottomLeftCorner.getPositionX()
-				&& middleLeftCorner.getPositionX() <= topLeftCorner.getPositionX()) {
+		} else if (middleLeftCorner.getPositionX() >= bottomLeftCorner.getPositionX()
+				&& middleLeftCorner.getPositionX() >= topLeftCorner.getPositionX()) {
 			lowerX = middleLeftCorner;
 		} else {
 			lowerX = topLeftCorner;
@@ -60,14 +68,14 @@ public class SquareVision {
 	// Obtendo o maior X
 	public Point getGreaterX() {
 
-		if (bottomLeftCorner.getPositionX() >= middleLeftCorner.getPositionX()
-				&& bottomLeftCorner.getPositionX() >= topLeftCorner.getPositionX()) {
-			greaterX = bottomLeftCorner;
-		} else if (middleLeftCorner.getPositionX() >= bottomLeftCorner.getPositionX()
-				&& middleLeftCorner.getPositionX() >= topLeftCorner.getPositionX()) {
-			greaterX = middleLeftCorner;
+		if (bottomRightCorner.getPositionX() <= middleRightCorner.getPositionX()
+				&& bottomRightCorner.getPositionX() <= topRightCorner.getPositionX()) {
+			greaterX = bottomRightCorner;
+		} else if (middleRightCorner.getPositionX() <= bottomRightCorner.getPositionX()
+				&& middleRightCorner.getPositionX() <= topRightCorner.getPositionX()) {
+			greaterX = middleRightCorner;
 		} else {
-			greaterX = topLeftCorner;
+			greaterX = topRightCorner;
 		}
 
 		return this.greaterX;
@@ -75,82 +83,65 @@ public class SquareVision {
 
 	// Obtendo o menor Y
 	public Point getLowerY() {
-		if (bottomLeftCorner.getPositionY() <= middleLeftCorner.getPositionY()
-				&& bottomLeftCorner.getPositionY() <= topLeftCorner.getPositionY()) {
+		if (bottomLeftCorner.getPositionY() <= bottomCenter.getPositionY()
+				&& bottomLeftCorner.getPositionY() <= bottomRightCorner.getPositionY()) {
 			lowerY = bottomLeftCorner;
-		} else if (middleLeftCorner.getPositionY() <= bottomLeftCorner.getPositionY()
-				&& middleLeftCorner.getPositionY() <= topLeftCorner.getPositionY()) {
-			lowerY = middleLeftCorner;
+		} else if (bottomCenter.getPositionY() <= bottomLeftCorner.getPositionY()
+				&& bottomCenter.getPositionY() <= bottomRightCorner.getPositionY()) {
+			lowerY = bottomCenter;
 		} else {
-			lowerY = topLeftCorner;
+			lowerY = bottomRightCorner;
 		}
 
 		return this.lowerY;
 	}
-	
-	// Obtendo o menor Y
-		public Point getGreaterY() {
-			if (bottomLeftCorner.getPositionY() >= middleLeftCorner.getPositionY()
-					&& bottomLeftCorner.getPositionY() >= topLeftCorner.getPositionY()) {
-				greaterY = bottomLeftCorner;
-			} else if (middleLeftCorner.getPositionY() >= bottomLeftCorner.getPositionY()
-					&& middleLeftCorner.getPositionY() >= topLeftCorner.getPositionY()) {
-				greaterY = middleLeftCorner;
-			} else {
-				greaterY = topLeftCorner;
-			}
 
-			return this.greaterY;
+	// Obtendo o maior Y
+	public Point getGreaterY() {
+		if (topLeftCorner.getPositionY() >= topCenter.getPositionY()
+				&& topLeftCorner.getPositionY() >= topRightCorner.getPositionY()) {
+			greaterY = topLeftCorner;
+		} else if (topCenter.getPositionY() >= topLeftCorner.getPositionY()
+				&& topCenter.getPositionY() >= topRightCorner.getPositionY()) {
+			greaterY = topCenter;
+		} else {
+			greaterY = topRightCorner;
 		}
-	
-	
 
-	public Point getTopLeftCorner() {
-		return topLeftCorner;
+		return this.greaterY;
 	}
 
+	public void setTopCenter(int x, int y) {
+		topCenter.updatePosition(x, y);
+	}
+	
+	public void setBottomCenter(int x, int y) {
+		bottomCenter.updatePosition(x, y);
+	}
+	
 	public void setTopLeftCorner(int x, int y) {
 		topLeftCorner.updatePosition(x, y);
-	}
-
-	public Point getBottomLeftCorner() {
-		return bottomLeftCorner;
 	}
 
 	public void setBottomLeftCorner(int x, int y) {
 		bottomLeftCorner.updatePosition(x, y);
 	}
 
-	public Point getTopRightCorner() {
-		return topRightCorner;
-	}
-
 	public void setTopRightCorner(int x, int y) {
 		topRightCorner.updatePosition(x, y);
-	}
-
-	public Point getBottomRightCorner() {
-		return bottomRightCorner;
 	}
 
 	public void setBottomRightCorner(int x, int y) {
 		bottomRightCorner.updatePosition(x, y);
 	}
 
-	public Point getMiddleLeftCorner() {
-		return middleLeftCorner;
-	}
-
 	public void setMiddleLeftCorner(int x, int y) {
 		middleLeftCorner.updatePosition(x, y);
-	}
-
-	public Point getMiddleRightCorner() {
-		return middleRightCorner;
 	}
 
 	public void setMiddleRightCorner(int x, int y) {
 		middleRightCorner.updatePosition(x, y);
 	}
+
 
 }

@@ -32,10 +32,10 @@ public class Game {
 	private Hero hero;
 
 	// Construtor do Jogo
-	public Game(Hero player, int xSize, int ySize) {
+	public Game(Hero player, int ySize, int xSize) {
 
 		// guardando o tamanho do mapa
-		this.map = new String[xSize][ySize];
+		this.map = new String[ySize][xSize];
 		this.xMapSize = xSize;
 		this.yMapSize = ySize;
 		this.hero = player;
@@ -64,14 +64,14 @@ public class Game {
 
 			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
 			// número aleatório
-			while (!map[randomX][randomY].equals("--") && !map[randomX][randomY].equals(">>")) {
+			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
 				randomX = generator.nextInt(xSize);
 				randomY = generator.nextInt(ySize);
 			}
 
 			// inserindo os goblins
-			//Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
-			//monstersOnMap.add(goblin);
+			// Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
+			// monstersOnMap.add(goblin);
 		}
 
 		// Adicionando 2 esqueletos magos no mapa
@@ -83,7 +83,7 @@ public class Game {
 
 			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
 			// número aleatório
-			while (!map[randomX][randomY].equals("--") && !map[randomX][randomY].equals(">>")) {
+			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
 				randomX = generator.nextInt(xSize);
 				randomY = generator.nextInt(ySize);
 			}
@@ -102,14 +102,14 @@ public class Game {
 
 			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
 			// número aleatório
-			while (!map[randomX][randomY].equals("--") && !map[randomX][randomY].equals(">>")) {
+			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
 				randomX = generator.nextInt(xSize);
 				randomY = generator.nextInt(ySize);
 			}
 
 			// inserindo os esqueletos
-			Skeleton Skeleton = new Skeleton(randomX, randomY, null);
-			monstersOnMap.add(Skeleton);
+			Skeleton skeleton = new Skeleton(randomX, randomY, null);
+			monstersOnMap.add(skeleton);
 		}
 
 		// ---------------------------------
@@ -124,7 +124,7 @@ public class Game {
 
 			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
 			// número aleatório
-			while (!map[randomX][randomY].equals(">>") && !map[randomX][randomY].equals("--")) {
+			while (!map[randomY][randomX].equals(">>") && !map[randomY][randomX].equals("--")) {
 				randomX = generator.nextInt(xSize);
 				randomY = generator.nextInt(ySize);
 			}
@@ -142,7 +142,7 @@ public class Game {
 
 			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
 			// número aleatório
-			while (!map[randomX][randomY].equals("--") && !map[randomX][randomY].equals(">>")) {
+			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
 				randomX = generator.nextInt(xSize);
 				randomY = generator.nextInt(ySize);
 			}
@@ -168,7 +168,7 @@ public class Game {
 							&& !map[i + 1][j].equals("##") && !map[i - 1][j].equals("##")) {
 
 						// Adicionando a porta no mapa
-						traceablesOnMap.add(new Door(i, j));
+						traceablesOnMap.add(new Door(j, i));
 					}
 				}
 				// Caso a coluna j-1 ou j+1 esteja fora da nossa tabela
@@ -243,8 +243,8 @@ public class Game {
 	// Printa todo conteúdo do mapa
 	public void printAllMap() {
 
-		for (int i = 0; i < this.xMapSize; i++) {
-			for (int j = 0; j < this.yMapSize; j++) {
+		for (int i = 0; i < this.yMapSize; i++) {
+			for (int j = 0; j < this.xMapSize; j++) {
 				System.out.print(this.map[i][j]);
 			}
 			System.out.println("");
@@ -269,11 +269,13 @@ public class Game {
 		// Buscando o canto superior esquerdo -------------------------
 
 		// Verificando o máximo que conseguimos ver acima do personagem
-		while (map[heroX][yVision].equals("--") || map[heroX][yVision].equals(">>")) {
+		while (map[yVision][heroX].equals("--") || map[yVision][heroX].equals(">>")
+				|| map[yVision][heroX].equals(hero.toString())) {
 			yVision--;
 		}
 		// Verificando no maximoY qual seria o menor X visível
-		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+		while (map[yVision + 1][xVision].equals("--") || map[yVision + 1][xVision].equals(">>")
+				|| map[yVision + 1][xVision].equals(hero.toString())) {
 			xVision--;
 		}
 
@@ -282,141 +284,266 @@ public class Game {
 
 		// Buscando o canto superior direito -------------------------
 
-		// Verificando no maximoY qual seria o maior X visível
-		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Verificando o máximo que conseguimos ver acima do personagem
+		while (map[yVision][heroX].equals("--") || map[yVision][heroX].equals(">>")
+				|| map[yVision][heroX].equals(hero.toString())) {
+			yVision--;
+		}
+
+		// Verificando no maximoY qual seria o menor X visível
+		while (map[yVision + 1][xVision].equals("--") || map[yVision + 1][xVision].equals(">>")
+				|| map[yVision + 1][xVision].equals(hero.toString())) {
 			xVision++;
 		}
 
 		// Guardando o ponto superior direito
 		firstSquare.setTopRightCorner(xVision, yVision);
 
-		// Buscando o maximo central da direita -------------------------
-		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o maximo central do eixo X -------------------------
+		while (map[heroY][xVision].equals("--") || map[heroY][xVision].equals(">>")
+				|| map[heroY][xVision].equals(hero.toString())) {
 			xVision++;
 		}
 
 		// Guardando o ponto maximo central da direita
 		firstSquare.setMiddleRightCorner(xVision, heroY);
 
-		// Buscando o maximo central do eixo x ------------------------
-		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o máximo central -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
+			yVision--;
+		}
+
+		// Guardando o ponto maximo central
+		firstSquare.setTopCenter(heroX, yVision);
+
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o minimo central -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
+			yVision++;
+		}
+
+		// Guardando o ponto maximo central
+		firstSquare.setBottomCenter(heroX, yVision);
+
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o minimo central do eixo X -------------------------
+		while (map[heroY][xVision].equals("--") || map[heroY][xVision].equals(">>")
+				|| map[heroY][xVision].equals(hero.toString())) {
 			xVision--;
 		}
 
 		// Guardando o ponto minimo central do eixo X
 		firstSquare.setMiddleLeftCorner(xVision, heroY);
 
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
 		// Buscando o canto inferior esquerdo ---------------------------
-		while (map[heroX][yVision].equals("--") || map[heroX][yVision].equals(">>")) {
+		while (map[yVision][heroX].equals("--") || map[yVision][heroX].equals(">>")
+				|| map[yVision][heroX].equals(hero.toString())) {
 			yVision++;
 		}
-		// Verificando no minimoY qual seria o menor X visível
-		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+		// Verificando no maximoY qual seria o menor X visível
+		while (map[yVision - 1][xVision].equals("--") || map[yVision - 1][xVision].equals(">>")
+				|| map[yVision - 1][xVision].equals(hero.toString())) {
 			xVision--;
 		}
 
 		firstSquare.setBottomLeftCorner(xVision, yVision);
 
 		// Buscando o canto inferior direito ---------------------------
-		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Verificando o máximo que conseguimos ver abaixo do personagem
+		while (map[yVision][heroX].equals("--") || map[yVision][heroX].equals(">>")
+				|| map[yVision][heroX].equals(hero.toString())) {
+			yVision++;
+		}
+
+		// Verificando no maximoY qual seria o maior X visível
+		while (map[yVision - 1][xVision].equals("--") || map[yVision - 1][xVision].equals(">>")
+				|| map[yVision - 1][xVision].equals(hero.toString())) {
 			xVision++;
 		}
 
 		firstSquare.setBottomRightCorner(xVision, yVision);
 
 		// Segundo quadrado de visão Y -> X
+		// --------------------------------------------------
 		SquareVision secondSquare = new SquareVision();
 
-		// Buscando o canto superior esquerdo -------------------------
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
 
-		// Verificando o máximo que conseguimos ver acima do personagem
-		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
+		// Buscando o canto superior esquerdo -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
 			xVision--;
 		}
 
-		// Verificando no maximoY qual seria o menor X visível
-		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
 			yVision--;
 		}
 
-		// Guardando o valor no segundo quadrado
+		// Guardando o dado
 		secondSquare.setTopLeftCorner(xVision, yVision);
 
-		// Buscando o canto superior direito -----------------------
-		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o canto superior direito -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
 			xVision++;
 		}
 
-		// Guardando o valor
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
+			yVision--;
+		}
+
 		secondSquare.setTopRightCorner(xVision, yVision);
 
-		// Buscando o canto medio esquerdo --------------------------------
-		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o centro superior -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
+			yVision--;
+		}
+		// Guardando o dado
+		secondSquare.setTopCenter(xVision, yVision);
+
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o centro minimo do eixo X -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
+			xVision--;
+		}
+		// Guardando o dado
+		secondSquare.setMiddleLeftCorner(xVision, yVision);
+
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o centro maximo do eixo X -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
+			xVision++;
+		}
+		// Guardando o dado
+		secondSquare.setMiddleRightCorner(xVision, yVision);
+
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o canto inferior esquerdo -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
 			xVision--;
 		}
 
-		// Guardando o valor
-		secondSquare.setMiddleLeftCorner(xVision, heroY);
-
-		// Buscando o canto medio direito --------------------------------
-		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
-			xVision++;
-		}
-
-		// Guardando o valor
-		secondSquare.setMiddleRightCorner(xVision, heroY);
-
-		// Buscando o canto inferior esquerdo -------------------------
-
-		// Verificando o máximo que conseguimos ver acima do personagem
-		while (map[heroX][yVision].equals("--") || map[heroX][yVision].equals(">>")) {
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
 			yVision++;
 		}
 
-		// Verificando no maximoY qual seria o menor X visível
-		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
-			xVision--;
-		}
-		
-		//Guardando o valor
+		// Guardando o dado
 		secondSquare.setBottomLeftCorner(xVision, yVision);
 
-		// Buscando o canto inferior direito ------------------------
-		// Verificando no maximoY qual seria o menor X visível
-		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o canto inferior direito -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
 			xVision++;
 		}
-		
-		//Guardando o valor
-		secondSquare.setBottomRightCorner(xVision, yVision);
 
-		//Os limites do primeiro quadrado são:
-		int firstX1 = firstSquare.getLowerX().getPositionX();
-		int firstX2 = firstSquare.getGreaterX().getPositionX();
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
+			yVision++;
+		}
+
+		// Guardando o dado
+		secondSquare.setBottomLeftCorner(xVision, yVision);
+
+		// Resetando
+		yVision = heroY;
+		xVision = heroX;
+
+		// Buscando o centro inferior do eixo Y -------------------------
+		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
+				|| map[yVision][xVision].equals(hero.toString())) {
+			yVision++;
+		}
+		// Guardando o dado
+		secondSquare.setBottomCenter(xVision, yVision);
+
+		// Os limites do primeiro quadrado são:
+		int firstLowerX = firstSquare.getLowerX().getPositionX();
+		int firstUpperX = firstSquare.getGreaterX().getPositionX();
+
+		int firstLowerY = firstSquare.getLowerY().getPositionY();
+		int firstUpperY = firstSquare.getGreaterY().getPositionY();
 		
-		int firstY1 = firstSquare.getLowerY().getPositionY();
-		int firstY2 = firstSquare.getGreaterY().getPositionY();
-		
-		
-		
+		//Os limites do segundo quadrado são
+		int secondLowerX = secondSquare.getLowerX().getPositionX();
+		int secondUpperX = secondSquare.getGreaterX().getPositionX();
+
+		int secondLowerY = secondSquare.getLowerY().getPositionY();
+		int secondUpperY = secondSquare.getGreaterY().getPositionY();
+
 		// Mostrando somente o primeiro quadrado que o player tem visão
 		for (int i = 0; i < this.yMapSize; i++) {
 			for (int j = 0; j < this.xMapSize; j++) {
-				
-				//Caso esteja fora do campo de visão X
-				if(j <= firstX1 || j >= firstX2) {
-					System.out.print("^^");
+
+				// Caso esteja dentro do campo de visão dele
+				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY) ||
+						(j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
+
+					System.out.print(this.map[i][j]);
 				}
-				
-				//Caso esteja fora do campo de visão Y
-				else if(i <= firstY1 || i >= firstY2) {
-					System.out.print("^^");
-				}
-				
+
 				else {
-					System.out.print(this.map[i][j]);					
+					System.out.print("^^");
 				}
-				
+
 			}
 			System.out.println("");
 		}
@@ -483,7 +610,7 @@ public class Game {
 			String[] formatedLine = line.strip().split(" ");
 
 			// iterando sobre as colunas
-			for (int j = 0; j < yMapSize; j++) {
+			for (int j = 0; j < xMapSize; j++) {
 				this.map[0][j] = formatedLine[j];
 			}
 
@@ -502,7 +629,7 @@ public class Game {
 				formatedLine = line.strip().split(" ");
 
 				// Iterando por colunaa
-				for (int j = 0; j < this.yMapSize; j++) {
+				for (int j = 0; j < this.xMapSize; j++) {
 					this.map[i][j] = formatedLine[j];
 				}
 
@@ -514,13 +641,13 @@ public class Game {
 		}
 
 		// Adicionando o Player no mapa
-		this.map[hero.getPositionX()][hero.getPositionY()] = hero.toString();
+		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
 
 		// Atualizando os monstros
 		for (Monster monster : monstersOnMap) {
 			int newX = monster.getPositionX();
 			int newY = monster.getPositionY();
-			map[newX][newY] = monster.toString();
+			map[newY][newX] = monster.toString();
 		}
 
 		// Atualizando os outros traceables
@@ -533,7 +660,7 @@ public class Game {
 				if (trap.isVisible()) {
 					int x = trap.getPositionX();
 					int y = trap.getPositionY();
-					map[x][y] = traceable.toString();
+					map[y][x] = traceable.toString();
 				} else {
 					// Mantendo a armadilha escondida
 					continue;
@@ -546,7 +673,7 @@ public class Game {
 					if (treasure.isVisible()) {
 						int x = treasure.getPositionX();
 						int y = treasure.getPositionY();
-						map[x][y] = traceable.toString();
+						map[y][x] = traceable.toString();
 					} else {
 						// Mantendo o tesouro escondido
 						continue;
@@ -554,7 +681,7 @@ public class Game {
 				} catch (ClassCastException ex) {
 					int newX = traceable.getPositionX();
 					int newY = traceable.getPositionY();
-					map[newX][newY] = traceable.toString();
+					map[newY][newX] = traceable.toString();
 				}
 			}
 
