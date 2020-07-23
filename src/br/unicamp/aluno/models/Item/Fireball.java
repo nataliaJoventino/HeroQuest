@@ -2,6 +2,7 @@ package br.unicamp.aluno.models.Item;
 
 import br.unicamp.aluno.Game;
 import br.unicamp.aluno.models.Character.Character;
+import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Traceable;
 
@@ -23,6 +24,12 @@ public class Fireball extends Spell{
     public void cast(Character character) {
         character.removeLifePoints(DAMAGE_TARGET);
         listAdjacent(character);
+
+        for (Character c : map.getCharacter()){
+            for(Traceable t : adjacent)
+            if (c.getPositionX() == t.getPositionX() && c.getPositionY() == t.getPositionY())
+                c.removeLifePoints(DAMAGE_ADJACENT); // deveria ter os dados de defesa aqui (character ter prorprio dado)
+        }
 
         // precisa receber o mapa para causar danos na adjacencias, precisa de metodo em mapa que retorne objeto dada posição, caso seja item;
 
