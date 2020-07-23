@@ -2,6 +2,7 @@ package br.unicamp.aluno.models.Character.Hero;
 
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Dice;
+import br.unicamp.aluno.models.SquareVision;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
 import br.unicamp.aluno.models.Enum.SideDice;
@@ -18,6 +19,8 @@ public abstract class Hero extends Character {
 	private Item leftHand;
 	private Item armor;
 	private ArrayList<Item> backpack;
+	private SquareVision firstSquareVision;
+	private SquareVision secondSquareVision;
 	
 	//Construtor de Heroi
 	public Hero(String name, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
@@ -25,6 +28,20 @@ public abstract class Hero extends Character {
 		super(18, 2, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
 		this.name = name;
 		this.backpack = new ArrayList();
+		firstSquareVision = new SquareVision();
+		secondSquareVision = new SquareVision();
+	}
+	
+	//Atualizando o campo de visão
+	public void updateVision(SquareVision vision1, SquareVision vision2) {
+		firstSquareVision = vision1;
+		secondSquareVision = vision2;
+	}
+	public SquareVision getFirstSquareVision() {
+		return firstSquareVision;
+	}
+	public SquareVision getSecondSquareVision() {
+		return secondSquareVision;
 	}
 
 	protected void storeInBackpack(Item item){ //Colocar item na mochila

@@ -1,14 +1,14 @@
 package br.unicamp.aluno.models.Character.Monster;
 
+import java.util.ArrayList;
+
+import br.unicamp.aluno.models.Dice;
+import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Character.Hero.Hero;
-import br.unicamp.aluno.models.Dice;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Item.Dagger;
 import br.unicamp.aluno.models.Item.Weapon;
-import br.unicamp.aluno.models.Traceable;
-
-import java.util.ArrayList;
 
 public class Goblin extends Monster {
     private ArrayList<Weapon> daggers;

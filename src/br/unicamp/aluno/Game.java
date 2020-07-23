@@ -8,11 +8,11 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import br.unicamp.aluno.models.Door;
+import br.unicamp.aluno.models.SquareVision;
 import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Trap;
 import br.unicamp.aluno.models.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Hero;
-import br.unicamp.aluno.models.Character.Monster.Goblin;
 import br.unicamp.aluno.models.Character.Monster.MageSkeleton;
 import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Character.Monster.Skeleton;
@@ -69,8 +69,8 @@ public class Game {
 			}
 
 			// inserindo os goblins
-			Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
-			monstersOnMap.add(goblin);
+			//Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
+			//monstersOnMap.add(goblin);
 		}
 
 		// Adicionando 2 esqueletos magos no mapa
@@ -239,48 +239,177 @@ public class Game {
 			System.out.println("");
 		}
 	}
-	
+
 	// Printa todo conteúdo do mapa que é visível ao player
-		public void printMap() {
-			int heroX = hero.getPositionX();
-			int heroY = hero.getPositionY();
-			
-			//Variáveis que irão verificar até onde nosso personagem consegue ver
-			int yVision = heroY; 
-			int xVision = heroX;
-			
-			//Para a visão efetuaremos uma dupla checagem
-			//Primeiro será checado começando pelo eixo X e depois seguiremos para o Y
-			//A segunda checagem será inversa, começando pelo Y e terminando pelo X, pois teremos diferença
-			//Isso está melhor desenhado e explicadp no nosso relatório
-			
-			//Buscando o canto superior esquerdo -------------------------
-			
-			//Verificando o máximo que conseguimos ver acima do personagem
-			while(map[heroX][yVision].equals("--") || map[heroX][yVision].equals(">>")) {
-				yVision--;
-			}
-			//Verificando no maximoY qual seria o menor X visível
-			while(map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
-				xVision--;
-			}
-			
-			//Guardando a coordenada X do canto superior esquerdo
-			int topLeftCornerX = xVision; 
-			//Guardando a coordenada Y do canto superior esquerdo
-			int topLeftCornerY = yVision;
-			
-			//Buscando o canto superior direito -------------------------
-			
-			
-			for (int i = 0; i < this.xMapSize; i++) {
-				for (int j = 0; j < this.yMapSize; j++) {
-					System.out.print(this.map[i][j]);
-				}
-				System.out.println("");
-			}
+	public void printMap() {
+		int heroX = hero.getPositionX();
+		int heroY = hero.getPositionY();
+
+		// Variáveis que irão verificar até onde nosso personagem consegue ver
+		int yVision = heroY;
+		int xVision = heroX;
+
+		// Para a visão efetuaremos uma dupla checagem
+		// Isso está melhor desenhado e explicadp no nosso relatório
+
+		// Primeiro quadrado de visão X -> Y
+		SquareVision firstSquare = hero.getFirstSquareVision();
+
+		// Buscando o canto superior esquerdo -------------------------
+
+		// Verificando o máximo que conseguimos ver acima do personagem
+		while (map[heroX][yVision].equals("--") || map[heroX][yVision].equals(">>")) {
+			yVision--;
 		}
-	
+		// Verificando no maximoY qual seria o menor X visível
+		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+			xVision--;
+		}
+
+		// Guardando a coordenada X e Y do canto superior esquerdo
+		firstSquare.setTopLeftCorner(xVision, yVision);
+
+		// Buscando o canto superior direito -------------------------
+
+		// Verificando no maximoY qual seria o maior X visível
+		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+			xVision++;
+		}
+
+		// Guardando o ponto superior direito
+		firstSquare.setTopRightCorner(xVision, yVision);
+
+		// Buscando o maximo central da direita -------------------------
+		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
+			xVision++;
+		}
+
+		// Guardando o ponto maximo central da direita
+		firstSquare.setMiddleRightCorner(xVision, heroY);
+
+		// Buscando o maximo central do eixo x ------------------------
+		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
+			xVision--;
+		}
+
+		// Guardando o ponto minimo central do eixo X
+		firstSquare.setMiddleLeftCorner(xVision, heroY);
+
+		// Buscando o canto inferior esquerdo ---------------------------
+		while (map[heroX][yVision].equals("--") || map[heroX][yVision].equals(">>")) {
+			yVision++;
+		}
+		// Verificando no minimoY qual seria o menor X visível
+		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+			xVision--;
+		}
+
+		firstSquare.setBottomLeftCorner(xVision, yVision);
+
+		// Buscando o canto inferior direito ---------------------------
+		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+			xVision++;
+		}
+
+		firstSquare.setBottomRightCorner(xVision, yVision);
+
+		// Segundo quadrado de visão Y -> X
+		SquareVision secondSquare = new SquareVision();
+
+		// Buscando o canto superior esquerdo -------------------------
+
+		// Verificando o máximo que conseguimos ver acima do personagem
+		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
+			xVision--;
+		}
+
+		// Verificando no maximoY qual seria o menor X visível
+		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+			yVision--;
+		}
+
+		// Guardando o valor no segundo quadrado
+		secondSquare.setTopLeftCorner(xVision, yVision);
+
+		// Buscando o canto superior direito -----------------------
+		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+			xVision++;
+		}
+
+		// Guardando o valor
+		secondSquare.setTopRightCorner(xVision, yVision);
+
+		// Buscando o canto medio esquerdo --------------------------------
+		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
+			xVision--;
+		}
+
+		// Guardando o valor
+		secondSquare.setMiddleLeftCorner(xVision, heroY);
+
+		// Buscando o canto medio direito --------------------------------
+		while (map[xVision][heroY].equals("--") || map[xVision][heroY].equals(">>")) {
+			xVision++;
+		}
+
+		// Guardando o valor
+		secondSquare.setMiddleRightCorner(xVision, heroY);
+
+		// Buscando o canto inferior esquerdo -------------------------
+
+		// Verificando o máximo que conseguimos ver acima do personagem
+		while (map[heroX][yVision].equals("--") || map[heroX][yVision].equals(">>")) {
+			yVision++;
+		}
+
+		// Verificando no maximoY qual seria o menor X visível
+		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+			xVision--;
+		}
+		
+		//Guardando o valor
+		secondSquare.setBottomLeftCorner(xVision, yVision);
+
+		// Buscando o canto inferior direito ------------------------
+		// Verificando no maximoY qual seria o menor X visível
+		while (map[xVision][yVision].equals("--") || map[xVision][yVision].equals(">>")) {
+			xVision++;
+		}
+		
+		//Guardando o valor
+		secondSquare.setBottomRightCorner(xVision, yVision);
+
+		//Os limites do primeiro quadrado são:
+		int firstX1 = firstSquare.getLowerX().getPositionX();
+		int firstX2 = firstSquare.getGreaterX().getPositionX();
+		
+		int firstY1 = firstSquare.getLowerY().getPositionY();
+		int firstY2 = firstSquare.getGreaterY().getPositionY();
+		
+		
+		
+		// Mostrando somente o primeiro quadrado que o player tem visão
+		for (int i = 0; i < this.yMapSize; i++) {
+			for (int j = 0; j < this.xMapSize; j++) {
+				
+				//Caso esteja fora do campo de visão X
+				if(j <= firstX1 || j >= firstX2) {
+					System.out.print("^^");
+				}
+				
+				//Caso esteja fora do campo de visão Y
+				else if(i <= firstY1 || i >= firstY2) {
+					System.out.print("^^");
+				}
+				
+				else {
+					System.out.print(this.map[i][j]);					
+				}
+				
+			}
+			System.out.println("");
+		}
+	}
 
 	// Verifica se o heroi pisou em alguma armadilha e retira vida dele
 	private void amIOnSomeTrap() {
@@ -385,40 +514,39 @@ public class Game {
 
 		// Atualizando os outros traceables
 		for (Traceable traceable : traceablesOnMap) {
-			
-			//Caso for armadilha iremos verificar se está ativa para que possamos camuflá-la
+
+			// Caso for armadilha iremos verificar se está ativa para que possamos
+			// camuflá-la
 			try {
-				Trap trap = (Trap)traceable;
-				if(trap.isVisible()) {
+				Trap trap = (Trap) traceable;
+				if (trap.isVisible()) {
 					int x = trap.getPositionX();
 					int y = trap.getPositionY();
 					map[x][y] = traceable.toString();
-				}
-				else {
-					//Mantendo a armadilha escondida
+				} else {
+					// Mantendo a armadilha escondida
 					continue;
 				}
 			}
-			//Fluxo normal
-			catch(ClassCastException e){
+			// Fluxo normal
+			catch (ClassCastException e) {
 				try {
-					Treasure treasure = (Treasure)traceable;
-					if(treasure.isVisible()) {
+					Treasure treasure = (Treasure) traceable;
+					if (treasure.isVisible()) {
 						int x = treasure.getPositionX();
 						int y = treasure.getPositionY();
 						map[x][y] = traceable.toString();
-					}
-					else {
-						//Mantendo o tesouro escondido
+					} else {
+						// Mantendo o tesouro escondido
 						continue;
 					}
-				}catch(ClassCastException ex) {
+				} catch (ClassCastException ex) {
 					int newX = traceable.getPositionX();
 					int newY = traceable.getPositionY();
-					map[newX][newY] = traceable.toString();					
+					map[newX][newY] = traceable.toString();
 				}
 			}
-			
+
 		}
 
 	}
