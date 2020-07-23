@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Door;
 import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Trap;
@@ -179,6 +180,16 @@ public class Game {
 		// Atualizando o mapa com a posição dos personagens
 		refreshMap();
 
+	}
+
+	public ArrayList<Character> getCharacter() {
+		ArrayList<Character> characters = new ArrayList();
+
+		for (Monster m : monstersOnMap)
+			characters.add(m);
+
+		characters.add(hero);
+		return characters;
 	}
 
 	// Adiciona localizaveis no nosso mapa
