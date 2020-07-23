@@ -24,8 +24,8 @@ public class Skeleton extends Monster {
         int x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
         int y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * weapon.getWeaponReach());
 
-        if (character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) //verifica se personagem esta a frente de monstro ou no alcance da arma em x
-            if (character.getPositionY() > this.getPositionY() && character.getPositionY() <= y)
+        if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) || (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) //verifica se personagem esta a entre o monstro e alcance da arma em x
+            if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y) || (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
                 return  true;
 
         return false;

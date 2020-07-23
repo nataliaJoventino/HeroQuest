@@ -9,6 +9,7 @@ import br.unicamp.aluno.models.Enum.SideDice;
 import br.unicamp.aluno.models.Item.Armor;
 import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Item.Weapon;
+import br.unicamp.aluno.models.Traceable;
 
 public abstract class Hero extends Character {
 	private String name;
@@ -27,6 +28,28 @@ public abstract class Hero extends Character {
 		this.backpack = new ArrayList();
 		firstSquareVision = new SquareVision();
 		secondSquareVision = new SquareVision();
+	}
+
+	public Hand isBothHandsUsed(){ // retorna qual mão está com item, se as duas estiverem ocupadas ou vazias retorna nulo
+		if (leftHand != null && rightHand == null)
+			return Hand.LEFT;
+		else if (rightHand != null && leftHand == null)
+			return Hand.RIGHT;
+		else
+			return null; // se duas mãos ocupadas ou duas mãos vazias
+
+	}
+
+	public boolean emptyHands(){
+		if (rightHand == null && leftHand == null)
+			return true;
+		return false;
+	}
+
+	public boolean isBothHandItem(){
+		if (!emptyHands() && rightHand == leftHand)
+			return true;
+		return false;
 	}
 	
 	//Atualizando o campo de visão
@@ -238,8 +261,8 @@ public abstract class Hero extends Character {
 			int x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * isWeapon(leftHand).getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
 			int y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * isWeapon(leftHand).getWeaponReach());
 
-			if (character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) //verifica se personagem esta a frente de monstro ou no alcance da arma em x
-				if (character.getPositionY() > this.getPositionY() && character.getPositionY() <= y)
+			if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) || (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) //verifica se personagem esta a entre o monstro e alcance da arma em x
+				if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y) || (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
 					return  true;
 
 			return false;
@@ -251,7 +274,7 @@ public abstract class Hero extends Character {
 
 	}
 
-	public boolean isOnSight(Character character, Hand hand) { //verivica arda da mão direita ou esquerda
+	public boolean isOnSight(Character character, Hand hand) { //verifica arma da mão direita ou esquerda
 		Weapon weapon;
 		int x, y;
 
@@ -264,8 +287,8 @@ public abstract class Hero extends Character {
 			x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
 			y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * weapon.getWeaponReach());
 
-			if (character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) //verifica se personagem esta a frente de monstro ou no alcance da arma em x
-				if (character.getPositionY() > this.getPositionY() && character.getPositionY() <= y)
+			if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) || (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) //verifica se personagem esta a entre o monstro e alcance da arma em x
+				if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y) || (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
 					return  true;
 
 			return false;
@@ -274,6 +297,42 @@ public abstract class Hero extends Character {
 			System.out.println("Item equipado não é arma com alcance");
 			return false;
 		}
+	}
+
+	private Traceable reach(Weapon weapon){
+		try {
+			int x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
+			int y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * weapon.getWeaponReach());
+
+			return new Traceable(x, y);
+
+		} catch (NullPointerException e) {
+			System.out.println("Item equipado não é arma com alcance");
+			return null;
+		}
+	}
+
+	public Traceable sight() { //verifica arma da mão direita ou esquerda
+		Weapon weapon;
+
+		if (isBothHandItem()) {
+			weapon = isWeapon(leftHand);
+			return reach(weapon);
+		}
+
+		return  null;
+	}
+
+	public Traceable sight(Hand hand) { //verifica arma da mão direita ou esquerda
+		Weapon weapon;
+		int x, y;
+
+		if (hand == Hand.LEFT)
+			weapon = isWeapon(leftHand);
+		else
+			weapon = isWeapon(rightHand);
+
+		return reach(weapon);
 	}
 
 

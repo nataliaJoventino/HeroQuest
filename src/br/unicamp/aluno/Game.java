@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Door;
+import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.SquareVision;
 import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Trap;
@@ -218,18 +219,14 @@ public class Game {
 	// verifica a possibilidade e caminha com o player para a posição
 	// xNow e yNow dizem a posição atual do player
 	// xRequested e yRequested dizem a posiçao solicitada pelo usuário
-	public boolean canIWalk(int xRequested, int yRequested) {
-
+	public boolean canIWalk(Direction direction) {
+		int xRequested = hero.getPositionX() + direction.getTraceable().getPositionX();
+		int yRequested = hero.getPositionY() + direction.getTraceable().getPositionY();
 		int xNow = hero.getPositionX();
 		int yNow = hero.getPositionY();
 
 		// caso tiver o espaço desejado caminharemos com o player
 		if (this.map[xRequested][yRequested].equals("--")) {
-
-			// Andando com o player
-			this.map[xRequested][yRequested] = hero.toString();
-			this.map[xNow][yNow] = "--";
-
 			return true;
 		} else {
 			// Depois tratamos isso com exceptions, deixa assim por enquanto kk

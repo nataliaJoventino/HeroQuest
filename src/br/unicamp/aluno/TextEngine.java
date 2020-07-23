@@ -1,23 +1,32 @@
 package br.unicamp.aluno;
 
+import br.unicamp.aluno.models.Character.Hero.Hero;
+import br.unicamp.aluno.models.Character.Hero.MisticHero;
+import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
 import br.unicamp.aluno.models.Exceptions.NotEquippableException;
 import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Item.Spell;
 import br.unicamp.aluno.models.Item.Weapon;
+import br.unicamp.aluno.models.Traceable;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 // AINDA TÔ AARRUMANDO E DEFININDO
 public class TextEngine {
     private Game map;
+    private Hero hero;
+
     public TextEngine(Game map){
         this.map = map;
+        hero = map.getHero();
     }
 
-    private Direction readCommandFromKeyboard(Scanner scanner){
+    private void readCommandFromKeyboard(Scanner scanner){
+        Direction walking = null;
         String command = "";
         boolean loop = true;
 
@@ -25,33 +34,107 @@ public class TextEngine {
 
         command = stringScanner(scanner);
 
-        if (command.compareTo("w") == 0) //andar para coma
-            return Direction.UP;
+        if (command.compareTo("w") == 0) //andar para cima
+            walking = Direction.UP;
 
         else if (command.compareTo("a") == 0) // andar para esquerda
-            return Direction.LEFT;
+            walking = Direction.LEFT;
 
         else if (command.compareTo("d") == 0) // andar para direita
-            return Direction.RIGHT;
+            walking = Direction.RIGHT;
 
         else if (command.compareTo("s") == 0) // andar para baixo
-            return Direction.DOWN;
+            walking = Direction.DOWN;
 
         else if (command.compareTo("m") == 0) { //abrir mochila
-            map.getHero().printBackpack();
+            hero.printBackpack();
             choosingItem(scanner);
-        }
 
+        } else if (command.compareTo("u") == 0){ // ataque/feitiço
+            Hand hand = hero.isBothHandsUsed(); // retorna nulo se as duas mãos estão ocupadas ou vazias
+            if ( hand != null) // segurando um unico item
+                hero.hit(allowAttack(hand), hand); // fazer erro se item não for arma
+            else{
+                if (!hero.emptyHands() && hero.isBothHandItem()) { // se mãos não vazias e item ocupar as duas mãos
+                    hero.hit(allowAttack(null)); //ataque
+                } else if (!hero.emptyHands()) {
+                    String comm = "";
+
+
+                    System.out.print("Escolha a arma para ataque (r para direita ou l para esquerda): ");
+                    comm = stringScanner(scanner);
+
+                    if (comm.compareTo("r") == 0)
+                        hero.hit(allowAttack(Hand.RIGHT), Hand.RIGHT);
+
+                    else if (comm.compareTo("l") == 0)
+                        hero.hit(allowAttack(Hand.LEFT), Hand.LEFT);
+                } else { //mãos ficam vazias se equipadas com feitiço
+                    // * IMPLEMENTA FEITIÇO *
+                    MisticHero misticHero = isMisticHero(hero);
+                    if (misticHero != null){
+                        //implement
+                    }
+
+                }
+            }
+
+        } else if (command.compareTo("e") == 0) // busca tesouro
+            map.searchForTreasure();
+        else if (command.compareTo("q") == 0) // busca armadilha
+            map.searchForTrap();
+
+        if (walking != null && map.canIWalk(walking))
+            hero.move(walking);
 
         System.out.println();
-
-        return null;
-
-
-
     }
 
-    private String stringScanner(Scanner scanner){
+    private MisticHero isMisticHero(Hero hero){
+        try{
+            MisticHero misticHero = (MisticHero) hero;
+            return misticHero;
+        } catch (ClassCastException e){
+            return null;
+        }
+    }
+
+    private Monster allowAttack(Hand hand){ // permite ataque do ao monstro que está dentro da mira e de menor distancia (primeiro monstro a frente)
+        ArrayList<Monster> isInSight = new ArrayList();
+        for (Monster m : map.getMonstersOnMap())
+            if (hand != null) {
+                if (hero.isOnSight(m, hand)) // verifica se monstro está na mira da arma da mçao selecionada
+                    isInSight.add(m);
+            }else
+                if (hero.isOnSight(m)) // verifica se monstro esta na mira de arma que ocupa as duas mãos
+                    isInSight.add(m);
+        return shortDistance(isInSight);
+    }
+
+    private Monster shortDistance(ArrayList<Monster> monsters){ // calcula qual monstro é o primeiro  na mira
+        int toCompare;
+        Monster shortMonster = monsters.get(0);
+        int shorter = distance(hero.getPositionX(), hero.getPositionY(), shortMonster.getPositionX(), shortMonster.getPositionY());
+
+        for (Monster m : monsters) {
+            toCompare = distance(hero.getPositionX(), hero.getPositionY(), m.getPositionX(), m.getPositionY());
+            if (shorter >= toCompare){
+                shortMonster = m;
+                shorter = toCompare;
+            }
+        }
+
+        return shortMonster;
+    }
+
+    private int distance(int x0, int y0, int x1, int y1){ // distancia entre dois pontos (geometria taxi)
+        int absX = Math.abs((x0 - x1)); // guarda valor absoluto da diferença x
+        int absY = Math.abs((y0 - y1));// guarda valor absoluto da diferença y
+
+        return absX + absY;
+    }
+
+    private String stringScanner(Scanner scanner){ // lê entrada do teclado tipo string
         String command = "";
         boolean loop = true;
 
@@ -129,29 +212,32 @@ public class TextEngine {
             if (weapon != null) // se for equipa
 
                 if(weapon.isBothHands()) // se é de duas mãos
-                    map.getHero().equip(weapon);
+                    hero.equip(weapon);
 
                 else { // se não precisa receber comando de qual mão carregar
                     System.out.print("Escolha a mão para equipar (r para direita ou l para esquerda): ");
                     comm = stringScanner(scanner);
 
                     if (comm.compareTo("r") == 0)
-                        map.getHero().equip(weapon, Hand.RIGHT);
+                        hero.equip(weapon, Hand.RIGHT);
 
                     else if (comm.compareTo("l") == 0)
-                        map.getHero().equip(weapon, Hand.LEFT);
+                        hero.equip(weapon, Hand.LEFT);
                 }
 
             else
                 throw new NotEquippableException();
 
         } catch (NotEquippableException e){
-            Spell spell = isSpell(map.getHero().getInBackpack(command));
+            if (isMisticHero(hero) != null) { // só equipa feitiço se héroi é mistico
+                Spell spell = isSpell(hero.getInBackpack(command));
 
-            if (spell != null) //spell deve ser equipado sozinho
-                map.getHero().equip(spell);
-            else
-                throw new NotEquippableException();
+                if (spell != null) //spell deve ser equipado sozinho
+                    hero.equip(spell);
+                else
+                    throw new NotEquippableException();
+            } else
+                System.out.println("Herói não pode usar feitiço"); // fazer exception
         }
     }
 
