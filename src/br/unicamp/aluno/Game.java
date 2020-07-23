@@ -182,14 +182,8 @@ public class Game {
 
 	}
 
-	public ArrayList<Character> getCharacter() {
-		ArrayList<Character> characters = new ArrayList();
-
-		for (Monster m : monstersOnMap)
-			characters.add(m);
-
-		characters.add(hero);
-		return characters;
+	public ArrayList<Monster> getMonstersOnMap() {
+		return monstersOnMap;
 	}
 
 	// Adiciona localizaveis no nosso mapa
