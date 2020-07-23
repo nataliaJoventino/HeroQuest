@@ -12,6 +12,8 @@ public class Main {
 		
 		game.printAllMap();
 		System.out.println("");
+//		game.searchForTreasure();
+//		game.searchForTrap();
 		game.printMap();
 
 	}

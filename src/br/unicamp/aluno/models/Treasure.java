@@ -15,13 +15,16 @@ public class Treasure extends Traceable {
 	//Construtor da classe
 	public Treasure(int x, int y) {
 		super(x, y);
-
 		//Guardaremos itens aleatórios dentro do baú -> Vou implementar depois
 		this.items = new ArrayList<Item>();
 	}
 	
 	public boolean isVisible() {
 		return visible;
+	}
+	
+	public void turnVisible() {
+		visible = true;
 	}
 	
 	//ToString

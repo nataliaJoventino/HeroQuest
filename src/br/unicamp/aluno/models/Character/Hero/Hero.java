@@ -18,9 +18,10 @@ public abstract class Hero extends Character {
 	private ArrayList<Item> backpack;
 	private SquareVision firstSquareVision;
 	private SquareVision secondSquareVision;
+	
 	//Construtor de Heroi
 	public Hero(String name, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
-		//O heroi sempre nasce no (18,2) por enquanto
+		//O heroi sempre nasce no (18,2)
 		super(8, 18, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
 		this.name = name;
 		this.backpack = new ArrayList();
