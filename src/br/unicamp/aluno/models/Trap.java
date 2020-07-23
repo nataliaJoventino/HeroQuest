@@ -31,4 +31,9 @@ public class Trap extends Traceable {
 	public String toString() {
 			return "§§";			
 	}
+
+	public void turnVisible() {
+		this.visible = true;
+		
+	}
 }

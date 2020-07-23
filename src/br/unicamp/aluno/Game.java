@@ -251,6 +251,258 @@ public class Game {
 
 	// Printa todo conteúdo do mapa que é visível ao player
 	public void printMap() {
+
+		// Os limites do primeiro quadrado da visão do player são:
+		int firstLowerX = hero.getFirstSquareVision().getLowerX();
+		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
+
+		int firstLowerY = hero.getFirstSquareVision().getLowerY();
+		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
+
+		// Os limites do segundo quadrado são
+		int secondLowerX = hero.getSecondSquareVision().getLowerX();
+		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
+
+		int secondLowerY = hero.getSecondSquareVision().getLowerY();
+		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
+
+		// Mostrando somente o primeiro quadrado que o player tem visão
+		for (int i = 0; i < this.yMapSize; i++) {
+			for (int j = 0; j < this.xMapSize; j++) {
+
+				// Caso esteja dentro do campo de visão dele
+				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY)
+						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
+
+					// Printando a posição do mapa
+					System.out.print(this.map[i][j]);
+				}
+
+				else {
+					System.out.print("^^");
+				}
+
+			}
+			System.out.println("");
+		}
+	}
+
+	public void searchForTreasure() {
+		// Buscando somente pelo campo de visão do heroi
+
+		// Os limites do primeiro quadrado são:
+		int firstLowerX = hero.getFirstSquareVision().getLowerX();
+		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
+
+		int firstLowerY = hero.getFirstSquareVision().getLowerY();
+		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
+
+		// Os limites do segundo quadrado são
+		int secondLowerX = hero.getSecondSquareVision().getLowerX();
+		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
+
+		int secondLowerY = hero.getSecondSquareVision().getLowerY();
+		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
+
+		// Verificando a lista de traceables
+		for (Traceable traceable : traceablesOnMap) {
+			// Caso esteja dentro do campo de visão dele
+			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
+					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
+					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
+							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+
+				try {
+					Treasure treasure = (Treasure) traceable;
+					treasure.turnVisible();
+					refreshMap();
+
+				} catch (ClassCastException e) {
+					continue;
+				}
+			}
+		}
+	}
+	
+	public void searchForTrap() {
+		// Buscando somente pelo campo de visão do heroi
+
+				// Os limites do primeiro quadrado são:
+				int firstLowerX = hero.getFirstSquareVision().getLowerX();
+				int firstUpperX = hero.getFirstSquareVision().getGreaterX();
+
+				int firstLowerY = hero.getFirstSquareVision().getLowerY();
+				int firstUpperY = hero.getFirstSquareVision().getGreaterY();
+
+				// Os limites do segundo quadrado são
+				int secondLowerX = hero.getSecondSquareVision().getLowerX();
+				int secondUpperX = hero.getSecondSquareVision().getGreaterX();
+
+				int secondLowerY = hero.getSecondSquareVision().getLowerY();
+				int secondUpperY = hero.getSecondSquareVision().getGreaterY();
+
+				// Verificando a lista de traceables
+				for (Traceable traceable : traceablesOnMap) {
+					// Caso esteja dentro do campo de visão dele
+					if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
+							&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
+							|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
+									&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+
+						try {
+							Trap trap = (Trap) traceable;
+							trap.turnVisible();
+							refreshMap();
+
+						} catch (ClassCastException e) {
+							continue;
+						}
+					}
+				}
+	}
+
+	// Verifica se o heroi pisou em alguma armadilha e retira vida dele
+	private void amIOnSomeTrap() {
+		for (Traceable traceable : traceablesOnMap) {
+			// Caso a posição do herói seja a mesma que a da armadilha:
+			if (hero.getPositionX() == traceable.getPositionX() && hero.getPositionY() == traceable.getPositionY()
+					&& traceable instanceof Trap) {
+				// Cast
+				Trap trap = (Trap) traceable;
+
+				// Ativando a armadilha
+				trap.active(hero);
+
+				// Encerrando o turno do jogador com uma mensagem de erro
+				throw new TrapsHurtMeException();
+
+			}
+		}
+	}
+
+	// Iniciando o jogo/turno
+	public void start() {
+
+		boolean exit = false;
+		System.out.println("Game started!");
+
+		// Ciclo do jogo
+		while (!exit) {
+
+			// Acontecimentos do jogo
+			try {
+
+			}
+
+			// Tratamento de excessões que possam surgir
+			catch (TrapsHurtMeException e) {
+				System.out.println(e.getMessage());
+			} catch (YouAreDeadException e) {
+				System.out.println(e.getMessage());
+				exit = true;
+			}
+		}
+
+		System.out.println("Game termined. Bye!");
+
+	}
+
+	private void refreshMap() {
+
+		// resetando o mapa (é mais performático do que ficar mudando cada personagem)
+		// Lendo arquivo do mapa
+		try {
+			// Recebendo o arquivo de texto do mapa
+			FileReader arq = new FileReader("map.txt");
+			BufferedReader br = new BufferedReader(arq);
+
+			// lê a linha do arquivo
+			String line = br.readLine();
+
+			String[] formatedLine = line.strip().split(" ");
+
+			// iterando sobre as colunas
+			for (int j = 0; j < xMapSize; j++) {
+				this.map[0][j] = formatedLine[j];
+			}
+
+			// Setando para continuar a partir da segunda linha
+			int i = 1;
+			// Lendo as outras linhas
+			while (line != null) {
+
+				// Formatando assim como feito acima
+				line = br.readLine();
+
+				if (line == null) {
+					break;
+				}
+
+				formatedLine = line.strip().split(" ");
+
+				// Iterando por colunaa
+				for (int j = 0; j < this.xMapSize; j++) {
+					this.map[i][j] = formatedLine[j];
+				}
+
+				i++;
+			}
+			arq.close();
+		} catch (IOException e) {
+			System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
+		}
+
+		// Adicionando o Player no mapa
+		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
+
+		// Atualizando os monstros
+		for (Monster monster : monstersOnMap) {
+			int newX = monster.getPositionX();
+			int newY = monster.getPositionY();
+			map[newY][newX] = monster.toString();
+		}
+
+		// Atualizando os outros traceables
+		for (Traceable traceable : traceablesOnMap) {
+
+			// Caso for armadilha iremos verificar se está ativa para que possamos
+			// camuflá-la
+			try {
+				Trap trap = (Trap) traceable;
+				if (trap.isVisible()) {
+					int x = trap.getPositionX();
+					int y = trap.getPositionY();
+					map[y][x] = traceable.toString();
+				} else {
+					// Mantendo a armadilha escondida
+					continue;
+				}
+			}
+			// Fluxo normal
+			catch (ClassCastException e) {
+				try {
+					Treasure treasure = (Treasure) traceable;
+					if (treasure.isVisible()) {
+						int x = treasure.getPositionX();
+						int y = treasure.getPositionY();
+						map[y][x] = traceable.toString();
+					} else {
+						// Mantendo o tesouro escondido
+						continue;
+					}
+				} catch (ClassCastException ex) {
+					int newX = traceable.getPositionX();
+					int newY = traceable.getPositionY();
+					map[newY][newX] = traceable.toString();
+				}
+			}
+
+		}
+		calculateHeroVision();
+
+	}
+	
+	private void calculateHeroVision() {
 		int heroX = hero.getPositionX();
 		int heroY = hero.getPositionY();
 
@@ -513,179 +765,7 @@ public class Game {
 		// Guardando o dado
 		secondSquare.setBottomCenter(xVision, yVision);
 
-		// Os limites do primeiro quadrado são:
-		int firstLowerX = firstSquare.getLowerX().getPositionX();
-		int firstUpperX = firstSquare.getGreaterX().getPositionX();
-
-		int firstLowerY = firstSquare.getLowerY().getPositionY();
-		int firstUpperY = firstSquare.getGreaterY().getPositionY();
-		
-		//Os limites do segundo quadrado são
-		int secondLowerX = secondSquare.getLowerX().getPositionX();
-		int secondUpperX = secondSquare.getGreaterX().getPositionX();
-
-		int secondLowerY = secondSquare.getLowerY().getPositionY();
-		int secondUpperY = secondSquare.getGreaterY().getPositionY();
-
-		// Mostrando somente o primeiro quadrado que o player tem visão
-		for (int i = 0; i < this.yMapSize; i++) {
-			for (int j = 0; j < this.xMapSize; j++) {
-
-				// Caso esteja dentro do campo de visão dele
-				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY) ||
-						(j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
-
-					//Printando a posição do mapa
-					System.out.print(this.map[i][j]);
-				}
-
-				else {
-					System.out.print("^^");
-				}
-
-			}
-			System.out.println("");
-		}
-	}
-
-	// Verifica se o heroi pisou em alguma armadilha e retira vida dele
-	private void amIOnSomeTrap() {
-		for (Traceable traceable : traceablesOnMap) {
-			// Caso a posição do herói seja a mesma que a da armadilha:
-			if (hero.getPositionX() == traceable.getPositionX() && hero.getPositionY() == traceable.getPositionY()
-					&& traceable instanceof Trap) {
-				// Cast
-				Trap trap = (Trap) traceable;
-
-				// Ativando a armadilha
-				trap.active(hero);
-
-				// Encerrando o turno do jogador com uma mensagem de erro
-				throw new TrapsHurtMeException();
-
-			}
-		}
-	}
-
-	// Iniciando o jogo/turno
-	public void start() {
-
-		boolean exit = false;
-		System.out.println("Game started!");
-
-		// Ciclo do jogo
-		while (!exit) {
-
-			// Acontecimentos do jogo
-			try {
-
-			}
-
-			// Tratamento de excessões que possam surgir
-			catch (TrapsHurtMeException e) {
-				System.out.println(e.getMessage());
-			} catch (YouAreDeadException e) {
-				System.out.println(e.getMessage());
-				exit = true;
-			}
-		}
-
-		System.out.println("Game termined. Bye!");
-
-	}
-
-	private void refreshMap() {
-
-		// resetando o mapa (é mais performático do que ficar mudando cada personagem)
-		// Lendo arquivo do mapa
-		try {
-			// Recebendo o arquivo de texto do mapa
-			FileReader arq = new FileReader("map.txt");
-			BufferedReader br = new BufferedReader(arq);
-
-			// lê a linha do arquivo
-			String line = br.readLine();
-
-			String[] formatedLine = line.strip().split(" ");
-
-			// iterando sobre as colunas
-			for (int j = 0; j < xMapSize; j++) {
-				this.map[0][j] = formatedLine[j];
-			}
-
-			// Setando para continuar a partir da segunda linha
-			int i = 1;
-			// Lendo as outras linhas
-			while (line != null) {
-
-				// Formatando assim como feito acima
-				line = br.readLine();
-
-				if (line == null) {
-					break;
-				}
-
-				formatedLine = line.strip().split(" ");
-
-				// Iterando por colunaa
-				for (int j = 0; j < this.xMapSize; j++) {
-					this.map[i][j] = formatedLine[j];
-				}
-
-				i++;
-			}
-			arq.close();
-		} catch (IOException e) {
-			System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
-		}
-
-		// Adicionando o Player no mapa
-		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
-
-		// Atualizando os monstros
-		for (Monster monster : monstersOnMap) {
-			int newX = monster.getPositionX();
-			int newY = monster.getPositionY();
-			map[newY][newX] = monster.toString();
-		}
-
-		// Atualizando os outros traceables
-		for (Traceable traceable : traceablesOnMap) {
-
-			// Caso for armadilha iremos verificar se está ativa para que possamos
-			// camuflá-la
-			try {
-				Trap trap = (Trap) traceable;
-				if (trap.isVisible()) {
-					int x = trap.getPositionX();
-					int y = trap.getPositionY();
-					map[y][x] = traceable.toString();
-				} else {
-					// Mantendo a armadilha escondida
-					continue;
-				}
-			}
-			// Fluxo normal
-			catch (ClassCastException e) {
-				try {
-					Treasure treasure = (Treasure) traceable;
-					if (treasure.isVisible()) {
-						int x = treasure.getPositionX();
-						int y = treasure.getPositionY();
-						map[y][x] = traceable.toString();
-					} else {
-						// Mantendo o tesouro escondido
-						continue;
-					}
-				} catch (ClassCastException ex) {
-					int newX = traceable.getPositionX();
-					int newY = traceable.getPositionY();
-					map[newY][newX] = traceable.toString();
-				}
-			}
-
-		}
-
+		hero.updateVision(firstSquare, secondSquare);
 	}
 
 }
