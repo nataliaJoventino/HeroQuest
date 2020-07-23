@@ -12,10 +12,10 @@ public class Skeleton extends Monster {
 //        addAttackDice(weapon.getAttackBonus());
     }
 
-    public void hit(Character character, Dice dice) {
+    public void hit(Character character) {
         int attackBonus = weapon.getAttackBonus();
         addAttackDice(attackBonus);
-        super.hit(character, dice);
+        super.hit(character);
         removeAttackDice(attackBonus);
     }
 
