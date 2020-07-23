@@ -18,7 +18,7 @@ public abstract class Monster extends Character {
 	}
 
 	// gera uma direção aleatória
-	public Direction randomDirection() {
+	public Direction randomDirection() { // no mapa verifica se posição está livre (isso deve estar em mapa ao invés daqui?)
 		Random randomDirection = new Random();
 
 		switch (randomDirection.nextInt(4)) {
@@ -36,10 +36,10 @@ public abstract class Monster extends Character {
 		return null;
 	}
 
-	public int hitDefence(Dice dice){
+	public int hitDefence(){
 		int cont = 0;
 		for (int i = 0; i < getQuantityOfDefenceDices(); i++)
-			if(dice.combatDice() == SideDice.MONSTER_SHIELD){
+			if(getDice().combatDice() == SideDice.MONSTER_SHIELD){
 				cont++;
 			}
 
@@ -68,7 +68,7 @@ public abstract class Monster extends Character {
 				return true;
 		}
 		return false;
-	} // é necessario se tem isOnSight?
+	}
 
 
 }
