@@ -10,14 +10,16 @@ import br.unicamp.aluno.models.Item.Weapon;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-// AINDA TÔ AARRUMANDO E DEFININDO
+// AINDA TÔ AARRUMANDO E DEFININDO (TA BOM KKKKK)
 public class TextEngine {
     private Game map;
+    
     public TextEngine(Game map){
         this.map = map;
     }
 
-    private Direction readCommandFromKeyboard(Scanner scanner){
+    public Direction readCommandFromKeyboard(){
+    	Scanner scanner = new Scanner(System.in);
         String command = "";
         boolean loop = true;
 
@@ -40,6 +42,41 @@ public class TextEngine {
         else if (command.compareTo("m") == 0) { //abrir mochila
             map.getHero().printBackpack();
             choosingItem(scanner);
+        }
+        //Busca por tesouros
+        else if (command.compareTo("t") == 0) {
+        	map.searchForTreasure();
+        }
+        //Busca por armadilhas
+        else if (command.compareTo("h") == 0) {
+        	map.searchForTrap();
+        }
+        //Teleporte
+        else if (command.compareTo("v") == 0) {
+        	loop = true;
+        	while(loop == true) {
+        		//Printando a area que o teleporte pode ser feito
+        		map.printTeleportArea();
+        		
+        		try {
+        			
+        			//Recebendo as coordenadas
+        			System.out.print("Digite o número desejado:");
+        			int number = Integer.parseInt(stringScanner(scanner));
+        			
+        			//Teleportando
+        			map.teleport(number);
+        			
+        			map.printMap();
+        			
+        			//saindo do loop
+        			loop = false;        			
+        		}catch(ClassCastException e) {
+        			System.out.println("Por favor, as coordenadas devem ser números!");
+        		}
+
+        	}
+        	
         }
 
 

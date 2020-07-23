@@ -10,12 +10,17 @@ public class Main {
 		
 		Game game = new Game(hero, 21, 23);
 		
-		game.printAllMap();
+		TextEngine keyboard = new TextEngine(game);
+
+//		game.printAllMap();
 		System.out.println("");
 //		game.searchForTreasure();
 //		game.searchForTrap();
 		game.printMap();
 
+		keyboard.readCommandFromKeyboard();
+		
+		
 	}
 
 }

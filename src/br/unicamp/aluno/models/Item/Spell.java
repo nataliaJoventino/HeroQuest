@@ -10,8 +10,9 @@ public abstract class Spell extends Item {
 		super(name);
 		this.isDestroyed = isDestroyed;
 	}
-
-	public boolean isDestroyed() { // retorna se item deve ser detruido depois do uso
+	
+	//Retorna se item deve ser detruido depois do uso
+	public boolean isDestroyed() { 
 		return isDestroyed;
 	}
 
