@@ -257,7 +257,7 @@ public class Game {
 		// Para a visão efetuaremos uma dupla checagem
 		// Isso está melhor desenhado e explicadp no nosso relatório
 
-		// Primeiro quadrado de visão X -> Y
+		// Primeiro quadrado de visão Y -> X
 		SquareVision firstSquare = hero.getFirstSquareVision();
 
 		// Buscando o canto superior esquerdo -------------------------
@@ -386,7 +386,7 @@ public class Game {
 
 		firstSquare.setBottomRightCorner(xVision, yVision);
 
-		// Segundo quadrado de visão Y -> X
+		// Segundo quadrado de visão X -> Y
 		// --------------------------------------------------
 		SquareVision secondSquare = new SquareVision();
 
@@ -400,8 +400,8 @@ public class Game {
 			xVision--;
 		}
 
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
+		while (map[yVision][xVision + 1].equals("--") || map[yVision][xVision + 1].equals(">>")
+				|| map[yVision][xVision + 1].equals(hero.toString())) {
 			yVision--;
 		}
 
@@ -418,8 +418,8 @@ public class Game {
 			xVision++;
 		}
 
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
+		while (map[yVision][xVision - 1].equals("--") || map[yVision][xVision - 1].equals(">>")
+				|| map[yVision][xVision - 1].equals(hero.toString())) {
 			yVision--;
 		}
 
@@ -441,7 +441,7 @@ public class Game {
 		yVision = heroY;
 		xVision = heroX;
 
-		// Buscando o centro minimo do eixo X -------------------------
+		// Buscando o minimo do eixo X -------------------------
 		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
 				|| map[yVision][xVision].equals(hero.toString())) {
 			xVision--;
@@ -471,8 +471,8 @@ public class Game {
 			xVision--;
 		}
 
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
+		while (map[yVision][xVision + 1].equals("--") || map[yVision][xVision + 1].equals(">>")
+				|| map[yVision][xVision + 1].equals(hero.toString())) {
 			yVision++;
 		}
 
@@ -489,13 +489,13 @@ public class Game {
 			xVision++;
 		}
 
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
+		while (map[yVision][xVision - 1].equals("--") || map[yVision][xVision - 1].equals(">>")
+				|| map[yVision][xVision - 1].equals(hero.toString())) {
 			yVision++;
 		}
 
 		// Guardando o dado
-		secondSquare.setBottomLeftCorner(xVision, yVision);
+		secondSquare.setBottomRightCorner(xVision, yVision);
 
 		// Resetando
 		yVision = heroY;
@@ -531,6 +531,7 @@ public class Game {
 				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY) ||
 						(j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
 
+					//Printando a posição do mapa
 					System.out.print(this.map[i][j]);
 				}
 
