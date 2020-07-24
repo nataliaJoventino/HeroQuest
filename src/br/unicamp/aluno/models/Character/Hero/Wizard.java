@@ -2,7 +2,7 @@ package br.unicamp.aluno.models.Character.Hero;
 
 import br.unicamp.aluno.models.Item.MagicMissile;
 
-public class Wizard extends MisticHero {
+public class Wizard extends MysticHero {
 
 	public Wizard(String name) {
 		super(name,1,2,4,6); //Pontos de vida, inteligencia e defesa padrões

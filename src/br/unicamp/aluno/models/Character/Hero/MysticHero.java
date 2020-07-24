@@ -7,9 +7,9 @@ import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Item.Spell;
 
 //Os herois misticos podem dominar os 4 elementos e lançar magias
-public class MisticHero extends Hero {
+public class MysticHero extends Hero {
 	protected Spell spell;
-	public MisticHero(String name, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
+	public MysticHero(String name, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
 		super(name, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
 	}
 
