@@ -237,8 +237,6 @@ public class Game {
 
 	// Printa todo conteúdo do mapa
 	public void printAllMap() {
-		testMap();
-
 		for (int i = 0; i < this.yMapSize; i++) {
 			for (int j = 0; j < this.xMapSize; j++) {
 				System.out.print(this.map[i][j] + " ");
@@ -500,80 +498,6 @@ public class Game {
 			}
 
 		}
-		calculateHeroVision();
-
-	}
-
-	public void testMap() {
-
-		// resetando o mapa (é mais performático do que ficar mudando cada personagem)
-		// Lendo arquivo do mapa
-		try {
-			// Recebendo o arquivo de texto do mapa
-			FileReader arq = new FileReader("map.txt");
-			BufferedReader br = new BufferedReader(arq);
-
-			// lê a linha do arquivo
-			String line = br.readLine();
-
-			String[] formatedLine = line.strip().split(" ");
-
-			// iterando sobre as colunas
-			for (int j = 0; j < xMapSize; j++) {
-				this.map[0][j] = formatedLine[j];
-			}
-
-			// Setando para continuar a partir da segunda linha
-			int i = 1;
-			// Lendo as outras linhas
-			while (line != null) {
-
-				// Formatando assim como feito acima
-				line = br.readLine();
-
-				if (line == null) {
-					break;
-				}
-
-				formatedLine = line.strip().split(" ");
-
-				// Iterando por colunaa
-				for (int j = 0; j < this.xMapSize; j++) {
-					this.map[i][j] = formatedLine[j];
-				}
-
-				i++;
-			}
-			arq.close();
-		} catch (IOException e) {
-			System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
-		}
-
-		// Adicionando o Player no mapa
-		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
-
-		// Atualizando os monstros
-		for (Monster monster : monstersOnMap) {
-			int newX, newY;
-			if (monster.getLifePoints() > 0) {
-				newX = monster.getPositionX();
-				newY = monster.getPositionY();
-				map[newY][newX] = monster.toString();
-			} // tem que remover aqueles que já foram eliminados?
-		}
-
-
-		// Atualizando os outros traceables
-		for (Traceable traceable : traceablesOnMap) {
-
-
-			int newX = traceable.getPositionX();
-			int newY = traceable.getPositionY();
-			map[newY][newX] = traceable.toString();
-
-		}
-
-
 		calculateHeroVision();
 
 	}

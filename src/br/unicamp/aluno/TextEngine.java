@@ -8,7 +8,6 @@ import br.unicamp.aluno.models.Enum.Hand;
 import br.unicamp.aluno.models.Exceptions.CantMoveException;
 import br.unicamp.aluno.models.Exceptions.NotEquippableException;
 import br.unicamp.aluno.models.Item.*;
-import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Treasure;
 
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import java.util.Scanner;
 
 // AINDA TÔ AARRUMANDO E DEFININDO (TA BOM KKKKK)
 public class TextEngine {
+    private boolean exitSelected;
     private Game map;
     private Hero hero;
 
@@ -27,18 +27,20 @@ public class TextEngine {
 
     public void gameLoop(){
         Scanner scanner = new Scanner(System.in);
+        exitSelected = false;
 
-        while (true){ ///tem que fazer as exceções que param o jogo (não olhei ainda o exemplo no texto do projeto)
+        System.out.println("Game started!");
+
+        while (!exitSelected){ ///tem que fazer as exceções que param o jogo (não olhei ainda o exemplo no texto do projeto)
             map.refreshMap();
             map.printMap();
             readCommandFromKeyboard(scanner);
-
         }
 
-//Habilitar para quando arrumar
-//        map.printMap();
-//        System.out.println("Mapa finalizado! Parabens");
-//        scanner.close();
+
+        map.printMap();
+        System.out.println("Game terminated. Bye!");
+        scanner.close();
     }
 
     private void readCommandFromKeyboard(Scanner scanner){
@@ -161,9 +163,10 @@ public class TextEngine {
                 System.out.println("Monster has been attacked, life points left: " + monster.getLifePoints());
         }
 
+
         try {
         	if (walking != null && map.canIWalk(walking))
-        		hero.move(walking);        	
+        		hero.move(walking);
         }catch(CantMoveException e) {
         	System.out.println(e.getMessage());
         }

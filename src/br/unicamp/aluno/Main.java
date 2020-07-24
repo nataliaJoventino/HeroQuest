@@ -14,17 +14,13 @@ public class Main {
 		
 		TextEngine keyboard = new TextEngine(game);
 
-		game.printAllMap();
+//		game.printAllMap();
 //		System.out.println("");
 ////		game.searchForTreasure();
 ////		game.searchForTrap();
 //		game.printMap();
 
-
 		keyboard.gameLoop();
-
-
-		
 		
 	}
 
