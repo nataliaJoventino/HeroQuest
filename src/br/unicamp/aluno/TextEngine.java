@@ -119,7 +119,6 @@ public class TextEngine {
         else
             action(command, scanner);
 
-
         try {
         	if (walking != null && map.canIWalk(walking))
         		hero.move(walking);

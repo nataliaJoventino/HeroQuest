@@ -7,7 +7,7 @@ public class MagicMissile extends Spell {
     private final int ARROW_NUMBER = 3; // as três flechas são jogadas de uma vez?
 
     public MagicMissile() {
-        super(false);
+        super(true);
     }
 
     @Override

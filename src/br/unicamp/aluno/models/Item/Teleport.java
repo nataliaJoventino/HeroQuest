@@ -7,7 +7,7 @@ public class Teleport extends Spell {
     private Traceable newPosition;
 
     public Teleport() {
-        super(false);
+        super(true);
     }
 
     public void positionToMove(Traceable traceable){

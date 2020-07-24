@@ -9,7 +9,6 @@ public class Skeleton extends Monster {
     public Skeleton(int x, int y, Weapon weapon) {
         super(x, y, 2,1,3,2); //definir pontos com zero
         this.weapon = weapon; // gerar aleatóriamente aqui?
-//        addAttackDice(weapon.getAttackBonus());
     }
 
     public void hit(Character character) {
@@ -17,6 +16,9 @@ public class Skeleton extends Monster {
         addAttackDice(attackBonus);
         super.hit(character);
         removeAttackDice(attackBonus);
+
+        if (weapon.isDestroyed())
+            weapon = null;
     }
 
     @Override

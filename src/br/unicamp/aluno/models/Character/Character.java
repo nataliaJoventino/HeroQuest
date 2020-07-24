@@ -71,10 +71,8 @@ public abstract class Character extends Traceable {
 
     public void removeLifePoints(int value) { //Remove uma certa quantidade de vida do personagem
         this.lifePoints -= value; // value deve ser sempre positiva, fazer exceção?
-        if(lifePoints <= 0)
+        if(lifePoints < 0)
             lifePoints = 0;
-//            throw new YouAreDeadException(); essa verificação tem que ser fora daqui 
-//        }
     }
 
     public void removeLifePointsWithDefense(int value){ // remove pontos de vida descontando pontos de defesa

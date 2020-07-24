@@ -7,7 +7,7 @@ public class SimpleHeal extends Spell {
     private Dice dice;
 
     public SimpleHeal() {
-        super(false); // definir se é destruido após o uso
+        super(true); // definir se é destruido após o uso
         this.dice = new Dice();
     }
 

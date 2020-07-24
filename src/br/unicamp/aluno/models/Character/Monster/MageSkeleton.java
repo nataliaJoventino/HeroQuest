@@ -32,10 +32,14 @@ public class MageSkeleton extends Monster {
 
     @Override
     public void hit(Character character) {
-        int attackBonus = daggers.get(daggers.size() - 1).getAttackBonus(); // pega ultimo elemento na lista sempre fazer excessão caso não haja mais punhais
+        Weapon dagger =  daggers.get(daggers.size() - 1);
+        int attackBonus = dagger.getAttackBonus(); // pega ultimo elemento na lista sempre fazer excessão caso não haja mais punhais
         addAttackDice(attackBonus);
         super.hit(character);
         removeAttackDice(attackBonus);
+
+        if (dagger.isDestroyed())
+            daggers.remove(dagger);
     }
 
     @Override

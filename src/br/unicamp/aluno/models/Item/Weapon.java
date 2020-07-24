@@ -13,6 +13,7 @@ public abstract class Weapon implements Item {
 		this.attackBonus = attackBonus;
 	}
 
+	@Override
 	public boolean isDestroyed() {
 		return isDestroyed;
 	}

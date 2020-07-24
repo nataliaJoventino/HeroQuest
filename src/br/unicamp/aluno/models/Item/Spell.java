@@ -11,7 +11,8 @@ public abstract class Spell implements Item {
 	}
 	
 	//Retorna se item deve ser detruido depois do uso
-	public boolean isDestroyed() { 
+	@Override
+	public boolean isDestroyed() {
 		return isDestroyed;
 	}
 

@@ -13,12 +13,15 @@ public class Fireball extends Spell{
     private final int DAMAGE_TARGET = 6;
     private final int DAMAGE_ADJACENT = 3;
     private ArrayList<Traceable> adjacent;
-    private Game map;
+    private ArrayList<Character> possibleTarget;
 
 
-    public Fireball(Game map) { // vai precisar receber o mapa para encontrar adjacentes
+    public Fireball() { // vai precisar receber o mapa para encontrar adjacentes
         super(true);
-        this.map = map;
+    }
+
+    public void setPossibleTarget(ArrayList<Character> characters){
+        possibleTarget = characters;
     }
 
     @Override
@@ -27,7 +30,7 @@ public class Fireball extends Spell{
             Hero hero = (Hero) character; // se alvo for herói não há necessidade de verificar adjacencias, pois só há um herói no mapa
         }catch (ClassCastException e){ // se não é herói alvo é monstro
             listAdjacent(character);
-            for (Character c : map.getMonstersOnMap()){
+            for (Character c : possibleTarget){
                 for(Traceable t : adjacent)
                     if (c.getPositionX() == t.getPositionX() && c.getPositionY() == t.getPositionY())
                         c.removeLifePoints(DAMAGE_ADJACENT); // deveria ter os dados de defesa aqui (character ter prorprio dado)

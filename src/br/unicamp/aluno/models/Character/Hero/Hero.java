@@ -2,6 +2,7 @@ package br.unicamp.aluno.models.Character.Hero;
 
 import java.util.ArrayList;
 
+import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 import br.unicamp.aluno.models.SquareVision;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Enum.Hand;
@@ -28,6 +29,15 @@ public abstract class Hero extends Character {
 		this.backpack = new ArrayList();
 		firstSquareVision = new SquareVision();
 		secondSquareVision = new SquareVision();
+	}
+
+	@Override
+	public void removeLifePoints(int value) { //Remove uma certa quantidade de vida do personagem
+		super.removeLifePoints(value);
+
+		if (getLifePoints() == 0)
+            throw new YouAreDeadException();
+
 	}
 
 	public Hand isBothHandsUsed(){ // retorna qual mão está com item, se as duas estiverem ocupadas ou vazias retorna nulo
@@ -103,14 +113,6 @@ public abstract class Hero extends Character {
 		return armor;
 	}
 
-	//Veste a armadura
-	public void wearArmor(Armor newArmor) {
-		//Armaduras antigas serão destruidas quando trocadas
-		removeBonus(armor);
-		armor = newArmor;
-		addBonus(armor);
-	}
-
 	public void equip(Item item, Hand hand){ // quem chama verifica se o item deve ser segurado com as duas mão quando equipado
 		if (hand == Hand.LEFT)
 			holdWithLeftHand(item);
@@ -119,7 +121,33 @@ public abstract class Hero extends Character {
 	}
 
 	public void equip(Item item){ // equipa o item escolhido
-		holdItem(item);
+		if (isArmor(item) != null)
+			wearArmor(item);
+		else
+			holdItem(item);
+	}
+
+	//Veste a armadura
+	private void wearArmor(Item newArmor) {
+		//Armaduras antigas serão destruidas quando trocadas
+		if (armor != null && armor.isDestroyed())
+			removeBonus(armor);
+		else if (armor != null){
+			removeBonus(armor);
+			storeInBackpack(armor);
+		}
+
+		armor = newArmor;
+		addBonus(armor);
+	}
+
+	private Armor isArmor(Item item){
+		try{
+			Armor armor = (Armor) item;
+			return armor;
+		} catch (ClassCastException e){
+			return null;
+		}
 	}
 
 	private void holdItem(Item item){ // item deve ser segurado com as dua mãos
@@ -220,6 +248,11 @@ public abstract class Hero extends Character {
 		addBonus(leftHand); // para quando item ocupa duas mãos
 		super.hit(character);
 		removeBonus(leftHand);
+
+		if (leftHand.isDestroyed()){ // se item se destroi após o uso
+				leftHand = null;
+				rightHand = null;
+		}
 	}
 
 	public void hit(Character character, Hand hand){ //quanto de lifepoints vai ser tirado do inimigo dado dados (1 caveira = 1 hit)
@@ -234,6 +267,13 @@ public abstract class Hero extends Character {
 		addBonus(item);
 		super.hit(character);
 		removeBonus(item);
+
+		if (item.isDestroyed()){ // verifica se item se destroi após o uso
+			if (hand == Hand.LEFT)
+				leftHand = null;
+			else if (hand == Hand.RIGHT)
+				rightHand = null;
+		}
 	}
 
 	public int hitDefence(){ //quanto vai dfender de ataque do inimigo
