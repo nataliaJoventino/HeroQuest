@@ -3,6 +3,7 @@ package br.unicamp.aluno.models.Character;
 import br.unicamp.aluno.models.Dice;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.SideDice;
+import br.unicamp.aluno.models.Exceptions.CantMoveException;
 import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 import br.unicamp.aluno.models.Traceable;
 
@@ -15,6 +16,7 @@ public abstract class Character extends Traceable {
     private int inteligencePoints;
     private Direction currentDirection;
     private Dice dice;
+    private int moveAllowed;
 
     public Character(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) { //recebe via contrutor todas as informações
         super(x, y);
@@ -23,6 +25,7 @@ public abstract class Character extends Traceable {
         this.lifePoints = lifePoints;
         this.inteligencePoints = inteligencePoints;
         dice = new Dice();
+        moveAllowed = 0;
 
     }
 
@@ -88,16 +91,28 @@ public abstract class Character extends Traceable {
         return inteligencePoints;
     }
 
+    public int getMoveAllowed(){
+        return moveAllowed;
+    }
+
+    public void generateMoveAllowed(){ //gera o quanto personagem pode andar via dado
+        moveAllowed = dice.redDice();
+    }
+
     public void move(Traceable traceable){ //recebe nova direção e altera (para o teleporte)
         super.updatePosition(traceable.getPositionX(), traceable.getPositionY());
     }
 
     public void move(Direction direction) { // anda uma posição dada a direção
-        int x = super.getPositionX() + direction.getTraceable().getPositionX(); // coordenada x
-        int y = super.getPositionY() + direction.getTraceable().getPositionY(); // cooredenada y
-        currentDirection = direction;
-
-        super.updatePosition(x,y);
+        int x, y;
+        if (moveAllowed > 0) {
+            x = super.getPositionX() + direction.getTraceable().getPositionX(); // coordenada x
+            y = super.getPositionY() + direction.getTraceable().getPositionY(); // cooredenada y
+            currentDirection = direction;
+            super.updatePosition(x, y);
+            moveAllowed--;
+        } else
+            throw new CantMoveException("Moves allowed are over. Wave must be ended.");
     }
 
     public void hit(Character character){ //quanto de lifepoints vai ser tirado do inimigo dado dados (1 caveira = 1 hit)

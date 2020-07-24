@@ -8,4 +8,8 @@ public class CantMoveException extends RuntimeException {
 		super("A posição desejada está ocupada, tente outro lugar!");
 	}
 
+	public CantMoveException(String string) {
+		super(string);
+	}
+
 }

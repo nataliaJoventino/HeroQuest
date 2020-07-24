@@ -14,11 +14,12 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-// AINDA TÔ AARRUMANDO E DEFININDO (TA BOM KKKKK)
 public class TextEngine {
     private boolean exitSelected;
     private Game map;
     private Hero hero;
+    private int move;
+    private boolean wave;
 
     public TextEngine(Game map){
         this.map = map;
@@ -28,13 +29,25 @@ public class TextEngine {
     public void gameLoop(){
         Scanner scanner = new Scanner(System.in);
         exitSelected = false;
+        wave = true;
+        hero.generateMoveAllowed();
 
         System.out.println("Game started!");
 
-        while (!exitSelected){ ///tem que fazer as exceções que param o jogo (não olhei ainda o exemplo no texto do projeto)
-            map.refreshMap();
-            map.printMap();
-            readCommandFromKeyboard(scanner);
+        while (!exitSelected){ ///tem que fazer as exceções que param o jogo
+
+            if (wave) {
+                map.refreshMap();
+                map.printMap();
+                System.out.println("Moves allowed: " + hero.getMoveAllowed());
+                readCommandFromKeyboard(scanner);
+            } else {
+                System.out.println("Wave was ended");
+                hero.generateMoveAllowed();
+                wave = true;
+                System.out.println("New wave started");
+            }
+
         }
 
 
@@ -69,9 +82,10 @@ public class TextEngine {
             map.searchForTrap();
 
         else if (command.compareTo("b") == 0){ //abrir mochila
-            hero.printBackpack();
-            equipBackpack(choosingItem(scanner), scanner);
-
+            hero.printBackpack(); // por enquanto tá vazia
+            int choice = choosingItem(scanner);
+            if (choice != -1)
+                equipBackpack(choice, scanner);
         }
 
         else if (command.compareTo("g") == 0) { // coletar tesouro
@@ -86,7 +100,7 @@ public class TextEngine {
 
 
             while (loop) {
-                treasure.printTreasure(); // por enquanto ainda tá vazio
+                treasure.printTreasure(); // por enquanto ainda tá vazio os tesouros
                 System.out.print("Enter the command : ");
                 command = stringScanner(scanner);
 
@@ -169,6 +183,8 @@ public class TextEngine {
         		hero.move(walking);
         }catch(CantMoveException e) {
         	System.out.println(e.getMessage());
+        	if (walking != null)
+        	    wave = false;
         }
 
         System.out.println();
@@ -279,28 +295,17 @@ public class TextEngine {
     }
 
     private int choosingItem(Scanner scanner) {
-        int command = 0;
+        String command;
         boolean loop = true;
 
-        System.out.print("Enter item number to equip/use it: ");
+        System.out.print("Enter item number to equip/use it or type 'quit' to close backpack: ");
+        command = stringScanner(scanner);
 
-        while (loop) {
-            try {
-                command = scanner.nextInt();
-                loop = false;
-
-            } catch (InputMismatchException e) {
-                System.out.println(e.getCause());
-                System.out.println("Input Mismatch, try again");
-                loop = true;
-
-            } catch (NullPointerException e) {
-                System.out.println(e.getCause());
-                System.out.print("Null Pointer, try a valid input");
-                loop = true;
-            }
+        if (command.compareTo("quit") == 0)
+            return -1;
+        else {
+            return toInteger(command);
         }
-        return command;
     }
 
     private Weapon isWeapon(Item item){
@@ -332,7 +337,6 @@ public class TextEngine {
 
     private void equipBackpack(int command, Scanner scanner){
         String comm = "";
-        boolean loop = true;
 
         try{
             Weapon weapon = isWeapon(map.getHero().getInBackpack(command)); // verifica se é arma
