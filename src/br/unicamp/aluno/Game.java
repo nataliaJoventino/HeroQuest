@@ -73,8 +73,8 @@ public class Game {
 			}
 
 			// inserindo os goblins
-			 Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
-			 monstersOnMap.add(goblin);
+			Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
+			monstersOnMap.add(goblin);
 		}
 
 		// Adicionando 2 esqueletos magos no mapa
@@ -237,6 +237,7 @@ public class Game {
 
 	// Printa todo conteúdo do mapa
 	public void printAllMap() {
+		testMap();
 
 		for (int i = 0; i < this.yMapSize; i++) {
 			for (int j = 0; j < this.xMapSize; j++) {
@@ -307,7 +308,7 @@ public class Game {
 			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
 					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
 					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+					&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
 
 				try {
 					Treasure treasure = (Treasure) traceable;
@@ -344,7 +345,7 @@ public class Game {
 			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
 					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
 					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+					&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
 
 				try {
 					Trap trap = (Trap) traceable;
@@ -462,6 +463,7 @@ public class Game {
 			} // tem que remover aqueles que já foram eliminados?
 		}
 
+
 		// Atualizando os outros traceables
 		for (Traceable traceable : traceablesOnMap) {
 
@@ -498,6 +500,80 @@ public class Game {
 			}
 
 		}
+		calculateHeroVision();
+
+	}
+
+	public void testMap() {
+
+		// resetando o mapa (é mais performático do que ficar mudando cada personagem)
+		// Lendo arquivo do mapa
+		try {
+			// Recebendo o arquivo de texto do mapa
+			FileReader arq = new FileReader("map.txt");
+			BufferedReader br = new BufferedReader(arq);
+
+			// lê a linha do arquivo
+			String line = br.readLine();
+
+			String[] formatedLine = line.strip().split(" ");
+
+			// iterando sobre as colunas
+			for (int j = 0; j < xMapSize; j++) {
+				this.map[0][j] = formatedLine[j];
+			}
+
+			// Setando para continuar a partir da segunda linha
+			int i = 1;
+			// Lendo as outras linhas
+			while (line != null) {
+
+				// Formatando assim como feito acima
+				line = br.readLine();
+
+				if (line == null) {
+					break;
+				}
+
+				formatedLine = line.strip().split(" ");
+
+				// Iterando por colunaa
+				for (int j = 0; j < this.xMapSize; j++) {
+					this.map[i][j] = formatedLine[j];
+				}
+
+				i++;
+			}
+			arq.close();
+		} catch (IOException e) {
+			System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
+		}
+
+		// Adicionando o Player no mapa
+		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
+
+		// Atualizando os monstros
+		for (Monster monster : monstersOnMap) {
+			int newX, newY;
+			if (monster.getLifePoints() > 0) {
+				newX = monster.getPositionX();
+				newY = monster.getPositionY();
+				map[newY][newX] = monster.toString();
+			} // tem que remover aqueles que já foram eliminados?
+		}
+
+
+		// Atualizando os outros traceables
+		for (Traceable traceable : traceablesOnMap) {
+
+
+			int newX = traceable.getPositionX();
+			int newY = traceable.getPositionY();
+			map[newY][newX] = traceable.toString();
+
+		}
+
+
 		calculateHeroVision();
 
 	}
@@ -770,7 +846,7 @@ public class Game {
 
 	//Para o personagem teleportar dentro dos limites de sua visão
 	public void printTeleportArea() {
-		
+
 		// Os limites do primeiro quadrado da visão do player são:
 		int firstLowerX = hero.getFirstSquareVision().getLowerX();
 		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
@@ -787,7 +863,7 @@ public class Game {
 
 		//Preparando os index que o personagem irá ver
 		int index = 0;
-		
+
 		// Mostrando somente o primeiro quadrado que o player tem visão
 		for (int i = 0; i < this.yMapSize; i++) {
 			for (int j = 0; j < this.xMapSize; j++) {
@@ -800,20 +876,20 @@ public class Game {
 					if(this.map[i][j].equals("--") || this.map[i][j].equals(">>")) {
 						//Adicionando o index com o 0 à esquerda caso seja menor que 10
 						if(index < 10) {
-							this.map[i][j] = "0" + Integer.toString(index);		
+							this.map[i][j] = "0" + Integer.toString(index);
 							System.out.print(map[i][j] + " ");
 						}
 						else {
-							this.map[i][j] = Integer.toString(index);	
+							this.map[i][j] = Integer.toString(index);
 							System.out.print(map[i][j] + " ");
 						}
-					index++;
+						index++;
 					}
 					else {
 						System.out.print(map[i][j] + " ");
 					}
 				}
-				
+
 				else {
 					System.out.print("^^ ");
 				}
@@ -823,9 +899,9 @@ public class Game {
 		}
 
 	}
-	
+
 	public Traceable teleport(int index) {
-		
+
 		for (int i = 0; i < this.yMapSize; i++) {
 			for (int j = 0; j < this.xMapSize; j++) {
 				if(this.map[i][j].equals(Integer.toString(index)) || this.map[i][j].equals("0" + Integer.toString(index))){
@@ -946,11 +1022,10 @@ public class Game {
 
 		for (Traceable traceable : traceablesOnMap){
 			treasure = isTreasure(traceable);
-			if (treasure != null) // se for tesouro verifica posição
-				if (traceable.getPositionX() == x && traceable.getPositionY() == y && treasure.isVisible()) {// está em frente ao tesouro e verifica só se tesour visivel
-					treasure.printTreasure();
-					return treasure;
-				}
+			 // se for tesouro verifica posição
+			if (traceable.getPositionX() == x && traceable.getPositionY() == y && treasure.isVisible()) {// está em frente ao tesouro e verifica só se tesour visivel
+				return treasure;
+			}
 		}
 
 		return null;

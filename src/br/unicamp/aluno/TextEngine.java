@@ -82,7 +82,9 @@ public class TextEngine {
                     +"\n e - store all items"
                     +"\n quit - to close treasure");
 
+
             while (loop) {
+                treasure.printTreasure(); // por enquanto ainda tá vazio
                 System.out.print("Enter the command : ");
                 command = stringScanner(scanner);
 

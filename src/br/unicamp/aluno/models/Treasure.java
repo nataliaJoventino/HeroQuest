@@ -38,6 +38,10 @@ public class Treasure extends Traceable {
 		return item;
 	}
 
+	public void addTresure(Item item){
+		items.add(item);
+	}
+
 	public int size(){
 		return items.size();
 	}
