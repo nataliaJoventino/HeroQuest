@@ -26,7 +26,23 @@ public class Treasure extends Traceable {
 	public void turnVisible() {
 		visible = true;
 	}
-	
+
+	public void printTreasure(){
+		for (int i = 0; i < items.size(); i++)
+			System.out.println(""+ i +" "+ items.get(i).toString());
+	}
+
+	public Item removeTreasure(int index){
+		Item item = items.get(index);
+		items.remove(item);
+		return item;
+	}
+
+	public int size(){
+		return items.size();
+	}
+
+
 	//ToString
 	@Override
 	public String toString() {

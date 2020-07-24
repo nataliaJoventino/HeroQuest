@@ -44,7 +44,6 @@ public class Goblin extends Monster {
         return false;
     }
 
-
     public void move(Hero hero){
         int distUp = distAdjacent(hero, Direction.UP), distDown = distAdjacent(hero, Direction.DOWN);
         int distRight = distAdjacent(hero, Direction.RIGHT), distLeft = distAdjacent(hero, Direction.LEFT);

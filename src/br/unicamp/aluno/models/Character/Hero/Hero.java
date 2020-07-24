@@ -64,7 +64,7 @@ public abstract class Hero extends Character {
 		return secondSquareVision;
 	}
 
-	protected void storeInBackpack(Item item){ //Colocar item na mochila
+	public void storeInBackpack(Item item){ //Colocar item na mochila
 		backpack.add(item);
 	}
 

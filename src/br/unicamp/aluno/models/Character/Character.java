@@ -54,7 +54,7 @@ public abstract class Character extends Traceable {
         return quantityOfDefenceDices;
     }
 
-    protected Direction getCurrentDirection() {
+    public Direction getCurrentDirection() {
         return currentDirection;
     }
 
@@ -68,7 +68,8 @@ public abstract class Character extends Traceable {
 
     public void removeLifePoints(int value) { //Remove uma certa quantidade de vida do personagem
         this.lifePoints -= value; // value deve ser sempre positiva, fazer exceção?
-//        if(lifePoints <= 0) {
+        if(lifePoints <= 0)
+            lifePoints = 0;
 //            throw new YouAreDeadException(); essa verificação tem que ser fora daqui 
 //        }
     }

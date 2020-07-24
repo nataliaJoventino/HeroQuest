@@ -8,6 +8,7 @@ import br.unicamp.aluno.models.Enum.Hand;
 import br.unicamp.aluno.models.Exceptions.NotEquippableException;
 import br.unicamp.aluno.models.Item.*;
 import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.Treasure;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -27,6 +28,7 @@ public class TextEngine {
         Scanner scanner = new Scanner(System.in);
 
         while (true){ ///tem que fazer as exceções que param o jogo (não olhei ainda o exemplo no texto do projeto)
+            map.refreshMap();
             map.printMap();
             readCommandFromKeyboard(scanner);
 
@@ -38,14 +40,11 @@ public class TextEngine {
 //        scanner.close();
     }
 
-
     private void readCommandFromKeyboard(Scanner scanner){
         Direction walking = null;
         String command = "";
-        boolean loop = true;
 
         System.out.print("Enter the command : ");
-
         command = stringScanner(scanner);
 
         if (command.compareTo("w") == 0) //andar para cima
@@ -60,40 +59,72 @@ public class TextEngine {
         else if (command.compareTo("s") == 0) // andar para baixo
             walking = Direction.DOWN;
 
-        else if (command.compareTo("m") == 0) { //abrir mochila
-            hero.printBackpack();
-            choosingItem(scanner);
-
-        } else if (command.compareTo("v") == 0) { //Teleporte
-
-
-        } else if (command.compareTo("t") == 0) // busca tesouro
+        else if (command.compareTo("t") == 0) // busca tesouro
             map.searchForTreasure();
 
         else if (command.compareTo("h") == 0) // busca armadilha
             map.searchForTrap();
 
+        else if (command.compareTo("b") == 0){ //abrir mochila
+            hero.printBackpack();
+            equipBackpack(choosingItem(scanner), scanner);
+
+        }
+
+        else if (command.compareTo("g") == 0) { // coletar tesouro
+            Treasure treasure = map.getTreasure();
+            boolean loop = true;
+            Item item;
+
+            System.out.print("To store, type: "
+                    +"\n the number of the item"
+                    +"\n e - store all items"
+                    +"\n quit - to close treasure");
+
+            while (loop) {
+                System.out.print("Enter the command : ");
+                command = stringScanner(scanner);
+
+                if (command.compareTo("e") == 0) { //coletar todos os itens
+                    storeAll(treasure);
+                    loop = false;
+                } else if (command.compareTo("quit") == 0) // andar para esquerda
+                    loop = false;
+                else {
+                    item = treasure.removeTreasure(toInteger(command));
+                    hero.storeInBackpack(item);
+                }
+            }
+
+        }
+
         else if (command.compareTo("u") == 0){ // ataque/feitiço (falta colocar os pontos que afetam o ataque para o usuario ver)
+            Monster monster = null;
             Hand hand = hero.isBothHandsUsed(); // retorna nulo se as duas mãos estão ocupadas ou vazias
 
-            if ( hand != null) // segurando um unico item
-                hero.hit(allowAttack(hand), hand); // fazer erro se item não for arma
+            if ( hand != null) { // segurando um unico item
+                monster = allowAttack(hand);
+                hero.hit(monster, hand); // fazer erro se item não for arma
 
-            else{
+            } else{
 
                 if (!hero.emptyHands() && hero.isBothHandItem()) { // se mãos não vazias e item ocupar as duas mãos
-                    hero.hit(allowAttack(null)); //ataque
+                    monster = allowAttack(null);
+                    hero.hit(monster); //ataque
 
                 } else if (!hero.emptyHands()) {
                     String comm = "";
                     System.out.print("Escolha a arma para ataque (r para direita ou l para esquerda): ");
                     comm = stringScanner(scanner);
 
-                    if (comm.compareTo("r") == 0)
-                        hero.hit(allowAttack(Hand.RIGHT), Hand.RIGHT);
+                    if (comm.compareTo("r") == 0) {
+                        monster = allowAttack(Hand.RIGHT);
+                        hero.hit(monster, Hand.RIGHT);
 
-                    else if (comm.compareTo("l") == 0)
-                        hero.hit(allowAttack(Hand.LEFT), Hand.LEFT);
+                    }else if (comm.compareTo("l") == 0) {
+                        monster = allowAttack(Hand.LEFT);
+                        hero.hit(monster, Hand.LEFT);
+                    }
 
                 } else { //mãos ficam vazias se equipadas com feitiço
                     MisticHero misticHero = isMisticHero(hero);
@@ -112,7 +143,8 @@ public class TextEngine {
                                 misticHero.throwSpell(misticHero);
 
                             }catch (ClassCastException m){
-                                misticHero.throwSpell(target(scanner)); // vai ser fireball ou magicMissile
+                                monster = target(scanner);
+                                misticHero.throwSpell(monster); // vai ser fireball ou magicMissile
 
                             }
                         }
@@ -122,6 +154,8 @@ public class TextEngine {
                 }
             }
 
+            if (monster != null)
+                System.out.println("Monster has been attacked, life points left: " + monster.getLifePoints());
         }
 
         if (walking != null && map.canIWalk(walking))
@@ -198,6 +232,8 @@ public class TextEngine {
             }
         }
 
+        System.out.println("Monster life points: " + shortMonster.getLifePoints());
+
         return shortMonster;
     }
 
@@ -232,7 +268,7 @@ public class TextEngine {
         return command;
     }
 
-    private void choosingItem(Scanner scanner) {
+    private int choosingItem(Scanner scanner) {
         int command = 0;
         boolean loop = true;
 
@@ -254,8 +290,7 @@ public class TextEngine {
                 loop = true;
             }
         }
-
-        equipBackpack(command, scanner);
+        return command;
     }
 
     private Weapon isWeapon(Item item){
@@ -322,6 +357,20 @@ public class TextEngine {
             } else
                 System.out.println("Herói não pode usar feitiço"); // fazer exception
         }
+    }
+
+    private int toInteger(String command){
+        try{
+            int integer = Integer.parseInt(command);
+            return integer;
+        } catch (NumberFormatException e){
+            return -1; // não conseguiu converter
+        }
+    }
+
+    private void storeAll(Treasure treasure){
+        for (int i = 0; i < treasure.size(); i++)
+            hero.storeInBackpack(treasure.removeTreasure(i));
     }
 
 

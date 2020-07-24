@@ -273,11 +273,11 @@ public class Game {
 						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
 
 					// Printando a posição do mapa
-					System.out.print(this.map[i][j] + " ");
+					System.out.print(this.map[i][j] + "");
 				}
 
 				else {
-					System.out.print("^^ ");
+					System.out.print("^^");
 				}
 
 			}
@@ -405,7 +405,7 @@ public class Game {
 
 	}
 
-	private void refreshMap() {
+	public void refreshMap() {
 
 		// resetando o mapa (é mais performático do que ficar mudando cada personagem)
 		// Lendo arquivo do mapa
@@ -455,9 +455,12 @@ public class Game {
 
 		// Atualizando os monstros
 		for (Monster monster : monstersOnMap) {
-			int newX = monster.getPositionX();
-			int newY = monster.getPositionY();
-			map[newY][newX] = monster.toString();
+			int newX, newY;
+			if (monster.getLifePoints() > 0) {
+				newX = monster.getPositionX();
+				newY = monster.getPositionY();
+				map[newY][newX] = monster.toString();
+			} // tem que remover aqueles que já foram eliminados?
 		}
 
 		// Atualizando os outros traceables
@@ -869,7 +872,7 @@ public class Game {
 				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY)
 						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
 
-					for (String monster : monsterToString) {
+					for (String monster : monsterToString) { //usa lista de monstros que estão no mapa
 
 						// Trocando os espaços livres do mapa por indexes que o heroi escolherá
 						if (this.map[i][j].equals(monster)) {
@@ -910,8 +913,6 @@ public class Game {
 				if(this.map[i][j].equals(Integer.toString(index)) || this.map[i][j].equals("0" + Integer.toString(index))){
 					refreshMap();
 					return getPosition(j,i);
-
-//					hero.updatePosition(j, i);
 				}
 			}
 		}
@@ -922,8 +923,10 @@ public class Game {
 
 	private Monster getPosition(int x, int y){
 		for (Monster m : monstersOnMap)
-			if (m.getPositionX() == x && m.getPositionY() == y)
+			if (m.getPositionX() == x && m.getPositionY() == y) {
+				System.out.println("Monster life points: " + m.getLifePoints());
 				return m;
+			}
 		return null; // tratar retorno nulo
 	}
 
@@ -935,6 +938,32 @@ public class Game {
 				monsters.add(m.toString());
 		}
 		return monsters;
+	}
+
+	public Treasure getTreasure (){
+		int x = hero.getPositionX() + hero.getCurrentDirection().getTraceable().getPositionX(); // pega item na frente da direção que herói está
+		int y = hero.getPositionY() + hero.getCurrentDirection().getTraceable().getPositionY();
+		Treasure treasure = null;
+
+		for (Traceable traceable : traceablesOnMap){
+			treasure = isTreasure(traceable);
+			if (treasure != null) // se for tesouro verifica posição
+				if (traceable.getPositionX() == x && traceable.getPositionY() == y && treasure.isVisible()) {// está em frente ao tesouro e verifica só se tesour visivel
+					treasure.printTreasure();
+					return treasure;
+				}
+		}
+
+		return null;
+	}
+
+	private Treasure isTreasure(Traceable traceable){
+		try {
+			Treasure treasure = (Treasure) traceable;
+			return treasure;
+		} catch (ClassCastException e) {
+			return null;
+		}
 	}
 
 }
