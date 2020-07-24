@@ -13,7 +13,6 @@ public class Door extends Traceable{
 	//Abre a porta
 	public void open() {
 		this.opened = true;
-		return;
 	}
 	
 	//Verifica se a porta está aberta

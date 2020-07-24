@@ -64,29 +64,5 @@ public class MysticHero extends Hero {
 			System.out.println("Não há feitiço equipado");
 		}
 	}
-
-//	public void throwSpell(Character character) { // versão de throws recebendo um objetco
-//		try{
-//			Spell spell = (Spell) this.getRightHand(); //Checando se está na mão direita
-//			spell.cast(character); // precisa receber o  objetivo
-//
-//			if(!spell.isDestroyed())
-//				this.holdWithRightHand(null);
-//
-//		} catch (ClassCastException e){
-//
-//			try {
-//				Spell spell = (Spell) this.getLeftHand(); //Checando se está na mão esquerda e lançando caso esteja
-//				spell.cast(character); //lançando o feitiço
-//
-//				if(!spell.isDestroyed())
-//					this.holdWithLeftHand(null);
-//
-//			} catch (ClassCastException m){
-//				System.out.println("Você não está segurando nenhum feitiço!"); //Caso ele não esteja segurando nenhum feitiço
-//			}
-//
-//		}
-//	}
 	
 }

@@ -103,10 +103,10 @@ public abstract class Character extends Traceable {
 
     public void move(Direction direction) { // anda uma posição dada a direção
         int x, y;
+        currentDirection = direction;
         if (moveAllowed > 0) {
             x = super.getPositionX() + direction.getTraceable().getPositionX(); // coordenada x
             y = super.getPositionY() + direction.getTraceable().getPositionY(); // cooredenada y
-            currentDirection = direction;
             super.updatePosition(x, y);
             moveAllowed--;
         } else
