@@ -5,6 +5,7 @@ import br.unicamp.aluno.models.Character.Hero.MisticHero;
 import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
+import br.unicamp.aluno.models.Exceptions.CantMoveException;
 import br.unicamp.aluno.models.Exceptions.NotEquippableException;
 import br.unicamp.aluno.models.Item.*;
 import br.unicamp.aluno.models.Traceable;
@@ -158,8 +159,12 @@ public class TextEngine {
                 System.out.println("Monster has been attacked, life points left: " + monster.getLifePoints());
         }
 
-        if (walking != null && map.canIWalk(walking))
-            hero.move(walking);
+        try {
+        	if (walking != null && map.canIWalk(walking))
+        		hero.move(walking);        	
+        }catch(CantMoveException e) {
+        	System.out.println(e.getMessage());
+        }
 
         System.out.println();
     }
