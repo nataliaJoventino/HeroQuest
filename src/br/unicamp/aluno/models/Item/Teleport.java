@@ -8,11 +8,10 @@ public class Teleport extends Spell {
 
     public Teleport(String name) {
         super(name, false);
-        newPosition = new Traceable(0,0);
     }
 
-    public void positionToMove(int x, int y){
-        newPosition.updatePosition(x,y);
+    public void positionToMove(Traceable traceable){
+        newPosition = traceable;
     }
 
     @Override

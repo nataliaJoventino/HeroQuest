@@ -2,6 +2,8 @@ package br.unicamp.aluno;
 
 import br.unicamp.aluno.models.Character.Hero.Wizard;
 
+import java.util.Scanner;
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -10,12 +12,20 @@ public class Main {
 		
 		Game game = new Game(hero, 21, 23);
 		
-		game.printAllMap();
-		System.out.println("");
-//		game.searchForTreasure();
-//		game.searchForTrap();
-		game.printMap();
+		TextEngine keyboard = new TextEngine(game);
 
+////		game.printAllMap();
+//		System.out.println("");
+////		game.searchForTreasure();
+////		game.searchForTrap();
+//		game.printMap();
+
+
+		keyboard.gameLoop();
+
+
+		
+		
 	}
 
 }

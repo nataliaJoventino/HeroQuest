@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Door;
 import br.unicamp.aluno.models.Enum.Direction;
+import br.unicamp.aluno.models.Item.Teleport;
 import br.unicamp.aluno.models.SquareVision;
 import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Trap;
@@ -226,7 +227,7 @@ public class Game {
 		int yNow = hero.getPositionY();
 
 		// caso tiver o espaço desejado caminharemos com o player
-		if (this.map[xRequested][yRequested].equals("--")) {
+		if (this.map[yRequested][xRequested].equals("--")) {
 			return true;
 		} else {
 			// Depois tratamos isso com exceptions, deixa assim por enquanto kk
@@ -320,42 +321,42 @@ public class Game {
 			}
 		}
 	}
-	
+
 	public void searchForTrap() {
 		// Buscando somente pelo campo de visão do heroi
 
-				// Os limites do primeiro quadrado são:
-				int firstLowerX = hero.getFirstSquareVision().getLowerX();
-				int firstUpperX = hero.getFirstSquareVision().getGreaterX();
+		// Os limites do primeiro quadrado são:
+		int firstLowerX = hero.getFirstSquareVision().getLowerX();
+		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
 
-				int firstLowerY = hero.getFirstSquareVision().getLowerY();
-				int firstUpperY = hero.getFirstSquareVision().getGreaterY();
+		int firstLowerY = hero.getFirstSquareVision().getLowerY();
+		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
 
-				// Os limites do segundo quadrado são
-				int secondLowerX = hero.getSecondSquareVision().getLowerX();
-				int secondUpperX = hero.getSecondSquareVision().getGreaterX();
+		// Os limites do segundo quadrado são
+		int secondLowerX = hero.getSecondSquareVision().getLowerX();
+		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
 
-				int secondLowerY = hero.getSecondSquareVision().getLowerY();
-				int secondUpperY = hero.getSecondSquareVision().getGreaterY();
+		int secondLowerY = hero.getSecondSquareVision().getLowerY();
+		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
 
-				// Verificando a lista de traceables
-				for (Traceable traceable : traceablesOnMap) {
-					// Caso esteja dentro do campo de visão dele
-					if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
-							&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
-							|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-									&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+		// Verificando a lista de traceables
+		for (Traceable traceable : traceablesOnMap) {
+			// Caso esteja dentro do campo de visão dele
+			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
+					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
+					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
+							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
 
-						try {
-							Trap trap = (Trap) traceable;
-							trap.turnVisible();
-							refreshMap();
+				try {
+					Trap trap = (Trap) traceable;
+					trap.turnVisible();
+					refreshMap();
 
-						} catch (ClassCastException e) {
-							continue;
-						}
-					}
+				} catch (ClassCastException e) {
+					continue;
 				}
+			}
+		}
 	}
 
 	// Verifica se o heroi pisou em alguma armadilha e retira vida dele
@@ -498,7 +499,7 @@ public class Game {
 		calculateHeroVision();
 
 	}
-	
+
 	private void calculateHeroVision() {
 		int heroX = hero.getPositionX();
 		int heroY = hero.getPositionY();
@@ -763,6 +764,177 @@ public class Game {
 		secondSquare.setBottomCenter(xVision, yVision);
 
 		hero.updateVision(firstSquare, secondSquare);
+	}
+
+	//Para o personagem teleportar dentro dos limites de sua visão
+	public void printTeleportArea() {
+		
+		// Os limites do primeiro quadrado da visão do player são:
+		int firstLowerX = hero.getFirstSquareVision().getLowerX();
+		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
+
+		int firstLowerY = hero.getFirstSquareVision().getLowerY();
+		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
+
+		// Os limites do segundo quadrado são
+		int secondLowerX = hero.getSecondSquareVision().getLowerX();
+		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
+
+		int secondLowerY = hero.getSecondSquareVision().getLowerY();
+		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
+
+		//Preparando os index que o personagem irá ver
+		int index = 0;
+		
+		// Mostrando somente o primeiro quadrado que o player tem visão
+		for (int i = 0; i < this.yMapSize; i++) {
+			for (int j = 0; j < this.xMapSize; j++) {
+
+				// Caso esteja dentro do campo de visão dele
+				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY)
+						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
+
+					// Trocando os espaços livres do mapa por indexes que o heroi escolherá
+					if(this.map[i][j].equals("--") || this.map[i][j].equals(">>")) {
+						//Adicionando o index com o 0 à esquerda caso seja menor que 10
+						if(index < 10) {
+							this.map[i][j] = "0" + Integer.toString(index);		
+							System.out.print(map[i][j] + " ");
+						}
+						else {
+							this.map[i][j] = Integer.toString(index);	
+							System.out.print(map[i][j] + " ");
+						}
+					index++;
+					}
+					else {
+						System.out.print(map[i][j] + " ");
+					}
+				}
+				
+				else {
+					System.out.print("^^ ");
+				}
+
+			}
+			System.out.println();
+		}
+
+	}
+	
+	public Traceable teleport(int index) {
+		
+		for (int i = 0; i < this.yMapSize; i++) {
+			for (int j = 0; j < this.xMapSize; j++) {
+				if(this.map[i][j].equals(Integer.toString(index)) || this.map[i][j].equals("0" + Integer.toString(index))){
+					refreshMap(); // volta o mapa para o que era antes
+					return new Traceable(i,j);
+//					hero.updatePosition(j, i);
+				}
+			}
+		}
+
+		refreshMap();
+		return null;
+	}
+
+	//Para o personagem teleportar dentro dos limites de sua visão
+	public void printTarget() {
+
+		// Os limites do primeiro quadrado da visão do player são:
+		int firstLowerX = hero.getFirstSquareVision().getLowerX();
+		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
+
+		int firstLowerY = hero.getFirstSquareVision().getLowerY();
+		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
+
+		// Os limites do segundo quadrado são
+		int secondLowerX = hero.getSecondSquareVision().getLowerX();
+		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
+
+		int secondLowerY = hero.getSecondSquareVision().getLowerY();
+		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
+
+		//Preparando os index que o personagem irá ver
+		int index = 0;
+
+		ArrayList<String> monsterToString = monsterToString();
+		boolean print = false;
+
+		// Mostrando somente o primeiro quadrado que o player tem visão
+		for (int i = 0; i < this.yMapSize; i++) {
+			for (int j = 0; j < this.xMapSize; j++) {
+
+				// Caso esteja dentro do campo de visão dele
+				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY)
+						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
+
+					for (String monster : monsterToString) {
+
+						// Trocando os espaços livres do mapa por indexes que o heroi escolherá
+						if (this.map[i][j].equals(monster)) {
+							//Adicionando o index com o 0 à esquerda caso seja menor que 10
+							if (index < 10) {
+								this.map[i][j] = "0" + Integer.toString(index);
+								System.out.print(map[i][j]);
+							} else {
+								this.map[i][j] = Integer.toString(index);
+								System.out.print(map[i][j]);
+							}
+							index++;
+							print = false;
+							break;
+						} else {
+							print = true;
+						}
+					}
+
+					if (print)
+						System.out.print(map[i][j] + "");
+				}
+
+				else {
+					System.out.print("^^");
+				}
+
+			}
+			System.out.println();
+		}
+
+	}
+
+	public Monster target(int index) {
+
+		for (int i = 0; i < this.yMapSize; i++) {
+			for (int j = 0; j < this.xMapSize; j++) {
+				if(this.map[i][j].equals(Integer.toString(index)) || this.map[i][j].equals("0" + Integer.toString(index))){
+					refreshMap();
+					return getPosition(j,i);
+
+//					hero.updatePosition(j, i);
+				}
+			}
+		}
+
+		refreshMap();
+		return null;
+	}
+
+	private Monster getPosition(int x, int y){
+		for (Monster m : monstersOnMap)
+			if (m.getPositionX() == x && m.getPositionY() == y)
+				return m;
+		return null; // tratar retorno nulo
+	}
+
+	private ArrayList<String> monsterToString(){ // se forem criados novos monstros não precisará mudar nada
+		ArrayList<String> monsters = new ArrayList();
+
+		for (Monster m : monstersOnMap){
+			if (!monsters.contains(m.toString()))
+				monsters.add(m.toString());
+		}
+		return monsters;
 	}
 
 }

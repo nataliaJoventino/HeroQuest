@@ -6,16 +6,14 @@ import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
 import br.unicamp.aluno.models.Exceptions.NotEquippableException;
-import br.unicamp.aluno.models.Item.Item;
-import br.unicamp.aluno.models.Item.Spell;
-import br.unicamp.aluno.models.Item.Weapon;
+import br.unicamp.aluno.models.Item.*;
 import br.unicamp.aluno.models.Traceable;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-// AINDA TÔ AARRUMANDO E DEFININDO
+// AINDA TÔ AARRUMANDO E DEFININDO (TA BOM KKKKK)
 public class TextEngine {
     private Game map;
     private Hero hero;
@@ -24,6 +22,22 @@ public class TextEngine {
         this.map = map;
         hero = map.getHero();
     }
+
+    public void gameLoop(){
+        Scanner scanner = new Scanner(System.in);
+
+        while (true){ ///tem que fazer as exceções que param o jogo (não olhei ainda o exemplo no texto do projeto)
+            map.printMap();
+            readCommandFromKeyboard(scanner);
+
+        }
+
+//Habilitar para quando arrumar
+//        map.printMap();
+//        System.out.println("Mapa finalizado! Parabens");
+//        scanner.close();
+    }
+
 
     private void readCommandFromKeyboard(Scanner scanner){
         Direction walking = null;
@@ -50,17 +64,28 @@ public class TextEngine {
             hero.printBackpack();
             choosingItem(scanner);
 
-        } else if (command.compareTo("u") == 0){ // ataque/feitiço
+        } else if (command.compareTo("v") == 0) { //Teleporte
+
+
+        } else if (command.compareTo("t") == 0) // busca tesouro
+            map.searchForTreasure();
+
+        else if (command.compareTo("h") == 0) // busca armadilha
+            map.searchForTrap();
+
+        else if (command.compareTo("u") == 0){ // ataque/feitiço (falta colocar os pontos que afetam o ataque para o usuario ver)
             Hand hand = hero.isBothHandsUsed(); // retorna nulo se as duas mãos estão ocupadas ou vazias
+
             if ( hand != null) // segurando um unico item
                 hero.hit(allowAttack(hand), hand); // fazer erro se item não for arma
+
             else{
+
                 if (!hero.emptyHands() && hero.isBothHandItem()) { // se mãos não vazias e item ocupar as duas mãos
                     hero.hit(allowAttack(null)); //ataque
+
                 } else if (!hero.emptyHands()) {
                     String comm = "";
-
-
                     System.out.print("Escolha a arma para ataque (r para direita ou l para esquerda): ");
                     comm = stringScanner(scanner);
 
@@ -69,20 +94,35 @@ public class TextEngine {
 
                     else if (comm.compareTo("l") == 0)
                         hero.hit(allowAttack(Hand.LEFT), Hand.LEFT);
-                } else { //mãos ficam vazias se equipadas com feitiço
-                    // * IMPLEMENTA FEITIÇO *
-                    MisticHero misticHero = isMisticHero(hero);
-                    if (misticHero != null){
-                        //implement
-                    }
 
+                } else { //mãos ficam vazias se equipadas com feitiço
+                    MisticHero misticHero = isMisticHero(hero);
+
+                    if (misticHero != null){ // se herói mistico, usa feitiço
+
+                        try{
+                            Teleport teleport = (Teleport) misticHero.getSpell(); // converte para teleport
+                            teleport(scanner, teleport); // imprime mapa e recebe numero da noca posição
+                            misticHero.throwSpell(misticHero);
+
+                        }catch (ClassCastException e){
+
+                            try{
+                                SimpleHeal simpleHeal = (SimpleHeal) misticHero.getSpell();
+                                misticHero.throwSpell(misticHero);
+
+                            }catch (ClassCastException m){
+                                misticHero.throwSpell(target(scanner)); // vai ser fireball ou magicMissile
+
+                            }
+                        }
+                    } else {
+                        System.out.println("Herói não pode usar feitiço"); // fazer excessão
+                    }
                 }
             }
 
-        } else if (command.compareTo("e") == 0) // busca tesouro
-            map.searchForTreasure();
-        else if (command.compareTo("q") == 0) // busca armadilha
-            map.searchForTrap();
+        }
 
         if (walking != null && map.canIWalk(walking))
             hero.move(walking);
@@ -90,12 +130,46 @@ public class TextEngine {
         System.out.println();
     }
 
-    private MisticHero isMisticHero(Hero hero){
-        try{
-            MisticHero misticHero = (MisticHero) hero;
-            return misticHero;
-        } catch (ClassCastException e){
-            return null;
+    private void teleport(Scanner scanner, Teleport teleport) {
+        boolean loop = true;
+
+        while (loop == true) {
+            //Printando a area que o teleporte pode ser feito
+            map.printTeleportArea();
+
+            try {
+
+                //Recebendo as coordenadas
+                System.out.print("Digite o número desejado:");
+                int number = Integer.parseInt(stringScanner(scanner));
+
+                //Teleportando
+                teleport.positionToMove(map.teleport(number));
+//                map.printMap();
+
+                //saindo do loop
+                loop = false;
+            } catch (ClassCastException e) {
+                System.out.println("Por favor, as coordenadas devem ser números!");
+            }
+        }
+    }
+
+    private Monster target(Scanner scanner) {
+        while (true) {
+            //Printando a area que o teleporte pode ser feito
+            map.printTarget();
+
+            try {
+                //Recebendo as coordenadas
+                System.out.print("Digite o número desejado:");
+                int number = Integer.parseInt(stringScanner(scanner));
+
+                return map.target(number); // retorna alvo
+//                map.printMap();
+            } catch (ClassCastException e) {
+                System.out.println("Por favor, as coordenadas devem ser números!");
+            }
         }
     }
 
@@ -106,8 +180,8 @@ public class TextEngine {
                 if (hero.isOnSight(m, hand)) // verifica se monstro está na mira da arma da mçao selecionada
                     isInSight.add(m);
             }else
-                if (hero.isOnSight(m)) // verifica se monstro esta na mira de arma que ocupa as duas mãos
-                    isInSight.add(m);
+            if (hero.isOnSight(m)) // verifica se monstro esta na mira de arma que ocupa as duas mãos
+                isInSight.add(m);
         return shortDistance(isInSight);
     }
 
@@ -197,6 +271,15 @@ public class TextEngine {
         try{
             Spell spell = (Spell) item;
             return spell;
+        } catch (ClassCastException e){
+            return null;
+        }
+    }
+
+    private MisticHero isMisticHero(Hero hero){
+        try{
+            MisticHero misticHero = (MisticHero) hero;
+            return misticHero;
         } catch (ClassCastException e){
             return null;
         }
