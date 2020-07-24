@@ -19,6 +19,7 @@ import br.unicamp.aluno.models.Character.Monster.Goblin;
 import br.unicamp.aluno.models.Character.Monster.MageSkeleton;
 import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Character.Monster.Skeleton;
+import br.unicamp.aluno.models.Exceptions.CantMoveException;
 import br.unicamp.aluno.models.Exceptions.TrapsHurtMeException;
 import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 
@@ -227,12 +228,10 @@ public class Game {
 		int yNow = hero.getPositionY();
 
 		// caso tiver o espaço desejado caminharemos com o player
-		if (this.map[yRequested][xRequested].equals("--")) {
+		if (this.map[yRequested][xRequested].equals("--") || this.map[yRequested][xRequested].equals(">>") || this.map[yRequested][xRequested].equals("//")) {
 			return true;
 		} else {
-			// Depois tratamos isso com exceptions, deixa assim por enquanto kk
-			System.out.println("Não pode andar ai não, a posição ta ocupada!");
-			return false;
+			throw new CantMoveException();
 		}
 	}
 
@@ -910,8 +909,6 @@ public class Game {
 				if(this.map[i][j].equals(Integer.toString(index)) || this.map[i][j].equals("0" + Integer.toString(index))){
 					refreshMap();
 					return getPosition(j,i);
-
-//					hero.updatePosition(j, i);
 				}
 			}
 		}

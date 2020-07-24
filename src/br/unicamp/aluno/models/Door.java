@@ -26,7 +26,7 @@ public class Door extends Traceable{
 	public String toString() {
 		//Caso a porta esteja aberta
 		if(this.isOpened()) {
-			return "/";
+			return "//";
 		}
 		//Caso a porta esteja fechada
 		else {
