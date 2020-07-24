@@ -1,13 +1,12 @@
 package br.unicamp.aluno.models.Item;
 
-import br.unicamp.aluno.Game;
+import java.util.ArrayList;
+
+import br.unicamp.aluno.models.Point;
+import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Character.Hero.Hero;
-import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Enum.Direction;
-import br.unicamp.aluno.models.Traceable;
-
-import java.util.ArrayList;
 
 public class Fireball extends Spell{
     private final int DAMAGE_TARGET = 6;
@@ -47,10 +46,10 @@ public class Fireball extends Spell{
     }
 
     private void setAdjacent(Character character, Direction direction){ // pega adjacencias de personagem
-        int x = character.getPositionX() + direction.getTraceable().getPositionX(); // soma direção com posição atual da personagem para pegar adjacente
-        int y = character.getPositionY() + direction.getTraceable().getPositionY();
-        Traceable traceable = new Traceable(x,y);
-        adjacent.add(traceable);
+        int x = character.getPositionX() + direction.getPoint().getPositionX(); // soma direção com posição atual da personagem para pegar adjacente
+        int y = character.getPositionY() + direction.getPoint().getPositionY();
+        Point point = new Point(x,y);
+        adjacent.add(point);
     }
     
     @Override

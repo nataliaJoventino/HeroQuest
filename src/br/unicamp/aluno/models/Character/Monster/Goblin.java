@@ -26,7 +26,7 @@ public class Goblin extends Monster {
     }
 
     private int distAdjacent(Hero hero, Direction direction){ //dada a direção faz uma projeção do goblin na mesma e analisa distancia
-        Traceable dir = direction.getTraceable();
+        Traceable dir = direction.getPoint();
         return distance(hero.getPositionX(), hero.getPositionY(), (this.getPositionX() + dir.getPositionX()), (this.getPositionY() + dir.getPositionY()));
     }
 
@@ -77,8 +77,8 @@ public class Goblin extends Monster {
 
     @Override
     public boolean isOnSight(Character character) {
-        int x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * daggers.get(daggers.size() - 1).getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
-        int y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * daggers.get(daggers.size() - 1).getWeaponReach());
+        int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * daggers.get(daggers.size() - 1).getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
+        int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * daggers.get(daggers.size() - 1).getWeaponReach());
 
         if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) || (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) //verifica se personagem esta a entre o monstro e alcance da arma em x
             if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y) || (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))

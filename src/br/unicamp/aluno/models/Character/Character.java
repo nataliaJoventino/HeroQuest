@@ -1,13 +1,12 @@
 package br.unicamp.aluno.models.Character;
 
 import br.unicamp.aluno.models.Dice;
+import br.unicamp.aluno.models.Point;
+import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.SideDice;
 import br.unicamp.aluno.models.Exceptions.CantMoveException;
 import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
-import br.unicamp.aluno.models.Traceable;
-
-import java.util.ArrayList;
 
 public abstract class Character extends Traceable {
     private int quantityOfAttackDices;
@@ -70,9 +69,9 @@ public abstract class Character extends Traceable {
     }
 
     public void removeLifePoints(int value) { //Remove uma certa quantidade de vida do personagem
-        this.lifePoints -= value; // value deve ser sempre positiva, fazer exceção?
-        if(lifePoints < 0)
-            lifePoints = 0;
+        this.lifePoints -= value;
+        if(lifePoints <= 0)
+            throw new YouAreDeadException();
     }
 
     public void removeLifePointsWithDefense(int value){ // remove pontos de vida descontando pontos de defesa
@@ -97,15 +96,15 @@ public abstract class Character extends Traceable {
         moveAllowed = dice.redDice();
     }
 
-    public void move(Traceable traceable){ //recebe nova direção e altera (para o teleporte)
-        super.updatePosition(traceable.getPositionX(), traceable.getPositionY());
+    public void move(Point point){ //recebe nova direção e altera (para o teleporte)
+        super.updatePosition(point.getPositionX(), point.getPositionY());
     }
 
     public void move(Direction direction) { // anda uma posição dada a direção
         int x, y;
         if (moveAllowed > 0) {
-            x = super.getPositionX() + direction.getTraceable().getPositionX(); // coordenada x
-            y = super.getPositionY() + direction.getTraceable().getPositionY(); // cooredenada y
+            x = super.getPositionX() + direction.getPoint().getPositionX(); // coordenada x
+            y = super.getPositionY() + direction.getPoint().getPositionY(); // cooredenada y
             currentDirection = direction;
             super.updatePosition(x, y);
             moveAllowed--;
