@@ -22,7 +22,7 @@ public class Goblin extends Monster {
     }
 
     private Weapon instanciaPunhal(){
-        return  new Dagger("Monster Dagger");
+        return  new Dagger();
     }
 
     private int distAdjacent(Hero hero, Direction direction){ //dada a direção faz uma projeção do goblin na mesma e analisa distancia

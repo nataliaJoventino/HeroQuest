@@ -2,8 +2,8 @@ package br.unicamp.aluno.models.Item;
 
 public class LongSword extends Weapon{
 
-	public LongSword(String name) {
-		super(name, false, true, 1, 3);
+	public LongSword() {
+		super(false, true, 1, 3);
 	}
 
 	//O caso da LongsWord é que é necessário as duas mãos do heroi para que ela seja equipada
@@ -27,5 +27,10 @@ public class LongSword extends Weapon{
 //		hero.setQuantityOfAttackDices(hero.getQuantityOfAttackDices() - 3);
 //		hero.storeInBackpack(this);
 //	}
+	
+	@Override
+	public String toString() {
+		return "LongSword";
+	}
 	
 }

@@ -6,13 +6,18 @@ import br.unicamp.aluno.models.Dice;
 public class SimpleHeal extends Spell {
     private Dice dice;
 
-    public SimpleHeal(String name) {
-        super(name, false); // definir se é destruido após o uso
+    public SimpleHeal() {
+        super(false); // definir se é destruido após o uso
         this.dice = new Dice();
     }
 
     @Override
     public void cast(Character character) {
         character.addLifePoints(dice.normalDice());
+    }
+    
+    @Override
+    public String toString() {
+    	return "Simple Heal";
     }
 }

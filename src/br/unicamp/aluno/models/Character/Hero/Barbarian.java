@@ -9,7 +9,7 @@ public class Barbarian extends Hero {
 		//Chamando o construtor da super classe
 		super(name,3,2,8,2); //Pontos de vida, inteligencia e defesa padrões
 		//Adicionar arma segundo as regras do jogo
-		this.holdWithRightHand(new LongSword("Stander Long Sword"));
+		this.holdWithRightHand(new LongSword());
 	}
 	
 	@Override

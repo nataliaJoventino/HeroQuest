@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Door;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Item.Teleport;
@@ -16,6 +15,7 @@ import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Trap;
 import br.unicamp.aluno.models.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Hero;
+import br.unicamp.aluno.models.Character.Monster.Goblin;
 import br.unicamp.aluno.models.Character.Monster.MageSkeleton;
 import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Character.Monster.Skeleton;
@@ -72,8 +72,8 @@ public class Game {
 			}
 
 			// inserindo os goblins
-			// Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
-			// monstersOnMap.add(goblin);
+			 Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
+			 monstersOnMap.add(goblin);
 		}
 
 		// Adicionando 2 esqueletos magos no mapa
@@ -241,7 +241,7 @@ public class Game {
 
 		for (int i = 0; i < this.yMapSize; i++) {
 			for (int j = 0; j < this.xMapSize; j++) {
-				System.out.print(this.map[i][j]);
+				System.out.print(this.map[i][j] + " ");
 			}
 			System.out.println("");
 		}
@@ -273,11 +273,11 @@ public class Game {
 						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
 
 					// Printando a posição do mapa
-					System.out.print(this.map[i][j]);
+					System.out.print(this.map[i][j] + " ");
 				}
 
 				else {
-					System.out.print("^^");
+					System.out.print("^^ ");
 				}
 
 			}
