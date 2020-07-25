@@ -6,27 +6,21 @@ public enum Direction {
     UP,DOWN,RIGHT,LEFT;
 
     public Point getPoint(){
-    	//Por que precisa instanciar?
-        Point coordinate = null;
-
         switch (this){
             case UP:
-            	//Esse new traceble não seria na verdade um updatePosition?
-                coordinate = new Point(0, -1);
-                break;
+                return new Point(0, -1);
+
 
             case DOWN:
-                coordinate = new Point(0, 1);
-                break;
+                return new Point(0, 1);
 
             case LEFT:
-                coordinate = new Point(-1, 0);
-                break;
+                return new Point(-1, 0);
 
             case RIGHT:
-                coordinate = new Point(1, 0);
-                break;
+                return new Point(1, 0);
         }
-        return coordinate;
+
+        return null;
     }
 }

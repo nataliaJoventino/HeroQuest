@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import br.unicamp.aluno.models.Exceptions.OnlyNumbersException;
+import br.unicamp.aluno.models.Exceptions.*;
+import br.unicamp.aluno.models.Item.*;
 import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Hero;
@@ -12,13 +13,6 @@ import br.unicamp.aluno.models.Character.Hero.MysticHero;
 import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
-import br.unicamp.aluno.models.Exceptions.CantMoveException;
-import br.unicamp.aluno.models.Exceptions.NotEquippableException;
-import br.unicamp.aluno.models.Item.Item;
-import br.unicamp.aluno.models.Item.SimpleHeal;
-import br.unicamp.aluno.models.Item.Spell;
-import br.unicamp.aluno.models.Item.Teleport;
-import br.unicamp.aluno.models.Item.Weapon;
 
 public class TextEngine {
 	private boolean exitSelected;
@@ -56,12 +50,15 @@ public class TextEngine {
                         +" | Life points: " + hero.getLifePoints()); //fazer if pra caso item seja de suas mãos e para não ficar aparecendo o null
                 readCommandFromKeyboard(scanner);
             } else {
-                System.out.println("Wave was ended");
+                System.out.println("||| WAVE ENDED |||");
                 hero.generateMoveAllowed();
                 wave = true;
                 action = false;
                 move = false;
-                System.out.println("New wave started");
+
+                System.out.println();
+                System.out.println("||| NEW WAVE |||");
+                System.out.println();
             }
 
         }
@@ -91,8 +88,10 @@ public class TextEngine {
         else if (command.compareTo("s") == 0) // andar para baixo
             walking = Direction.DOWN;
 
-        else if (command.compareTo("h") == 0) // busca armadilha
+        else if (command.compareTo("h") == 0) { // busca armadilha
             map.searchForTrap();
+            System.out.println("Search for traps has been made!");
+        }
 
         else if (command.compareTo("p") == 0) { // abrir porta
             int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX();
@@ -100,7 +99,7 @@ public class TextEngine {
             Point point = new Point(x,y);
             map.openDoor(point);
 
-        }else if (command.compareTo("b") == 0){ //abrir mochila
+        } else if (command.compareTo("b") == 0){ //abrir mochila
             hero.printBackpack(); // por enquanto tá vazia
             int choice = choosingItem();
             if (choice != -1)
@@ -112,7 +111,7 @@ public class TextEngine {
             boolean loop = true;
             Item item;
 
-            System.out.print("To store, type: "
+            System.out.println("To store, type: "
                     +"\n the number of the item"
                     +"\n e - store all items"
                     +"\n quit - to close treasure");
@@ -144,9 +143,10 @@ public class TextEngine {
                 hero.move(walking);
         }catch(CantMoveException e) {
             System.out.println(e.getMessage());
-            if (hero.getMoveAllowed() == 0)
-                wave = false;
         }
+
+        if (hero.getMoveAllowed() == 0)
+            wave = false;
 
         System.out.println();
     }
@@ -155,11 +155,14 @@ public class TextEngine {
         if (!action){
             if (command.compareTo("t") == 0) { // busca tesouro
                 map.searchForTreasure();
+                System.out.println("Search for treasure has been made!");
                 action = true;
             }
 
             else if (command.compareTo("u") == 0){ // ataque/feitiço (falta colocar os pontos que afetam o ataque para o usuario ver)
                 Monster monster = null;
+                MysticHero mysticHero = null;
+
                 Hand hand = hero.isBothHandsUsed(); // retorna nulo se as duas mãos estão ocupadas ou vazias
                 try {
                     if (hand != null) { // segurando um unico item
@@ -190,7 +193,7 @@ public class TextEngine {
                             }
 
                         } else { //mãos ficam vazias se equipadas com feitiço
-                            MysticHero mysticHero = isMysticHero(hero);
+                            mysticHero = isMysticHero(hero);
 
                             if (mysticHero != null && mysticHero.getSpell() != null) { // se herói mistico, usa feitiço
 
@@ -206,26 +209,49 @@ public class TextEngine {
                                         mysticHero.throwSpell(mysticHero);
 
                                     } catch (ClassCastException m) {
-                                        monster = target();
-                                        mysticHero.throwSpell(monster); // vai ser fireball ou magicMissile
+
+                                        try {
+                                            Fireball fireball = (Fireball) mysticHero.getSpell();
+                                            fireball.setPossibleTarget(map.getMonstersOnMap());
+                                            mysticHero.throwSpell(mysticHero);
+
+                                        } catch (ClassCastException c) {
+                                            monster = target();
+                                            mysticHero.throwSpell(monster); // vai ser magicMissile
+
+                                        }
 
                                     }
                                 }
+
+
                             } else {
                                 if (hero.emptyHands())
-                                    System.out.println("No item equipped");
-                                else
-                                    System.out.println("Only mystic hero can cast spells"); // fazer excessão para sem spell
+                                    throw new NoItemEquippedException();
+                                else if (mysticHero == null)
+                                    throw new CantThrowSpellException();
                             }
                         }
                     }
-                } catch (NullPointerException e){
-                    System.out.println("No target on the sight.");
-                }
 
-                if (monster != null) {
-                    System.out.println("Monster has been attacked, life points left: " + monster.getLifePoints());
+                    if (mysticHero != null){
+                        System.out.println(" | Monster's defense: " + monster.getHitDefence());
+                        System.out.println("Monster '"+map.getFromMap(monster.getPositionX(), monster.getPositionY())+"' life points after hit: " + monster.getLifePoints());
+                    } else {
+                        map.printTarget();
+                        System.out.println("Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY()) + "' life points: " + monster.getLifePoints());
+                        System.out.println("Hero's hit: " + hero.getHitAttack()
+                                + " | Monster's defense: " + monster.getHitDefence());
+                        System.out.println("Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY()) + "' life points after hit: " + monster.getLifePoints());
+                    }
                     action = true;
+                } catch (NoItemEquippedException m){
+                    System.out.println(m.getMessage());
+                } catch (CantThrowSpellException n){
+                    System.out.println(n.getMessage());
+                }
+                catch (NullPointerException e){
+                    System.out.println("No target on the sight.");
                 }
             }
         }
@@ -241,6 +267,7 @@ public class TextEngine {
 
 		while (loop == true) {
 			// Printando a area que o teleporte pode ser feito
+            System.out.println();
 			map.printTeleportArea();
 
 			// Recebendo as coordenadas

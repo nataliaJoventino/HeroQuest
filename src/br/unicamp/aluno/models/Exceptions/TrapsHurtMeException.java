@@ -9,5 +9,17 @@ public class TrapsHurtMeException extends RuntimeException {
 	public TrapsHurtMeException() {
 		super("Seu turno acaba por aqui, você foi pego por uma armadilha!");
 	}
-	
+
+
+	public TrapsHurtMeException(String message) {
+		super(message);
+	}
+
+	public TrapsHurtMeException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public TrapsHurtMeException(Throwable cause) {
+		super(cause);
+	}
 }

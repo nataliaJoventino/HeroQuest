@@ -990,7 +990,7 @@ public class Game {
 				}
 
 				else {
-					System.out.print("^^");
+					System.out.print("^^ ");
 				}
 
 			}
@@ -1017,10 +1017,8 @@ public class Game {
 
 	private Monster getPosition(int x, int y) {
 		for (Monster m : monstersOnMap)
-			if (m.getPositionX() == x && m.getPositionY() == y) {
-				System.out.println("Monster life points: " + m.getLifePoints());
+			if (m.getPositionX() == x && m.getPositionY() == y)
 				return m;
-			}
 		return null; // tratar retorno nulo
 	}
 
@@ -1066,16 +1064,20 @@ public class Game {
 		}
 	}
 
-	public void openDoor(Traceable traceable) {
+	public boolean openDoor(Traceable traceable) {
 		int x = traceable.getPositionX();
 		int y = traceable.getPositionY();
 		Door door;
 
 		for (Traceable t : traceablesOnMap) {
 			door = isDoor(t);
-			if (t.getPositionX() == x && t.getPositionY() == y && door != null)
+			if (t.getPositionX() == x && t.getPositionY() == y && door != null) {
 				door.open();
+				return true;
+			}
 		}
+
+		return false;
 	}
 
 	private Door isDoor(Traceable traceable) {
@@ -1085,6 +1087,10 @@ public class Game {
 		} catch (ClassCastException e) {
 			return null;
 		}
+	}
+
+	public String getFromMap(int x, int y) {
+		return map[y][x];
 	}
 
 }

@@ -13,19 +13,19 @@ public abstract class Character extends Traceable {
     private int quantityOfAttackDices;
     private int quantityOfDefenceDices;
     private int lifePoints;
-    private int inteligencePoints;
+    private int intelligencePoints;
     private Direction currentDirection;
     private Dice dice;
     private int moveAllowed;
-    private int diceAttack;
-    private int diceDefence;
+    private int hitAttack;
+    private int hitDefence;
 
-    public Character(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) { //recebe via contrutor todas as informações
+    public Character(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int intelligencePoints) { //recebe via contrutor todas as informações
         super(x, y);
         this.quantityOfAttackDices = quantityOfAttackDices;
         this.quantityOfDefenceDices = quantityOfDefenceDices;
         this.lifePoints = lifePoints;
-        this.inteligencePoints = inteligencePoints;
+        this.intelligencePoints = intelligencePoints;
         dice = new Dice();
         moveAllowed = 0;
 
@@ -73,22 +73,33 @@ public abstract class Character extends Traceable {
 
     public void removeLifePoints(int value) { //Remove uma certa quantidade de vida do personagem
         this.lifePoints -= value;
-        if(lifePoints <= 0)
-            throw new YouAreDeadException();
+        if(lifePoints < 0)
+            lifePoints = 0;
     }
 
     public void removeLifePointsWithDefense(int value){ // remove pontos de vida descontando pontos de defesa
-        int totalHit = value - hitDefence(); // remove hits de defesa
+        int totalHit;
+        this.hitDefence = hitDefence();
+        totalHit = value - this.hitDefence; // remove hits de defesa
         if (totalHit > 0)
             removeLifePoints(totalHit);
+
+    }
+
+    public int getHitAttack() {
+        return hitAttack;
+    }
+
+    public int getHitDefence() {
+        return hitDefence;
     }
 
     public int getLifePoints() { // retorna life points
         return lifePoints;
     }
 
-    public int getInteligencePoints() { // retorna pontos de inteligencia
-        return inteligencePoints;
+    public int getIntelligencePoints() { // retorna pontos de inteligencia
+        return intelligencePoints;
     }
 
     public int getMoveAllowed(){
@@ -122,6 +133,7 @@ public abstract class Character extends Traceable {
             if(dice.combatDice() == SideDice.SKULL){
                 cont++;
             }
+        hitAttack = cont;
         character.removeLifePointsWithDefense(cont); // remove life points
     }
 
@@ -158,8 +170,8 @@ public abstract class Character extends Traceable {
 
     private Point reach(Direction direction, Weapon weapon){
         try {
-            int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
-            int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * weapon.getWeaponReach());
+            int x = this.getPositionX() + (direction.getPoint().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
+            int y = this.getPositionY() + (direction.getPoint().getPositionY() * weapon.getWeaponReach());
 
             return new Point(x, y);
 

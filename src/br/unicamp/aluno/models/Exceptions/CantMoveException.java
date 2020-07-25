@@ -7,8 +7,20 @@ public class CantMoveException extends RuntimeException {
 	private boolean isDoor;
 	private static final long serialVersionUID = 1L;
 
+	public CantMoveException() {
+		super();
+	}
+
 	public CantMoveException(String string) {
 		super(string);
+	}
+
+	public CantMoveException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public CantMoveException(Throwable cause) {
+		super(cause);
 	}
 
 	public CantMoveException(Traceable traceable) {

@@ -12,7 +12,7 @@ public class MagicMissile extends Spell {
 
     @Override
     public void cast(Character character) {
-        character.removeLifePoints(ARROW_NUMBER * DAMAGE_TARGET);
+        character.removeLifePointsWithDefense(ARROW_NUMBER * DAMAGE_TARGET);
     }
     
     @Override

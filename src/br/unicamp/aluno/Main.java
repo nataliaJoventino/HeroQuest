@@ -27,7 +27,7 @@ public class Main {
 		
 		//Escolhendo o heroi
 		switch (heroNumber) {
-		
+
 		//Barbaro
 		case 1:
 			hero = new Barbarian("Natália");
@@ -38,7 +38,7 @@ public class Main {
 			break;
 		//Elfo
 		case 3:
-			hero = new Elf("Irmão do Andrey"); 
+			hero = new Elf("Irmão do Andrey");
 			break;
 		//Mago
 		case 4:

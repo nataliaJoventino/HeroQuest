@@ -2,6 +2,7 @@ package br.unicamp.aluno.models.Item;
 
 import java.util.ArrayList;
 
+import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Character.Character;
@@ -19,8 +20,13 @@ public class Fireball extends Spell{
         super(true);
     }
 
-    public void setPossibleTarget(ArrayList<Character> characters){
-        possibleTarget = characters;
+    public void setPossibleTarget(ArrayList<Monster> characters){
+        for (Monster m : characters)
+            possibleTarget.add(m);
+    }
+
+    public void setPossibleTarget(Hero characters){
+        possibleTarget.add(characters);
     }
 
     @Override
@@ -32,10 +38,10 @@ public class Fireball extends Spell{
             for (Character c : possibleTarget){
                 for(Traceable t : adjacent)
                     if (c.getPositionX() == t.getPositionX() && c.getPositionY() == t.getPositionY())
-                        c.removeLifePoints(DAMAGE_ADJACENT); // deveria ter os dados de defesa aqui (character ter prorprio dado)
+                        c.removeLifePointsWithDefense(DAMAGE_ADJACENT); // deveria ter os dados de defesa aqui (character ter prorprio dado)
             }
         }
-        character.removeLifePoints(DAMAGE_TARGET);
+        character.removeLifePointsWithDefense(DAMAGE_TARGET);
     }
 
     private void listAdjacent(Character character){ // gera lista com todas as adjacencias

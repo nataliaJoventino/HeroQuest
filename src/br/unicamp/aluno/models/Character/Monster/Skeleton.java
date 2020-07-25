@@ -43,18 +43,6 @@ public class Skeleton extends Monster {
 			weapon = null;
 	}
 
-	@Override
-	public boolean isOnSight(Character character) {
-		int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * weapon.getWeaponReach()); // pega
-		int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * weapon.getWeaponReach());
-		if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x)
-				|| (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) // verifica se
-			if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y)
-					|| (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
-				return true;
-
-		return false;
-	}
 
     @Override
     public boolean isOnSight(Character character) {

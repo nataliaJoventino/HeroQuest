@@ -9,4 +9,6 @@ public class NotEquippableException extends NullPointerException{
     public NotEquippableException(String s) {
         super(s);
     }
+
+
 }

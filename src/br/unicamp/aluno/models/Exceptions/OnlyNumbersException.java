@@ -12,4 +12,6 @@ public class OnlyNumbersException extends NumberFormatException {
 		super(string);
 	}
 
+
+
 }

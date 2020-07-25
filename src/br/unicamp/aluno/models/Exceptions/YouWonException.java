@@ -7,4 +7,16 @@ public class YouWonException extends RuntimeException {
 	public YouWonException() {
 		super("Congratulations, you won the game!");
 	}
+
+	public YouWonException(String message) {
+		super(message);
+	}
+
+	public YouWonException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public YouWonException(Throwable cause) {
+		super(cause);
+	}
 }
