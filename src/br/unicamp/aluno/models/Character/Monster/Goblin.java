@@ -14,7 +14,7 @@ public class Goblin extends Monster {
     private ArrayList<Weapon> daggers;
 
 
-    public Goblin(int x, int y, int numDagger) { // ele tá falando de punhal a espadinha ou era para ser poção?
+    public Goblin(int x, int y, int numDagger) {
         super(x, y, 1,2,3,2); // definir pontos com zero
         daggers = new ArrayList();
         for (int i = 0; i < numDagger; i++)

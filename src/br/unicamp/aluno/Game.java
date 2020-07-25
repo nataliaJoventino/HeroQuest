@@ -22,6 +22,7 @@ import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Exceptions.CantMoveException;
 import br.unicamp.aluno.models.Exceptions.TrapsHurtMeException;
 import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
+import br.unicamp.aluno.models.Exceptions.YouWonException;
 
 public class Game {
 
@@ -86,6 +87,9 @@ public class Game {
 			int randomX = generator.nextInt(xSize);
 			int randomY = generator.nextInt(ySize);
 
+			// Quantidade de adagas aleatorizada
+			int randomQtdDaggers = generator.nextInt(10);
+
 			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
 			// número aleatório
 			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
@@ -94,7 +98,8 @@ public class Game {
 			}
 
 			// inserindo os esqueletos magos
-			MageSkeleton mageSkeleton = new MageSkeleton(randomX, randomY, 0); // gerar numero aleatório de punhais
+			MageSkeleton mageSkeleton = new MageSkeleton(randomX, randomY, randomQtdDaggers);
+
 			monstersOnMap.add(mageSkeleton);
 		}
 
@@ -113,7 +118,7 @@ public class Game {
 			}
 
 			// inserindo os esqueletos
-			Skeleton skeleton = new Skeleton(randomX, randomY, null);
+			Skeleton skeleton = new Skeleton(randomX, randomY);
 			monstersOnMap.add(skeleton);
 		}
 
@@ -230,7 +235,8 @@ public class Game {
 		int yNow = hero.getPositionY();
 
 		// caso tiver o espaço desejado caminharemos com o player
-		if (this.map[yRequested][xRequested].equals("--") || this.map[yRequested][xRequested].equals(">>") || this.map[yRequested][xRequested].equals("//")) {
+		if (this.map[yRequested][xRequested].equals("--") || this.map[yRequested][xRequested].equals(">>")
+				|| this.map[yRequested][xRequested].equals("//")) {
 			return true;
 		} else {
 			Traceable traceable = null;
@@ -314,12 +320,20 @@ public class Game {
 			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
 					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
 					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-					&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
 
 				try {
 					Treasure treasure = (Treasure) traceable;
 					treasure.turnVisible();
-					maybeARandomMonster(treasure);
+
+					// Verificando a possibilidade de nascer um monstro:
+					boolean willBorn = generateARandomBoolean();
+
+					// Caso vá nascer
+					if (willBorn) {
+						maybeARandomMonster(treasure);
+					}
+
 					refreshMap();
 
 				} catch (ClassCastException e) {
@@ -329,10 +343,65 @@ public class Game {
 		}
 	}
 
-	//Talvez um monstro nasça perto do baú, como no enunciado
+	// Talvez um monstro nasça perto do baú, como no enunciado
 	private void maybeARandomMonster(Treasure treasure) {
-		
-		
+
+		int xTreasure = treasure.getPositionX();
+		int yTreasure = treasure.getPositionY();
+
+		// Verificando se as posições adjacentes ao tesouro estão livres e pegando uma
+		Point adjacentPosition = new Point(0, 0);
+
+		if (map[yTreasure][xTreasure + 1].contentEquals("--") || map[yTreasure][xTreasure + 1].contentEquals(">>")) {
+			adjacentPosition.updatePosition(xTreasure + 1, yTreasure);
+		} else if (map[yTreasure][xTreasure - 1].contentEquals("--")
+				|| map[yTreasure][xTreasure - 1].contentEquals(">>")) {
+			adjacentPosition.updatePosition(xTreasure - 1, yTreasure);
+		} else if (map[yTreasure + 1][xTreasure].contentEquals("--")
+				|| map[yTreasure + 1][xTreasure].contentEquals(">>")) {
+			adjacentPosition.updatePosition(xTreasure, yTreasure + 1);
+		} else if (map[yTreasure - 1][xTreasure].contentEquals("--")
+				|| map[yTreasure - 1][xTreasure].contentEquals(">>")) {
+			adjacentPosition.updatePosition(xTreasure, yTreasure - 1);
+		}
+
+		int adjacentX = adjacentPosition.getPositionX();
+		int adjacentY = adjacentPosition.getPositionY();
+
+		// Gerando um monstro aleatório:
+		Random random = new Random();
+
+		// Gera um numero aleatório entre 0 e 2
+		switch (random.nextInt(3)) {
+		// caso 0 criaremos um esqueleto
+		case 0:
+			monstersOnMap.add(new Skeleton(adjacentX, adjacentY));
+			break;
+
+		// caso 1 criamos um Esqueleto Mago
+		case 1:
+			// Quantidade de adagas aleatorizada
+			int randomQtdDaggers = random.nextInt(10);
+
+			// inserindo os esqueletos magos
+			MageSkeleton mageSkeleton = new MageSkeleton(adjacentX, adjacentY, randomQtdDaggers);
+			monstersOnMap.add(mageSkeleton);
+
+		case 2:
+			// Quantidade de adagas aleatorizada
+			randomQtdDaggers = random.nextInt(10);
+			// inserindo os goblins
+			Goblin goblin = new Goblin(adjacentX, adjacentY, randomQtdDaggers);
+			monstersOnMap.add(goblin);
+		default:
+			break;
+		}
+
+	}
+
+	private boolean generateARandomBoolean() {
+		Random random = new Random();
+		return random.nextBoolean();
 	}
 
 	public void searchForTrap() {
@@ -358,7 +427,7 @@ public class Game {
 			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
 					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
 					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-					&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
 
 				try {
 					Trap trap = (Trap) traceable;
@@ -411,7 +480,7 @@ public class Game {
 			} catch (YouAreDeadException e1) {
 				System.out.println(e1.getMessage());
 				exit = true;
-			} catch(YouWonException e2) {
+			} catch (YouWonException e2) {
 				System.out.println(e2.getMessage());
 				exit = true;
 			}
@@ -466,8 +535,8 @@ public class Game {
 			System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
 		}
 
-		//Caso não tenham monstros no mapa o player vence
-		if(monstersOnMap.isEmpty() && created) {
+		// Caso não tenham monstros no mapa o player vence
+		if (monstersOnMap.isEmpty() && created) {
 			throw new YouWonException();
 		}
 
@@ -480,7 +549,6 @@ public class Game {
 				map[newY][newX] = monster.toString();
 			}
 		}
-
 
 		// Atualizando os outros traceables
 		for (Traceable traceable : traceablesOnMap) {
@@ -521,12 +589,12 @@ public class Game {
 
 		// Adicionando o Player no mapa
 		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
-		
+
 		calculateHeroVision();
 		this.created = true;
 
 	}
-	
+
 	private void calculateHeroVision() {
 		int heroX = hero.getPositionX();
 		int heroY = hero.getPositionY();
@@ -793,7 +861,7 @@ public class Game {
 		hero.updateVision(firstSquare, secondSquare);
 	}
 
-	//Para o personagem teleportar dentro dos limites de sua visão
+	// Para o personagem teleportar dentro dos limites de sua visão
 	public void printTeleportArea() {
 
 		// Os limites do primeiro quadrado da visão do player são:
@@ -810,7 +878,7 @@ public class Game {
 		int secondLowerY = hero.getSecondSquareVision().getLowerY();
 		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
 
-		//Preparando os index que o personagem irá ver
+		// Preparando os index que o personagem irá ver
 		int index = 0;
 
 		// Mostrando somente o primeiro quadrado que o player tem visão
@@ -822,19 +890,17 @@ public class Game {
 						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
 
 					// Trocando os espaços livres do mapa por indexes que o heroi escolherá
-					if(this.map[i][j].equals("--") || this.map[i][j].equals(">>")) {
-						//Adicionando o index com o 0 à esquerda caso seja menor que 10
-						if(index < 10) {
+					if (this.map[i][j].equals("--") || this.map[i][j].equals(">>")) {
+						// Adicionando o index com o 0 à esquerda caso seja menor que 10
+						if (index < 10) {
 							this.map[i][j] = "0" + Integer.toString(index);
 							System.out.print(map[i][j] + " ");
-						}
-						else {
+						} else {
 							this.map[i][j] = Integer.toString(index);
 							System.out.print(map[i][j] + " ");
 						}
 						index++;
-					}
-					else {
+					} else {
 						System.out.print(map[i][j] + " ");
 					}
 				}
@@ -853,9 +919,10 @@ public class Game {
 
 		for (int i = 0; i < this.yMapSize; i++) {
 			for (int j = 0; j < this.xMapSize; j++) {
-				if(this.map[i][j].equals(Integer.toString(index)) || this.map[i][j].equals("0" + Integer.toString(index))){
+				if (this.map[i][j].equals(Integer.toString(index))
+						|| this.map[i][j].equals("0" + Integer.toString(index))) {
 					refreshMap(); // volta o mapa para o que era antes
-					return new Point(j,i);
+					return new Point(j, i);
 //					hero.updatePosition(j, i);
 				}
 			}
@@ -865,7 +932,7 @@ public class Game {
 		return null;
 	}
 
-	//Para o personagem teleportar dentro dos limites de sua visão
+	// Para o personagem teleportar dentro dos limites de sua visão
 	public void printTarget() {
 
 		// Os limites do primeiro quadrado da visão do player são:
@@ -882,7 +949,7 @@ public class Game {
 		int secondLowerY = hero.getSecondSquareVision().getLowerY();
 		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
 
-		//Preparando os index que o personagem irá ver
+		// Preparando os index que o personagem irá ver
 		int index = 0;
 
 		ArrayList<String> monsterToString = monsterToString();
@@ -896,11 +963,11 @@ public class Game {
 				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY)
 						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
 
-					for (String monster : monsterToString) { //usa lista de monstros que estão no mapa
+					for (String monster : monsterToString) { // usa lista de monstros que estão no mapa
 
 						// Trocando os espaços livres do mapa por indexes que o heroi escolherá
 						if (this.map[i][j].equals(monster)) {
-							//Adicionando o index com o 0 à esquerda caso seja menor que 10
+							// Adicionando o index com o 0 à esquerda caso seja menor que 10
 							if (index < 10) {
 								this.map[i][j] = "0" + Integer.toString(index);
 								System.out.print(map[i][j]);
@@ -934,9 +1001,10 @@ public class Game {
 
 		for (int i = 0; i < this.yMapSize; i++) {
 			for (int j = 0; j < this.xMapSize; j++) {
-				if(this.map[i][j].equals(Integer.toString(index)) || this.map[i][j].equals("0" + Integer.toString(index))){
+				if (this.map[i][j].equals(Integer.toString(index))
+						|| this.map[i][j].equals("0" + Integer.toString(index))) {
 					refreshMap();
-					return getPosition(j,i);
+					return getPosition(j, i);
 				}
 			}
 		}
@@ -945,7 +1013,7 @@ public class Game {
 		return null;
 	}
 
-	private Monster getPosition(int x, int y){
+	private Monster getPosition(int x, int y) {
 		for (Monster m : monstersOnMap)
 			if (m.getPositionX() == x && m.getPositionY() == y) {
 				System.out.println("Monster life points: " + m.getLifePoints());
@@ -954,25 +1022,32 @@ public class Game {
 		return null; // tratar retorno nulo
 	}
 
-	private ArrayList<String> monsterToString(){ // se forem criados novos monstros não precisará mudar nada
+	private ArrayList<String> monsterToString() { // se forem criados novos monstros não precisará mudar nada
 		ArrayList<String> monsters = new ArrayList();
 
-		for (Monster m : monstersOnMap){
+		for (Monster m : monstersOnMap) {
 			if (!monsters.contains(m.toString()))
 				monsters.add(m.toString());
 		}
 		return monsters;
 	}
 
-	public Treasure getTreasure (){
-		int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega item na frente da direção que herói está
+	public Treasure getTreasure() {
+		int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega item na frente da
+																							// direção que herói está
 		int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
 		Treasure treasure = null;
 
-		for (Traceable traceable : traceablesOnMap){
+		for (Traceable traceable : traceablesOnMap) {
 			treasure = isTreasure(traceable);
-			 // se for tesouro verifica posição
-			if (traceable.getPositionX() == x && traceable.getPositionY() == y && treasure.isVisible()) {// está em frente ao tesouro e verifica só se tesour visivel
+			// se for tesouro verifica posição
+			if (traceable.getPositionX() == x && traceable.getPositionY() == y && treasure.isVisible()) {// está em
+																											// frente ao
+																											// tesouro e
+																											// verifica
+																											// só se
+																											// tesour
+																											// visivel
 				return treasure;
 			}
 		}
@@ -980,7 +1055,7 @@ public class Game {
 		return null;
 	}
 
-	private Treasure isTreasure(Traceable traceable){
+	private Treasure isTreasure(Traceable traceable) {
 		try {
 			Treasure treasure = (Treasure) traceable;
 			return treasure;
@@ -989,7 +1064,7 @@ public class Game {
 		}
 	}
 
-	public void openDoor(Traceable traceable){
+	public void openDoor(Traceable traceable) {
 		int x = traceable.getPositionX();
 		int y = traceable.getPositionY();
 		Door door;
@@ -1001,7 +1076,7 @@ public class Game {
 		}
 	}
 
-	private Door isDoor(Traceable traceable){
+	private Door isDoor(Traceable traceable) {
 		try {
 			Door door = (Door) traceable;
 			return door;

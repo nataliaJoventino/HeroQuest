@@ -1,4 +1,4 @@
-package br.unicamp.aluno;
+package br.unicamp.aluno.models.Exceptions;
 
 public class YouWonException extends RuntimeException {
 
