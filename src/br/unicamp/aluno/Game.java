@@ -33,6 +33,7 @@ public class Game {
 	private int xMapSize;
 	private int yMapSize;
 	private Hero hero;
+	private boolean created;
 
 	// Construtor do Jogo
 	public Game(Hero player, int ySize, int xSize) {
@@ -463,7 +464,7 @@ public class Game {
 		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
 		
 		//Caso não tenham monstros no mapa o player vence
-		if(monstersOnMap.isEmpty()) {
+		if(monstersOnMap.isEmpty() && created) {
 			throw new YouWonException();
 		}
 		
@@ -474,7 +475,7 @@ public class Game {
 				newX = monster.getPositionX();
 				newY = monster.getPositionY();
 				map[newY][newX] = monster.toString();
-			} // tem que remover aqueles que já foram eliminados?
+			}
 		}
 
 
@@ -515,6 +516,7 @@ public class Game {
 
 		}
 		calculateHeroVision();
+		this.created = true;
 
 	}
 	
