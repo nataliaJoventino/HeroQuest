@@ -7,13 +7,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import br.unicamp.aluno.models.Door;
+import br.unicamp.aluno.models.*;
 import br.unicamp.aluno.models.Exceptions.YouWonException;
-import br.unicamp.aluno.models.Point;
-import br.unicamp.aluno.models.SquareVision;
-import br.unicamp.aluno.models.Traceable;
-import br.unicamp.aluno.models.Trap;
-import br.unicamp.aluno.models.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Hero;
 import br.unicamp.aluno.models.Character.Monster.Goblin;
 import br.unicamp.aluno.models.Character.Monster.MageSkeleton;
@@ -464,30 +459,33 @@ public class Game {
 	// Iniciando o jogo/turno
 	public void start() {
 
-		boolean exit = false;
-		System.out.println("Game started!");
-
-		// Ciclo do jogo
-		while (!exit) {
-
-			// Acontecimentos do jogo
-			try {
-				keyboard.gameLoop();
-			}
-
-			// Tratamento de excessões que possam surgir
-			catch (TrapsHurtMeException e) {
-				System.out.println(e.getMessage());
-			} catch (YouAreDeadException e1) {
-				System.out.println(e1.getMessage());
-				exit = true;
-			} catch (YouWonException e2) {
-				System.out.println(e2.getMessage());
-				exit = true;
-			}
-		}
-
-		System.out.println("Game termined. Bye!");
+		keyboard.gameLoop();
+//		Enter enter = new Enter();
+//		boolean exit = false;
+//		System.out.println("Game started!");
+//
+//
+//
+//		// Ciclo do jogo
+//		while (!keyboard.isExitSelected()) {
+//
+//			// Acontecimentos do jogo
+//
+//
+//			// Tratamento de excessões que possam surgir
+//		}catch (TrapsHurtMeException e) {
+//				System.out.println(e.getMessage());
+//			} catch (YouAreDeadException e1) {
+//				System.out.println(e1.getMessage());
+//				exit = true;
+//			} catch (YouWonException e2) {
+//				System.out.println(e2.getMessage());
+//				exit = true;
+//			}
+//
+//		}
+//
+//		System.out.println("Game termined. Bye!");
 
 	}
 

@@ -1,8 +1,7 @@
 package br.unicamp.aluno;
 
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 import br.unicamp.aluno.models.Exceptions.*;
 import br.unicamp.aluno.models.Item.*;
@@ -14,7 +13,7 @@ import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
 
-public class TextEngine {
+public class TextEngine extends TimerTask{
 	private boolean exitSelected;
 	private Game map;
 	private Hero hero;
@@ -22,54 +21,133 @@ public class TextEngine {
 	private boolean action; // controle de ação (só pode ser realizada uma vez por turno)
     private boolean move;
 	private Scanner scanner;
+	private int index;
+	ArrayList<String> buffer;
 
-	public TextEngine(Game map) {
+
+
+
+	public TextEngine(Game map){
 		this.map = map;
 		hero = map.getHero();
 		this.scanner = new Scanner(System.in);
+		buffer = new ArrayList<>();
+		wave = true;
+        hero.generateMoveAllowed();
+        exitSelected = false;
 	}
 
-    public void gameLoop(){
-        Scanner scanner = new Scanner(System.in);
-        exitSelected = false;
-        wave = true;
-        action = false;
-        move = false;
-        hero.generateMoveAllowed();
-
-        System.out.println("Game started!");
-
-        while (!exitSelected){ ///tem que fazer as exceções que param o jogo
-
-            if (wave) {
-                map.refreshMap();
-                map.printMap();
-                System.out.println("Moves allowed: " + hero.getMoveAllowed()
-                        +" | Equipped right hand: " + hero.getRightHand()
-                        +" | Equipped left hand: " + hero.getLeftHand()
-                        +" | Life points: " + hero.getLifePoints()); //fazer if pra caso item seja de suas mãos e para não ficar aparecendo o null
-                readCommandFromKeyboard(scanner);
-            } else {
-                System.out.println("||| WAVE ENDED |||");
-                hero.generateMoveAllowed();
-                wave = true;
-                action = false;
-                move = false;
-
-                System.out.println();
-                System.out.println("||| NEW WAVE |||");
-                System.out.println();
-            }
-
-        }
-
-
-        map.printMap();
-        System.out.println("Game terminated. Bye!");
-        scanner.close();
+	public boolean isExitSelected(){
+	    return exitSelected;
     }
 
-    private void readCommandFromKeyboard(Scanner scanner){
+//	public String get(){
+//        String s = "";
+//	    synchronized (buffer){
+//	        while (wave){
+//                try {
+//                    buffer.wait();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//	        String s = buffer.get(buffer.size() - 1);
+////            System.out.println("\n||| WAVE ENDED |||");
+////	        endWave();
+//	        buffer.notifyAll();
+//
+//        }
+//        return s;
+//    }
+//
+//    public void put(String s){
+//        synchronized (buffer){
+//            while (!wave){
+//                try {
+//                    buffer.wait();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+////            index++;
+//            buffer.add(s);
+////            starWave();
+//            buffer.notifyAll();
+//
+//        }
+//    }
+
+
+    public void setWave(boolean wave){
+	    this.wave = wave;
+    }
+
+    public boolean getWave(){
+	    return this.wave;
+    }
+
+
+    public void gameLoop(){
+	    synchronized (this) {
+            Scanner scanner = new Scanner(System.in);
+            exitSelected = false;
+            wave = true;
+            action = false;
+            move = false;
+            hero.generateMoveAllowed();
+
+            System.out.println("Game started!");
+
+            while (!exitSelected) { ///tem que fazer as exceções que param o jogo
+
+
+                while (wave) {
+                    new Coordinator(this).start();
+                    starWave();
+                    readCommandFromKeyboard();
+
+
+
+                }
+                endWave();
+            }
+
+            map.printMap();
+            System.out.println("Game terminated. Bye!");
+            scanner.close();
+        }
+    }
+
+    public Scanner scanner(){
+	    return scanner;
+    }
+
+    public void starWave(){
+	    synchronized (this) {
+            map.refreshMap();
+            map.printMap();
+            System.out.println("Moves allowed: " + hero.getMoveAllowed()
+                    + " | Equipped right hand: " + hero.getRightHand()
+                    + " | Equipped left hand: " + hero.getLeftHand()
+                    + " | Life points: " + hero.getLifePoints()); //fazer if pra caso item seja de suas mãos e para não ficar aparecendo o null
+        }
+    }
+
+    public void endWave(){
+	    synchronized (this) {
+            System.out.println("\n||| WAVE ENDED |||");
+            hero.generateMoveAllowed();
+            wave = true;
+            action = false;
+            move = false;
+            System.out.println();
+            System.out.println("||| NEW WAVE |||");
+            System.out.println();
+        }
+    }
+
+    public void readCommandFromKeyboard(){
         Direction walking = null;
         String command = "";
 
@@ -369,7 +447,9 @@ public class TextEngine {
 				System.out.println(e.getCause());
 				System.out.print("Null Pointer, try a valid input");
 				loop = true;
-			}
+			} catch (IndexOutOfBoundsException b){
+			    continue;
+            }
 		}
 
 		return command;
@@ -470,4 +550,17 @@ public class TextEngine {
 	}
 
 
+    @Override
+    public void run() {
+
+        try {
+            throw new TimeoutException("||| TEMPO ESGOTADO |||");
+        } catch (TimeoutException e) {
+            System.out.println("\n"+e.getMessage());
+            wave = false;
+//            scanner.nextLine();
+            this.cancel();
+        }
+
+    }
 }

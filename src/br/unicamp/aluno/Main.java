@@ -47,6 +47,8 @@ public class Main {
 		default:
 			break;
 		}
+
+		hero = new Wizard("Andrey");
 		
 		Game game = new Game(hero, 21, 23);
 
