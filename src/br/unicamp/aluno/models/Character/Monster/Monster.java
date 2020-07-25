@@ -1,14 +1,14 @@
 package br.unicamp.aluno.models.Character.Monster;
 
-import br.unicamp.aluno.models.Character.Character;
-import br.unicamp.aluno.models.Character.Hero.Hero;
-import br.unicamp.aluno.models.Dice;
-import br.unicamp.aluno.models.Enum.Direction;
-import br.unicamp.aluno.models.Enum.SideDice;
-import br.unicamp.aluno.models.Traceable;
-
 import java.util.ArrayList;
 import java.util.Random;
+
+import br.unicamp.aluno.models.Point;
+import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.Character.Character;
+import br.unicamp.aluno.models.Character.Hero.Hero;
+import br.unicamp.aluno.models.Enum.Direction;
+import br.unicamp.aluno.models.Enum.SideDice;
 
 public abstract class Monster extends Character {
 	private ArrayList<Traceable> adjacent;
@@ -54,10 +54,10 @@ public abstract class Monster extends Character {
 	}
 
 	private void setAdjacent(Character character, Direction direction){ // pega adjacencias de personagem
-		int x = character.getPositionX() + direction.getTraceable().getPositionX(); // soma direção com posição atual da personagem para pegar adjacente
-		int y = character.getPositionY() + direction.getTraceable().getPositionY();
-		Traceable traceable = new Traceable(x,y);
-		adjacent.add(traceable);
+		int x = character.getPositionX() + direction.getPoint().getPositionX(); // soma direção com posição atual da personagem para pegar adjacente
+		int y = character.getPositionY() + direction.getPoint().getPositionY();
+		Point point = new Point(x,y);
+		adjacent.add(point);
 	}
 
 	public boolean isHeroAround(Hero hero){ // verifica se heroi está nas adjacencias

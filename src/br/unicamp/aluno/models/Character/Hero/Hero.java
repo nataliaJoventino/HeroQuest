@@ -2,15 +2,16 @@ package br.unicamp.aluno.models.Character.Hero;
 
 import java.util.ArrayList;
 
-import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
+import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.SquareVision;
+import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Enum.Hand;
 import br.unicamp.aluno.models.Enum.SideDice;
+import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 import br.unicamp.aluno.models.Item.Armor;
 import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Item.Weapon;
-import br.unicamp.aluno.models.Traceable;
 
 public abstract class Hero extends Character {
 	private String name;
@@ -298,8 +299,8 @@ public abstract class Hero extends Character {
 	@Override
 	public boolean isOnSight(Character character) { // para arma que ocupa duas mãos
 		try {
-			int x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * isWeapon(leftHand).getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
-			int y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * isWeapon(leftHand).getWeaponReach());
+			int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * isWeapon(leftHand).getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
+			int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * isWeapon(leftHand).getWeaponReach());
 
 			if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) || (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) //verifica se personagem esta a entre o monstro e alcance da arma em x
 				if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y) || (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
@@ -324,8 +325,8 @@ public abstract class Hero extends Character {
 			weapon = isWeapon(rightHand);
 
 		try {
-			x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
-			y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * weapon.getWeaponReach());
+			x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
+			y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * weapon.getWeaponReach());
 
 			if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) || (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) //verifica se personagem esta a entre o monstro e alcance da arma em x
 				if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y) || (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
@@ -339,12 +340,12 @@ public abstract class Hero extends Character {
 		}
 	}
 
-	private Traceable reach(Weapon weapon){
+	private Point reach(Weapon weapon){
 		try {
-			int x = this.getPositionX() + (getCurrentDirection().getTraceable().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
-			int y = this.getPositionY() + (getCurrentDirection().getTraceable().getPositionY() * weapon.getWeaponReach());
+			int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
+			int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * weapon.getWeaponReach());
 
-			return new Traceable(x, y);
+			return new Point(x, y);
 
 		} catch (NullPointerException e) {
 			System.out.println("Item equipado não é arma com alcance");

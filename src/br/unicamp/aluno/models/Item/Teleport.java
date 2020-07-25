@@ -1,17 +1,18 @@
 package br.unicamp.aluno.models.Item;
 
-import br.unicamp.aluno.models.Character.Character;
+import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.Character.Character;
 
 public class Teleport extends Spell {
-    private Traceable newPosition;
+    private Point newPosition;
 
     public Teleport() {
         super(true);
     }
 
-    public void positionToMove(Traceable traceable){
-        newPosition = traceable;
+    public void positionToMove(Point point){
+        newPosition = point;
     }
 
     @Override

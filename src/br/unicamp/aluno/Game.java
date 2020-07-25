@@ -8,8 +8,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import br.unicamp.aluno.models.Door;
-import br.unicamp.aluno.models.Enum.Direction;
-import br.unicamp.aluno.models.Item.Teleport;
+import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.SquareVision;
 import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Trap;
@@ -19,6 +18,7 @@ import br.unicamp.aluno.models.Character.Monster.Goblin;
 import br.unicamp.aluno.models.Character.Monster.MageSkeleton;
 import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Character.Monster.Skeleton;
+import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Exceptions.CantMoveException;
 import br.unicamp.aluno.models.Exceptions.TrapsHurtMeException;
 import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
@@ -29,7 +29,7 @@ public class Game {
 
 	private ArrayList<Traceable> traceablesOnMap;
 	private ArrayList<Monster> monstersOnMap;
-
+	private TextEngine keyboard;
 	private int xMapSize;
 	private int yMapSize;
 	private Hero hero;
@@ -42,6 +42,7 @@ public class Game {
 		this.xMapSize = xSize;
 		this.yMapSize = ySize;
 		this.hero = player;
+		this.keyboard = new TextEngine(this);
 
 		// Iniciando a variável de localizaveis no mapa
 		this.traceablesOnMap = new ArrayList<Traceable>();
@@ -222,8 +223,8 @@ public class Game {
 	// xNow e yNow dizem a posição atual do player
 	// xRequested e yRequested dizem a posiçao solicitada pelo usuário
 	public boolean canIWalk(Direction direction) {
-		int xRequested = hero.getPositionX() + direction.getTraceable().getPositionX();
-		int yRequested = hero.getPositionY() + direction.getTraceable().getPositionY();
+		int xRequested = hero.getPositionX() + direction.getPoint().getPositionX();
+		int yRequested = hero.getPositionY() + direction.getPoint().getPositionY();
 		int xNow = hero.getPositionX();
 		int yNow = hero.getPositionY();
 
@@ -277,11 +278,11 @@ public class Game {
 						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
 
 					// Printando a posição do mapa
-					System.out.print(this.map[i][j] + "");
+					System.out.print(this.map[i][j] + " ");
 				}
 
 				else {
-					System.out.print("^^");
+					System.out.print("^^ ");
 				}
 
 			}
@@ -317,6 +318,7 @@ public class Game {
 				try {
 					Treasure treasure = (Treasure) traceable;
 					treasure.turnVisible();
+					maybeARandomMonster(treasure);
 					refreshMap();
 
 				} catch (ClassCastException e) {
@@ -324,6 +326,12 @@ public class Game {
 				}
 			}
 		}
+	}
+
+	//Talvez um monstro nasça perto do baú, como no enunciado
+	private void maybeARandomMonster(Treasure treasure) {
+		
+		
 	}
 
 	public void searchForTrap() {
@@ -393,14 +401,17 @@ public class Game {
 
 			// Acontecimentos do jogo
 			try {
-
+				keyboard.gameLoop();
 			}
 
 			// Tratamento de excessões que possam surgir
 			catch (TrapsHurtMeException e) {
 				System.out.println(e.getMessage());
-			} catch (YouAreDeadException e) {
-				System.out.println(e.getMessage());
+			} catch (YouAreDeadException e1) {
+				System.out.println(e1.getMessage());
+				exit = true;
+			} catch(YouWonException e2) {
+				System.out.println(e2.getMessage());
 				exit = true;
 			}
 		}
@@ -452,6 +463,11 @@ public class Game {
 			arq.close();
 		} catch (IOException e) {
 			System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
+		}
+
+		//Caso não tenham monstros no mapa o player vence
+		if(monstersOnMap.isEmpty()) {
+			throw new YouWonException();
 		}
 
 		// Atualizando os monstros
@@ -508,7 +524,7 @@ public class Game {
 		calculateHeroVision();
 
 	}
-
+	
 	private void calculateHeroVision() {
 		int heroX = hero.getPositionX();
 		int heroY = hero.getPositionY();
@@ -831,13 +847,13 @@ public class Game {
 
 	}
 
-	public Traceable teleport(int index) {
+	public Point teleport(int index) {
 
 		for (int i = 0; i < this.yMapSize; i++) {
 			for (int j = 0; j < this.xMapSize; j++) {
 				if(this.map[i][j].equals(Integer.toString(index)) || this.map[i][j].equals("0" + Integer.toString(index))){
 					refreshMap(); // volta o mapa para o que era antes
-					return new Traceable(i,j);
+					return new Point(j,i);
 //					hero.updatePosition(j, i);
 				}
 			}
@@ -899,7 +915,7 @@ public class Game {
 					}
 
 					if (print)
-						System.out.print(map[i][j] + "");
+						System.out.print(map[i][j]);
 				}
 
 				else {
@@ -947,8 +963,8 @@ public class Game {
 	}
 
 	public Treasure getTreasure (){
-		int x = hero.getPositionX() + hero.getCurrentDirection().getTraceable().getPositionX(); // pega item na frente da direção que herói está
-		int y = hero.getPositionY() + hero.getCurrentDirection().getTraceable().getPositionY();
+		int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega item na frente da direção que herói está
+		int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
 		Treasure treasure = null;
 
 		for (Traceable traceable : traceablesOnMap){

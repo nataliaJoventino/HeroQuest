@@ -1,7 +1,7 @@
 package br.unicamp.aluno.models;
 
 //Objetos que possuem localização no mapa
-public class Traceable {
+public abstract class Traceable {
 	private int positionX;
 	private int positionY;
 	
