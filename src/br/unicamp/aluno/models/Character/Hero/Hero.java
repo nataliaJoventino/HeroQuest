@@ -2,6 +2,7 @@ package br.unicamp.aluno.models.Character.Hero;
 
 import java.util.ArrayList;
 
+import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.SquareVision;
 import br.unicamp.aluno.models.Traceable;
@@ -21,7 +22,7 @@ public abstract class Hero extends Character {
 	private ArrayList<Item> backpack;
 	private SquareVision firstSquareVision;
 	private SquareVision secondSquareVision;
-	
+
 	//Construtor de Heroi
 	public Hero(String name, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
 		//O heroi sempre nasce no (18,2)
@@ -37,7 +38,7 @@ public abstract class Hero extends Character {
 		super.removeLifePoints(value);
 
 		if (getLifePoints() == 0)
-            throw new YouAreDeadException();
+			throw new YouAreDeadException();
 
 	}
 
@@ -62,7 +63,7 @@ public abstract class Hero extends Character {
 			return true;
 		return false;
 	}
-	
+
 	//Atualizando o campo de visão
 	public void updateVision(SquareVision vision1, SquareVision vision2) {
 		firstSquareVision = vision1;
@@ -204,15 +205,19 @@ public abstract class Hero extends Character {
 	//Desequipando e guardando na mochila o item da mão direita
 	protected void unequipTheItemFromRightHand() {
 		Item item = rightHand;
-		rightHand = null;
-		storeInBackpack(item);
+		if (item != null) {
+			rightHand = null;
+			storeInBackpack(item);
+		}
 	}
 
 	//Desequipando e guardando na mochila o item da mão esquerda
 	protected void unequipTheItemFromLeftHand() {
 		Item item = leftHand;
-		leftHand = null; // esvazia mão
-		storeInBackpack(item);
+		if (item != null) {
+			leftHand = null; // esvazia mão
+			storeInBackpack(item);
+		}
 	}
 
 	private void addBonus(Item item){
@@ -251,8 +256,8 @@ public abstract class Hero extends Character {
 		removeBonus(leftHand);
 
 		if (leftHand.isDestroyed()){ // se item se destroi após o uso
-				leftHand = null;
-				rightHand = null;
+			leftHand = null;
+			rightHand = null;
 		}
 	}
 
@@ -298,21 +303,8 @@ public abstract class Hero extends Character {
 
 	@Override
 	public boolean isOnSight(Character character) { // para arma que ocupa duas mãos
-		try {
-			int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * isWeapon(leftHand).getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
-			int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * isWeapon(leftHand).getWeaponReach());
-
-			if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) || (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) //verifica se personagem esta a entre o monstro e alcance da arma em x
-				if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y) || (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
-					return  true;
-
-			return false;
-
-		}catch (NullPointerException e) {
-			System.out.println("Item equipado não é arma com alcance");
-			return false;
-		}
-
+		Weapon weapon = isWeapon(leftHand);
+		return onSight(character, weapon);
 	}
 
 	public boolean isOnSight(Character character, Hand hand) { //verifica arma da mão direita ou esquerda
@@ -324,58 +316,7 @@ public abstract class Hero extends Character {
 		else
 			weapon = isWeapon(rightHand);
 
-		try {
-			x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
-			y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * weapon.getWeaponReach());
-
-			if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) || (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) //verifica se personagem esta a entre o monstro e alcance da arma em x
-				if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y) || (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
-					return  true;
-
-			return false;
-
-		}catch (NullPointerException e) {
-			System.out.println("Item equipado não é arma com alcance");
-			return false;
-		}
+		return onSight(character, weapon);
 	}
-
-	private Point reach(Weapon weapon){
-		try {
-			int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
-			int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * weapon.getWeaponReach());
-
-			return new Point(x, y);
-
-		} catch (NullPointerException e) {
-			System.out.println("Item equipado não é arma com alcance");
-			return null;
-		}
-	}
-
-	public Traceable sight() { //verifica arma da mão direita ou esquerda
-		Weapon weapon;
-
-		if (isBothHandItem()) {
-			weapon = isWeapon(leftHand);
-			return reach(weapon);
-		}
-
-		return  null;
-	}
-
-	public Traceable sight(Hand hand) { //verifica arma da mão direita ou esquerda
-		Weapon weapon;
-		int x, y;
-
-		if (hand == Hand.LEFT)
-			weapon = isWeapon(leftHand);
-		else
-			weapon = isWeapon(rightHand);
-
-		return reach(weapon);
-	}
-
-
 
 }

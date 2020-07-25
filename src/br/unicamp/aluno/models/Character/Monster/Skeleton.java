@@ -1,10 +1,8 @@
 package br.unicamp.aluno.models.Character.Monster;
 
-import br.unicamp.aluno.models.Character.Character;
-
 import java.util.Random;
 
-import br.unicamp.aluno.models.Dice;
+import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Item.LongSword;
 import br.unicamp.aluno.models.Item.ShortSword;
 import br.unicamp.aluno.models.Item.Weapon;
@@ -48,31 +46,9 @@ public class Skeleton extends Monster {
 	@Override
 	public boolean isOnSight(Character character) {
 		int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * weapon.getWeaponReach()); // pega
-																													// direção
-																													// atual
-																													// e
-																													// multiplica
-																													// pelo
-																													// alcance
-																													// da
-																													// arma
-																													// somando
-																													// com
-																													// a
-																													// coordenada
-																													// atual
-																													// para
-																													// projetar
-																													// ataque
 		int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * weapon.getWeaponReach());
-
 		if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x)
 				|| (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) // verifica se
-																										// personagem
-																										// esta a entre
-																										// o monstro e
-																										// alcance da
-																										// arma em x
 			if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y)
 					|| (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
 				return true;
@@ -80,7 +56,12 @@ public class Skeleton extends Monster {
 		return false;
 	}
 
-	@Override
+    @Override
+    public boolean isOnSight(Character character) {
+        return onSight(character, weapon);
+    }
+    
+    @Override
 	public String toString() {
 		return "SK";
 	}

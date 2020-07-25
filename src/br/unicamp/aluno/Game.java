@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import br.unicamp.aluno.models.Door;
+import br.unicamp.aluno.models.Exceptions.YouWonException;
 import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.SquareVision;
 import br.unicamp.aluno.models.Traceable;
@@ -537,6 +538,7 @@ public class Game {
 
 		// Caso não tenham monstros no mapa o player vence
 		if (monstersOnMap.isEmpty() && created) {
+		if(monstersOnMap.isEmpty() && created) {
 			throw new YouWonException();
 		}
 
@@ -592,7 +594,7 @@ public class Game {
 
 		calculateHeroVision();
 		this.created = true;
-
+		}
 	}
 
 	private void calculateHeroVision() {

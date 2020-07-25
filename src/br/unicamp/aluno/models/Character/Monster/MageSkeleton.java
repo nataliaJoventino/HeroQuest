@@ -44,14 +44,8 @@ public class MageSkeleton extends Monster {
 
     @Override
     public boolean isOnSight(Character character) {
-        int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * daggers.get(daggers.size() - 1).getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
-        int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * daggers.get(daggers.size() - 1).getWeaponReach());
-
-        if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= x) || (character.getPositionX() >= x && character.getPositionX() < this.getPositionX())) //verifica se personagem esta a entre o monstro e alcance da arma em x
-            if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= y) || (character.getPositionY() >= y && character.getPositionY() < this.getPositionY()))
-                return  true;
-
-        return false;
+        Weapon dagger = daggers.get(daggers.size() - 1);
+        return  onSight(character, dagger);
     }
 
     @Override
