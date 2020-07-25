@@ -1,6 +1,7 @@
 package br.unicamp.aluno.models.Character;
 
 import br.unicamp.aluno.models.Dice;
+import br.unicamp.aluno.models.Item.Weapon;
 import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Enum.Direction;
@@ -16,6 +17,8 @@ public abstract class Character extends Traceable {
     private Direction currentDirection;
     private Dice dice;
     private int moveAllowed;
+    private int diceAttack;
+    private int diceDefence;
 
     public Character(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) { //recebe via contrutor todas as informações
         super(x, y);
@@ -125,5 +128,45 @@ public abstract class Character extends Traceable {
     protected abstract int hitDefence(); //quanto de lifepoints vai ser defendido de ataque do inimigo dado dados
 
     public abstract boolean isOnSight(Character character);// verifica se personagem está em alcance da arma
+
+    protected boolean onSight(Character character, Weapon weapon) { // retorna se personagem está na mira da arma em alguma das adjacencias
+        try {
+            Point left = reach(Direction.LEFT, weapon);
+            Point right = reach(Direction.RIGHT, weapon);
+            Point down = reach(Direction.DOWN, weapon);
+            Point up = reach(Direction.UP, weapon);
+
+            if ((character.getPositionX() >= left.getPositionX() && character.getPositionX() < this.getPositionX())&& (left.getPositionY() == character.getPositionY())) // verifica se character está entre hero e alcance da arma em x. Posição y é a mesma neste caso.
+                return true;
+
+            else if ((character.getPositionX() > this.getPositionX() && character.getPositionX() <= right.getPositionX()) && (right.getPositionY() == character.getPositionY())) //verifica se character está entre hero e alcance da arma em x. Posição y é a mesma neste caso.
+                return true;
+
+            if ((character.getPositionY() > this.getPositionY() && character.getPositionY() <= down.getPositionY()) && (down.getPositionX() == character.getPositionX())) //verifica se character está entre hero e alcance da arma em y. Posição x é a mesma neste caso.
+                return true;
+
+            if ((character.getPositionY() >= up.getPositionY() && character.getPositionY() < this.getPositionY()) && (up.getPositionX() == character.getPositionX())) //verifica se character está entre hero e alcance da arma em y. Posição x é a mesma neste caso.
+                return true;
+
+            return false;
+
+        }catch (NullPointerException e) {
+            return false; // item não pode ser usado para ataque
+        }
+
+    }
+
+    private Point reach(Direction direction, Weapon weapon){
+        try {
+            int x = this.getPositionX() + (getCurrentDirection().getPoint().getPositionX() * weapon.getWeaponReach()); // pega direção atual e multiplica pelo alcance da arma somando com a coordenada atual para projetar ataque
+            int y = this.getPositionY() + (getCurrentDirection().getPoint().getPositionY() * weapon.getWeaponReach());
+
+            return new Point(x, y);
+
+        } catch (NullPointerException e) {
+            System.out.println("Item equipado não é arma com alcance");
+            return null;
+        }
+    }
 
 }

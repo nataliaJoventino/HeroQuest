@@ -52,7 +52,8 @@ public class TextEngine {
                 map.printMap();
                 System.out.println("Moves allowed: " + hero.getMoveAllowed()
                         +" | Equipped right hand: " + hero.getRightHand()
-                        +" | Equipped left hand: " + hero.getLeftHand()); //fazer if pra caso item seja de suas mãos e para não ficar aparecendo o null
+                        +" | Equipped left hand: " + hero.getLeftHand()
+                        +" | Life points: " + hero.getLifePoints()); //fazer if pra caso item seja de suas mãos e para não ficar aparecendo o null
                 readCommandFromKeyboard(scanner);
             } else {
                 System.out.println("Wave was ended");
@@ -164,7 +165,6 @@ public class TextEngine {
                     if (hand != null) { // segurando um unico item
                         monster = allowAttack(hand);
                         hero.hit(monster, hand); // fazer erro se item não for arma
-                        hero.hit(monster, hand); // fazer erro se item não for arma
 
                     } else {
 
@@ -212,7 +212,10 @@ public class TextEngine {
                                     }
                                 }
                             } else {
-                                System.out.println("Only mystic hero can cast spells"); // fazer excessão para sem spell
+                                if (hero.emptyHands())
+                                    System.out.println("No item equipped");
+                                else
+                                    System.out.println("Only mystic hero can cast spells"); // fazer excessão para sem spell
                             }
                         }
                     }
@@ -225,12 +228,12 @@ public class TextEngine {
                     action = true;
                 }
             }
-
+        }
+        else {
+            System.out.println("Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
             if (move) // se herói tiver se movimentado e realizou ação wave finaliza
                 wave = false;
         }
-        else
-            System.out.println("Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
     }
 
 	private void teleport(Teleport teleport) {
@@ -280,8 +283,7 @@ public class TextEngine {
 		}
 	}
 
-	private Monster allowAttack(Hand hand) { // permite ataque do ao monstro que está dentro da mira e de menor
-												// distancia (primeiro monstro a frente)
+	private Monster allowAttack(Hand hand) { // permite ataque do ao monstro que está dentro da mira e de menor distancia (primeiro monstro a frente)
 		ArrayList<Monster> isInSight = new ArrayList();
 		for (Monster m : map.getMonstersOnMap())
 			if (hand != null) {
@@ -289,6 +291,7 @@ public class TextEngine {
 					isInSight.add(m);
 			} else if (hero.isOnSight(m)) // verifica se monstro esta na mira de arma que ocupa as duas mãos
 				isInSight.add(m);
+
 		return shortDistance(isInSight);
 	}
 
