@@ -13,7 +13,7 @@ import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
 
-public class TextEngine extends TimerTask{
+public class TextEngine{
 	private boolean exitSelected;
 	private Game map;
 	private Hero hero;
@@ -21,7 +21,6 @@ public class TextEngine extends TimerTask{
 	private boolean action; // controle de ação (só pode ser realizada uma vez por turno)
     private boolean move;
 	private Scanner scanner;
-	private int index;
 	ArrayList<String> buffer;
 
 
@@ -32,83 +31,36 @@ public class TextEngine extends TimerTask{
 		hero = map.getHero();
 		this.scanner = new Scanner(System.in);
 		buffer = new ArrayList<>();
-		wave = true;
-        hero.generateMoveAllowed();
-        exitSelected = false;
 	}
 
-	public boolean isExitSelected(){
-	    return exitSelected;
+	public boolean isWave(){
+	    return wave;
     }
-
-//	public String get(){
-//        String s = "";
-//	    synchronized (buffer){
-//	        while (wave){
-//                try {
-//                    buffer.wait();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//	        String s = buffer.get(buffer.size() - 1);
-////            System.out.println("\n||| WAVE ENDED |||");
-////	        endWave();
-//	        buffer.notifyAll();
-//
-//        }
-//        return s;
-//    }
-//
-//    public void put(String s){
-//        synchronized (buffer){
-//            while (!wave){
-//                try {
-//                    buffer.wait();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-////            index++;
-//            buffer.add(s);
-////            starWave();
-//            buffer.notifyAll();
-//
-//        }
-//    }
-
 
     public void setWave(boolean wave){
-	    this.wave = wave;
-    }
+	    synchronized (this) {
+            this.wave = wave;
+        }
 
-    public boolean getWave(){
-	    return this.wave;
     }
-
 
     public void gameLoop(){
-	    synchronized (this) {
             Scanner scanner = new Scanner(System.in);
             exitSelected = false;
             wave = true;
             action = false;
             move = false;
+
             hero.generateMoveAllowed();
 
             System.out.println("Game started!");
 
             while (!exitSelected) { ///tem que fazer as exceções que param o jogo
 
-
+                new Coordinator(this).start();
                 while (wave) {
-                    new Coordinator(this).start();
                     starWave();
                     readCommandFromKeyboard();
-
-
-
                 }
                 endWave();
             }
@@ -116,12 +68,9 @@ public class TextEngine extends TimerTask{
             map.printMap();
             System.out.println("Game terminated. Bye!");
             scanner.close();
-        }
+
     }
 
-    public Scanner scanner(){
-	    return scanner;
-    }
 
     public void starWave(){
 	    synchronized (this) {
@@ -154,79 +103,76 @@ public class TextEngine extends TimerTask{
         System.out.print("Enter the command : ");
         command = stringScanner();
 
-        if (command.compareTo("w") == 0) //andar para cima
-            walking = Direction.UP;
+        if (wave) {
 
-        else if (command.compareTo("a") == 0) // andar para esquerda
-            walking = Direction.LEFT;
+            if (command.compareTo("w") == 0) //andar para cima
+                walking = Direction.UP;
 
-        else if (command.compareTo("d") == 0) // andar para direita
-            walking = Direction.RIGHT;
+            else if (command.compareTo("a") == 0) // andar para esquerda
+                walking = Direction.LEFT;
 
-        else if (command.compareTo("s") == 0) // andar para baixo
-            walking = Direction.DOWN;
+            else if (command.compareTo("d") == 0) // andar para direita
+                walking = Direction.RIGHT;
 
-        else if (command.compareTo("h") == 0) { // busca armadilha
-            map.searchForTrap();
-            System.out.println("Search for traps has been made!");
-        }
+            else if (command.compareTo("s") == 0) // andar para baixo
+                walking = Direction.DOWN;
 
-        else if (command.compareTo("p") == 0) { // abrir porta
-            int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX();
-            int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
-            Point point = new Point(x,y);
-            map.openDoor(point);
+            else if (command.compareTo("h") == 0) { // busca armadilha
+                map.searchForTrap();
+                System.out.println("Search for traps has been made!");
+            } else if (command.compareTo("p") == 0) { // abrir porta
+                int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX();
+                int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
+                Point point = new Point(x, y);
+                map.openDoor(point);
 
-        } else if (command.compareTo("b") == 0){ //abrir mochila
-            hero.printBackpack(); // por enquanto tá vazia
-            int choice = choosingItem();
-            if (choice != -1)
-                equipBackpack(choice);
-        }
+            } else if (command.compareTo("b") == 0) { //abrir mochila
+                hero.printBackpack(); // por enquanto tá vazia
+                int choice = choosingItem();
+                if (choice != -1)
+                    equipBackpack(choice);
+            } else if (command.compareTo("g") == 0) { // coletar tesouro
+                Treasure treasure = map.getTreasure();
+                boolean loop = true;
+                Item item;
 
-        else if (command.compareTo("g") == 0) { // coletar tesouro
-            Treasure treasure = map.getTreasure();
-            boolean loop = true;
-            Item item;
-
-            System.out.println("To store, type: "
-                    +"\n the number of the item"
-                    +"\n e - store all items"
-                    +"\n quit - to close treasure");
+                System.out.println("To store, type: "
+                        + "\n the number of the item"
+                        + "\n e - store all items"
+                        + "\n quit - to close treasure");
 
 
-            while (loop) {
-                treasure.printTreasure(); // por enquanto ainda tá vazio os tesouros
-                System.out.print("Enter the command : ");
-                command = stringScanner();
+                while (loop) {
+                    treasure.printTreasure(); // por enquanto ainda tá vazio os tesouros
+                    System.out.print("Enter the command : ");
+                    command = stringScanner();
 
-                if (command.compareTo("e") == 0) { //coletar todos os itens
-                    storeAll(treasure);
-                    loop = false;
-                } else if (command.compareTo("quit") == 0) // andar para esquerda
-                    loop = false;
-                else {
-                    item = treasure.removeTreasure(toInteger(command));
-                    hero.storeInBackpack(item);
+                    if (command.compareTo("e") == 0) { //coletar todos os itens
+                        storeAll(treasure);
+                        loop = false;
+                    } else if (command.compareTo("quit") == 0) // andar para esquerda
+                        loop = false;
+                    else {
+                        item = treasure.removeTreasure(toInteger(command));
+                        hero.storeInBackpack(item);
+                    }
                 }
+
+            } else
+                action(command);
+
+            try {
+                if (walking != null && map.canIWalk(walking))
+                    hero.move(walking);
+            } catch (CantMoveException e) {
+                System.out.println(e.getMessage());
             }
 
+            if (hero.getMoveAllowed() == 0)
+                wave = false;
+
+            System.out.println();
         }
-
-        else
-            action(command);
-
-        try {
-            if (walking != null && map.canIWalk(walking))
-                hero.move(walking);
-        }catch(CantMoveException e) {
-            System.out.println(e.getMessage());
-        }
-
-        if (hero.getMoveAllowed() == 0)
-            wave = false;
-
-        System.out.println();
     }
 
     private void action(String command){
@@ -549,18 +495,4 @@ public class TextEngine extends TimerTask{
 			hero.storeInBackpack(treasure.removeTreasure(i));
 	}
 
-
-    @Override
-    public void run() {
-
-        try {
-            throw new TimeoutException("||| TEMPO ESGOTADO |||");
-        } catch (TimeoutException e) {
-            System.out.println("\n"+e.getMessage());
-            wave = false;
-//            scanner.nextLine();
-            this.cancel();
-        }
-
-    }
 }
