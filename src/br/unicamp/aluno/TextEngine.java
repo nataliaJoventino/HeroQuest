@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import br.unicamp.aluno.models.Exceptions.OnlyNumbersException;
 import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Hero;
@@ -13,7 +14,6 @@ import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
 import br.unicamp.aluno.models.Exceptions.CantMoveException;
 import br.unicamp.aluno.models.Exceptions.NotEquippableException;
-import br.unicamp.aluno.models.Exceptions.OnlyNumbersException;
 import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Item.SimpleHeal;
 import br.unicamp.aluno.models.Item.Spell;
@@ -26,6 +26,7 @@ public class TextEngine {
 	private Hero hero;
 	private boolean wave; // controle de truno
 	private boolean action; // controle de ação (só pode ser realizada uma vez por turno)
+    private boolean move;
 	private Scanner scanner;
 
 	public TextEngine(Game map) {
@@ -34,180 +35,203 @@ public class TextEngine {
 		this.scanner = new Scanner(System.in);
 	}
 
-	public void gameLoop() {
-		exitSelected = false;
-		wave = true;
-		action = false;
-		hero.generateMoveAllowed();
+    public void gameLoop(){
+        Scanner scanner = new Scanner(System.in);
+        exitSelected = false;
+        wave = true;
+        action = false;
+        move = false;
+        hero.generateMoveAllowed();
 
-		System.out.println("Game started!");
+        System.out.println("Game started!");
 
-		while (!exitSelected) { /// tem que fazer as exceções que param o jogo
+        while (!exitSelected){ ///tem que fazer as exceções que param o jogo
 
-			if (wave) {
-				map.refreshMap();
-				map.printMap();
-				System.out.println("Moves allowed: " + hero.getMoveAllowed());
-				readCommandFromKeyboard();
-			} else {
-				System.out.println("Wave was ended");
-				hero.generateMoveAllowed();
-				wave = true;
-				action = false;
-				System.out.println("New wave started");
-			}
+            if (wave) {
+                map.refreshMap();
+                map.printMap();
+                System.out.println("Moves allowed: " + hero.getMoveAllowed()
+                        +" | Equipped right hand: " + hero.getRightHand()
+                        +" | Equipped left hand: " + hero.getLeftHand()); //fazer if pra caso item seja de suas mãos e para não ficar aparecendo o null
+                readCommandFromKeyboard(scanner);
+            } else {
+                System.out.println("Wave was ended");
+                hero.generateMoveAllowed();
+                wave = true;
+                action = false;
+                move = false;
+                System.out.println("New wave started");
+            }
 
-		}
+        }
 
-		map.printMap();
-		System.out.println("Game terminated. Bye!");
-		scanner.close();
-	}
 
-	private void readCommandFromKeyboard() {
-		Direction walking = null;
-		String command = "";
+        map.printMap();
+        System.out.println("Game terminated. Bye!");
+        scanner.close();
+    }
 
-		System.out.print("Enter the command : ");
-		command = stringScanner();
+    private void readCommandFromKeyboard(Scanner scanner){
+        Direction walking = null;
+        String command = "";
 
-		if (command.compareTo("w") == 0) // andar para cima
-			walking = Direction.UP;
+        System.out.print("Enter the command : ");
+        command = stringScanner();
 
-		else if (command.compareTo("a") == 0) // andar para esquerda
-			walking = Direction.LEFT;
+        if (command.compareTo("w") == 0) //andar para cima
+            walking = Direction.UP;
 
-		else if (command.compareTo("d") == 0) // andar para direita
-			walking = Direction.RIGHT;
+        else if (command.compareTo("a") == 0) // andar para esquerda
+            walking = Direction.LEFT;
 
-		else if (command.compareTo("s") == 0) // andar para baixo
-			walking = Direction.DOWN;
+        else if (command.compareTo("d") == 0) // andar para direita
+            walking = Direction.RIGHT;
 
-		else if (command.compareTo("h") == 0) // busca armadilha
-			map.searchForTrap();
+        else if (command.compareTo("s") == 0) // andar para baixo
+            walking = Direction.DOWN;
 
-		else if (command.compareTo("b") == 0) { // abrir mochila
-			hero.printBackpack(); // por enquanto tá vazia
-			int choice = choosingItem();
-			if (choice != -1)
-				equipBackpack(choice);
-		}
+        else if (command.compareTo("h") == 0) // busca armadilha
+            map.searchForTrap();
 
-		else if (command.compareTo("g") == 0) { // coletar tesouro
-			Treasure treasure = map.getTreasure();
-			boolean loop = true;
-			Item item;
+        else if (command.compareTo("p") == 0) { // abrir porta
+            int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX();
+            int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
+            Point point = new Point(x,y);
+            map.openDoor(point);
 
-			System.out.print("To store, type: " + "\n the number of the item" + "\n e - store all items"
-					+ "\n quit - to close treasure");
+        }else if (command.compareTo("b") == 0){ //abrir mochila
+            hero.printBackpack(); // por enquanto tá vazia
+            int choice = choosingItem();
+            if (choice != -1)
+                equipBackpack(choice);
+        }
 
-			while (loop) {
-				treasure.printTreasure(); // por enquanto ainda tá vazio os tesouros
-				System.out.print("Enter the command : ");
-				command = stringScanner();
+        else if (command.compareTo("g") == 0) { // coletar tesouro
+            Treasure treasure = map.getTreasure();
+            boolean loop = true;
+            Item item;
 
-				if (command.compareTo("e") == 0) { // coletar todos os itens
-					storeAll(treasure);
-					loop = false;
-				} else if (command.compareTo("quit") == 0) // andar para esquerda
-					loop = false;
-				else {
-					item = treasure.removeTreasure(toInteger(command));
-					hero.storeInBackpack(item);
-				}
-			}
+            System.out.print("To store, type: "
+                    +"\n the number of the item"
+                    +"\n e - store all items"
+                    +"\n quit - to close treasure");
 
-		}
 
-		else
-			action(command);
+            while (loop) {
+                treasure.printTreasure(); // por enquanto ainda tá vazio os tesouros
+                System.out.print("Enter the command : ");
+                command = stringScanner();
 
-		try {
-			if (walking != null && map.canIWalk(walking))
-				hero.move(walking);
-		} catch (CantMoveException e) {
-			System.out.println(e.getMessage());
-			if (walking != null)
-				wave = false;
-		}
+                if (command.compareTo("e") == 0) { //coletar todos os itens
+                    storeAll(treasure);
+                    loop = false;
+                } else if (command.compareTo("quit") == 0) // andar para esquerda
+                    loop = false;
+                else {
+                    item = treasure.removeTreasure(toInteger(command));
+                    hero.storeInBackpack(item);
+                }
+            }
 
-		System.out.println();
-	}
+        }
 
-	private void action(String command) {
-		if (!action) {
-			if (command.compareTo("t") == 0) { // busca tesouro
-				map.searchForTreasure();
-				action = true;
-			}
+        else
+            action(command);
 
-			else if (command.compareTo("u") == 0) { // ataque/feitiço (falta colocar os pontos que afetam o ataque para
-													// o usuario ver)
-				Monster monster = null;
-				Hand hand = hero.isBothHandsUsed(); // retorna nulo se as duas mãos estão ocupadas ou vazias
+        try {
+            if (walking != null && map.canIWalk(walking))
+                hero.move(walking);
+        }catch(CantMoveException e) {
+            System.out.println(e.getMessage());
+            if (hero.getMoveAllowed() == 0)
+                wave = false;
+        }
 
-				if (hand != null) { // segurando um unico item
-					monster = allowAttack(hand);
-					hero.hit(monster, hand); // fazer erro se item não for arma
+        System.out.println();
+    }
 
-				} else {
+    private void action(String command){
+        if (!action){
+            if (command.compareTo("t") == 0) { // busca tesouro
+                map.searchForTreasure();
+                action = true;
+            }
 
-					if (!hero.emptyHands() && hero.isBothHandItem()) { // se mãos não vazias e item ocupar as duas mãos
-						monster = allowAttack(null);
-						hero.hit(monster); // ataque
+            else if (command.compareTo("u") == 0){ // ataque/feitiço (falta colocar os pontos que afetam o ataque para o usuario ver)
+                Monster monster = null;
+                Hand hand = hero.isBothHandsUsed(); // retorna nulo se as duas mãos estão ocupadas ou vazias
+                try {
+                    if (hand != null) { // segurando um unico item
+                        monster = allowAttack(hand);
+                        hero.hit(monster, hand); // fazer erro se item não for arma
+                        hero.hit(monster, hand); // fazer erro se item não for arma
 
-					} else if (!hero.emptyHands()) {
-						String comm = "";
-						System.out.println("Choose weapon to attack:" + "\nr- right hand" + "\nl - left hand");
-						System.out.print("Enter the command : ");
-						comm = stringScanner();
+                    } else {
 
-						if (comm.compareTo("r") == 0) {
-							monster = allowAttack(Hand.RIGHT);
-							hero.hit(monster, Hand.RIGHT);
+                        if (!hero.emptyHands() && hero.isBothHandItem()) { // se mãos não vazias e item ocupar as duas mãos
+                            monster = allowAttack(null);
+                            hero.hit(monster); //ataque
 
-						} else if (comm.compareTo("l") == 0) {
-							monster = allowAttack(Hand.LEFT);
-							hero.hit(monster, Hand.LEFT);
-						}
+                        } else if (!hero.emptyHands()) {
+                            String comm = "";
+                            System.out.println("Choose weapon to attack:"
+                                    + "\nr- right hand"
+                                    + "\nl - left hand");
+                            System.out.print("Enter the command : ");
+                            comm = stringScanner();
 
-					} else { // mãos ficam vazias se equipadas com feitiço
-						MysticHero mysticHero = isMysticHero(hero);
+                            if (comm.compareTo("r") == 0) {
+                                monster = allowAttack(Hand.RIGHT);
+                                hero.hit(monster, Hand.RIGHT);
 
-						if (mysticHero != null) { // se herói mistico, usa feitiço
+                            } else if (comm.compareTo("l") == 0) {
+                                monster = allowAttack(Hand.LEFT);
+                                hero.hit(monster, Hand.LEFT);
+                            }
 
-							try {
-								Teleport teleport = (Teleport) mysticHero.getSpell(); // converte para teleport
-								teleport(teleport); // imprime mapa e recebe numero da noca posição
-								mysticHero.throwSpell(mysticHero);
+                        } else { //mãos ficam vazias se equipadas com feitiço
+                            MysticHero mysticHero = isMysticHero(hero);
 
-							} catch (ClassCastException e) {
+                            if (mysticHero != null && mysticHero.getSpell() != null) { // se herói mistico, usa feitiço
 
-								try {
-									SimpleHeal simpleHeal = (SimpleHeal) mysticHero.getSpell();
-									mysticHero.throwSpell(mysticHero);
+                                try {
+                                    Teleport teleport = (Teleport) mysticHero.getSpell(); // converte para teleport
+                                    teleport(teleport); // imprime mapa e recebe numero da noca posição
+                                    mysticHero.throwSpell(mysticHero);
 
-								} catch (ClassCastException m) {
-									monster = target();
-									mysticHero.throwSpell(monster); // vai ser fireball ou magicMissile
+                                } catch (ClassCastException e) {
 
-								}
-							}
-						} else {
-							System.out.println("Only mystic hero can cast spells"); // fazer excessão
-						}
-					}
-				}
+                                    try {
+                                        SimpleHeal simpleHeal = (SimpleHeal) mysticHero.getSpell();
+                                        mysticHero.throwSpell(mysticHero);
 
-				if (monster != null) {
-					System.out.println("Monster has been attacked, life points left: " + monster.getLifePoints());
-					action = true;
-				}
-			}
-		} else
-			System.out.println(
-					"Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
-	}
+                                    } catch (ClassCastException m) {
+                                        monster = target();
+                                        mysticHero.throwSpell(monster); // vai ser fireball ou magicMissile
+
+                                    }
+                                }
+                            } else {
+                                System.out.println("Only mystic hero can cast spells"); // fazer excessão para sem spell
+                            }
+                        }
+                    }
+                } catch (NullPointerException e){
+                    System.out.println("No target on the sight.");
+                }
+
+                if (monster != null) {
+                    System.out.println("Monster has been attacked, life points left: " + monster.getLifePoints());
+                    action = true;
+                }
+            }
+
+            if (move) // se herói tiver se movimentado e realizou ação wave finaliza
+                wave = false;
+        }
+        else
+            System.out.println("Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
+    }
 
 	private void teleport(Teleport teleport) {
 		boolean loop = true;
@@ -268,24 +292,27 @@ public class TextEngine {
 		return shortDistance(isInSight);
 	}
 
-	private Monster shortDistance(ArrayList<Monster> monsters) { // calcula qual monstro é o primeiro na mira
-		int toCompare;
-		Monster shortMonster = monsters.get(0);
-		int shorter = distance(hero.getPositionX(), hero.getPositionY(), shortMonster.getPositionX(),
-				shortMonster.getPositionY());
+    private Monster shortDistance(ArrayList<Monster> monsters){ // calcula qual monstro é o primeiro  na mira
+        Monster shortMonster;
+        try {
+            int toCompare;
+            shortMonster = monsters.get(0);
+            int shorter = distance(hero.getPositionX(), hero.getPositionY(), shortMonster.getPositionX(), shortMonster.getPositionY());
 
-		for (Monster m : monsters) {
-			toCompare = distance(hero.getPositionX(), hero.getPositionY(), m.getPositionX(), m.getPositionY());
-			if (shorter >= toCompare) {
-				shortMonster = m;
-				shorter = toCompare;
-			}
-		}
+            for (Monster m : monsters) {
+                toCompare = distance(hero.getPositionX(), hero.getPositionY(), m.getPositionX(), m.getPositionY());
+                if (shorter >= toCompare) {
+                    shortMonster = m;
+                    shorter = toCompare;
+                }
+            }
 
-		System.out.println("Monster life points: " + shortMonster.getLifePoints());
-
-		return shortMonster;
-	}
+            System.out.println("Monster life points: " + shortMonster.getLifePoints());
+        } catch (IndexOutOfBoundsException e){
+            shortMonster = null;
+        }
+        return shortMonster;
+    }
 
 	private int distance(int x0, int y0, int x1, int y1) { // distancia entre dois pontos (geometria taxi)
 		int absX = Math.abs((x0 - x1)); // guarda valor absoluto da diferença x
@@ -411,5 +438,6 @@ public class TextEngine {
 		for (int i = 0; i < treasure.size(); i++)
 			hero.storeInBackpack(treasure.removeTreasure(i));
 	}
+
 
 }

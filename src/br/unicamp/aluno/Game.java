@@ -233,7 +233,13 @@ public class Game {
 		if (this.map[yRequested][xRequested].equals("--") || this.map[yRequested][xRequested].equals(">>") || this.map[yRequested][xRequested].equals("//")) {
 			return true;
 		} else {
-			throw new CantMoveException();
+			Traceable traceable = null;
+			for (Traceable t : traceablesOnMap)
+				if (t.getPositionX() == xRequested && t.getPositionY() == yRequested) {
+					traceable = t;
+					break;
+				}
+			throw new CantMoveException(traceable);
 		}
 	}
 
@@ -460,14 +466,11 @@ public class Game {
 			System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
 		}
 
-		// Adicionando o Player no mapa
-		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
-		
 		//Caso não tenham monstros no mapa o player vence
 		if(monstersOnMap.isEmpty() && created) {
 			throw new YouWonException();
 		}
-		
+
 		// Atualizando os monstros
 		for (Monster monster : monstersOnMap) {
 			int newX, newY;
@@ -515,6 +518,10 @@ public class Game {
 			}
 
 		}
+
+		// Adicionando o Player no mapa
+		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
+		
 		calculateHeroVision();
 		this.created = true;
 
@@ -977,6 +984,27 @@ public class Game {
 		try {
 			Treasure treasure = (Treasure) traceable;
 			return treasure;
+		} catch (ClassCastException e) {
+			return null;
+		}
+	}
+
+	public void openDoor(Traceable traceable){
+		int x = traceable.getPositionX();
+		int y = traceable.getPositionY();
+		Door door;
+
+		for (Traceable t : traceablesOnMap) {
+			door = isDoor(t);
+			if (t.getPositionX() == x && t.getPositionY() == y && door != null)
+				door.open();
+		}
+	}
+
+	private Door isDoor(Traceable traceable){
+		try {
+			Door door = (Door) traceable;
+			return door;
 		} catch (ClassCastException e) {
 			return null;
 		}
