@@ -2,7 +2,7 @@ package br.unicamp.aluno.models.Character.Hero;
 
 import java.util.ArrayList;
 
-import br.unicamp.aluno.models.SquareVision;
+import br.unicamp.aluno.models.EngineComponents.SquareVision;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Enum.Hand;
 import br.unicamp.aluno.models.Enum.SideDice;

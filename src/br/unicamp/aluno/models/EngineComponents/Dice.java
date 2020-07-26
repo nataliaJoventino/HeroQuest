@@ -1,4 +1,4 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.EngineComponents;
 
 import br.unicamp.aluno.models.Enum.SideDice;
 
@@ -13,7 +13,7 @@ public class Dice {
         dice = new Random();
     }
 
-    public int normalDice(){
+    public int normalDice(){ // lança 1 dado
         return (dice.nextInt(BOUND_DICE) + 1);
     }
 

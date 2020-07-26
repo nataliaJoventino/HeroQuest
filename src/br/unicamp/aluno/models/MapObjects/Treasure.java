@@ -1,8 +1,9 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.MapObjects;
 
 import java.util.ArrayList;
 
 import br.unicamp.aluno.models.Item.Item;
+import br.unicamp.aluno.models.EngineComponents.Traceable;
 
 //Tesouro
 public class Treasure extends Traceable {

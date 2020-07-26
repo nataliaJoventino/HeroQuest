@@ -1,7 +1,7 @@
 package br.unicamp.aluno.models.Item;
 
 import br.unicamp.aluno.models.Character.Character;
-import br.unicamp.aluno.models.Dice;
+import br.unicamp.aluno.models.EngineComponents.Dice;
 
 public class SimpleHeal extends Spell {
     private Dice dice;

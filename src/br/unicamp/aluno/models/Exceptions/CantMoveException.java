@@ -1,7 +1,7 @@
 package br.unicamp.aluno.models.Exceptions;
 
-import br.unicamp.aluno.models.Door;
-import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.MapObjects.Door;
+import br.unicamp.aluno.models.EngineComponents.Traceable;
 
 public class CantMoveException extends RuntimeException {
 	private boolean isDoor;

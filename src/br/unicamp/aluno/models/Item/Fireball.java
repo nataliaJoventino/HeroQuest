@@ -3,8 +3,8 @@ package br.unicamp.aluno.models.Item;
 import java.util.ArrayList;
 
 import br.unicamp.aluno.models.Character.Monster.Monster;
-import br.unicamp.aluno.models.Point;
-import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.EngineComponents.Point;
+import br.unicamp.aluno.models.EngineComponents.Traceable;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Character.Hero.Hero;
 import br.unicamp.aluno.models.Enum.Direction;

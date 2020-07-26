@@ -1,7 +1,9 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.MapObjects;
+
+import br.unicamp.aluno.models.EngineComponents.Traceable;
 
 //Porta
-public class Door extends Traceable{
+public class Door extends Traceable {
 	
 	private boolean opened;
 	

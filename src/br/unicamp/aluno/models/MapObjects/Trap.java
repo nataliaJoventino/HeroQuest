@@ -1,6 +1,7 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.MapObjects;
 
 import br.unicamp.aluno.models.Character.Hero.Hero;
+import br.unicamp.aluno.models.EngineComponents.Traceable;
 
 //Armadilha
 public class Trap extends Traceable {

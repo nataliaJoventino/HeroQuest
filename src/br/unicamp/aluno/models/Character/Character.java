@@ -1,13 +1,12 @@
 package br.unicamp.aluno.models.Character;
 
-import br.unicamp.aluno.models.Dice;
+import br.unicamp.aluno.models.EngineComponents.Dice;
 import br.unicamp.aluno.models.Item.Weapon;
-import br.unicamp.aluno.models.Point;
-import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.EngineComponents.Point;
+import br.unicamp.aluno.models.EngineComponents.Traceable;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.SideDice;
 import br.unicamp.aluno.models.Exceptions.CantMoveException;
-import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 
 public abstract class Character extends Traceable {
     private int quantityOfAttackDices;

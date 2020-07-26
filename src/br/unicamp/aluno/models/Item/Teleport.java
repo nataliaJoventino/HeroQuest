@@ -1,7 +1,6 @@
 package br.unicamp.aluno.models.Item;
 
-import br.unicamp.aluno.models.Point;
-import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.EngineComponents.Point;
 import br.unicamp.aluno.models.Character.Character;
 
 public class Teleport extends Spell {

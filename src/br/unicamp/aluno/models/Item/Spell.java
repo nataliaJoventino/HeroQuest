@@ -9,7 +9,7 @@ public abstract class Spell implements Item {
 	public Spell(boolean isDestroyed) {
 		this.isDestroyed = isDestroyed;
 	}
-	
+
 	//Retorna se item deve ser detruido depois do uso
 	@Override
 	public boolean isDestroyed() {

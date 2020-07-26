@@ -1,4 +1,4 @@
-package br.unicamp.aluno.models;
+package br.unicamp.aluno.models.EngineComponents;
 
 public class SquareVision {
 	// Canto superior esquerdo
@@ -114,11 +114,11 @@ public class SquareVision {
 	public void setTopCenter(int x, int y) {
 		topCenter.updatePosition(x, y);
 	}
-	
+
 	public void setBottomCenter(int x, int y) {
 		bottomCenter.updatePosition(x, y);
 	}
-	
+
 	public void setTopLeftCorner(int x, int y) {
 		topLeftCorner.updatePosition(x, y);
 	}

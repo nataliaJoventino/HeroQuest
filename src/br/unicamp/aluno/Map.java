@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import br.unicamp.aluno.models.Door;
-import br.unicamp.aluno.models.Point;
-import br.unicamp.aluno.models.SquareVision;
-import br.unicamp.aluno.models.Traceable;
-import br.unicamp.aluno.models.Trap;
-import br.unicamp.aluno.models.Treasure;
+import br.unicamp.aluno.models.MapObjects.Door;
+import br.unicamp.aluno.models.EngineComponents.Point;
+import br.unicamp.aluno.models.EngineComponents.SquareVision;
+import br.unicamp.aluno.models.EngineComponents.Traceable;
+import br.unicamp.aluno.models.MapObjects.Trap;
+import br.unicamp.aluno.models.MapObjects.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Hero;
 import br.unicamp.aluno.models.Character.Monster.Goblin;
 import br.unicamp.aluno.models.Character.Monster.MageSkeleton;

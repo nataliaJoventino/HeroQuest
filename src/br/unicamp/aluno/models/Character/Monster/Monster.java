@@ -3,8 +3,8 @@ package br.unicamp.aluno.models.Character.Monster;
 import java.util.ArrayList;
 import java.util.Random;
 
-import br.unicamp.aluno.models.Point;
-import br.unicamp.aluno.models.Traceable;
+import br.unicamp.aluno.models.EngineComponents.Point;
+import br.unicamp.aluno.models.EngineComponents.Traceable;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Character.Hero.Hero;
 import br.unicamp.aluno.models.Enum.Direction;
@@ -15,25 +15,6 @@ public abstract class Monster extends Character {
 
 	public Monster(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
 		super(x, y, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
-	}
-
-	// gera uma direção aleatória
-	public Direction randomDirection() { // no mapa verifica se posição está livre (isso deve estar em mapa ao invés daqui?)
-		Random randomDirection = new Random();
-
-		switch (randomDirection.nextInt(4)) {
-		case 0:
-			return Direction.UP;
-		case 1:
-			return Direction.DOWN;
-		case 2:
-			return Direction.RIGHT;
-		case 3:
-			return Direction.LEFT;
-
-		}
-
-		return null;
 	}
 
 	public int hitDefence(){

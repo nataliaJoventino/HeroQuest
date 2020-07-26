@@ -1,12 +1,11 @@
 package br.unicamp.aluno;
 
 import java.util.*;
-import java.util.concurrent.TimeoutException;
 
 import br.unicamp.aluno.models.Exceptions.*;
 import br.unicamp.aluno.models.Item.*;
-import br.unicamp.aluno.models.Point;
-import br.unicamp.aluno.models.Treasure;
+import br.unicamp.aluno.models.EngineComponents.Point;
+import br.unicamp.aluno.models.MapObjects.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Barbarian;
 import br.unicamp.aluno.models.Character.Hero.Dwarf;
 import br.unicamp.aluno.models.Character.Hero.Elf;
@@ -18,29 +17,16 @@ import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.Hand;
 
 public class Game {
-	private boolean exitSelected;
 	private Map map;
 	private Hero hero;
+	private boolean move; // controla se heroi andou
 	private boolean wave; // controle de truno
 	private boolean action; // controle de ação (só pode ser realizada uma vez por turno)
-	private boolean move;
 	private Scanner scanner;
-	ArrayList<String> buffer;
+	private boolean exitSelected;
 
 	public Game() {
 		this.scanner = new Scanner(System.in);
-		buffer = new ArrayList<>();
-	}
-
-	public boolean isWave() {
-		return wave;
-	}
-
-	public void setWave(boolean wave) {
-		synchronized (this) {
-			this.wave = wave;
-		}
-
 	}
 
 	public void start(int xMaxMap, int yMaxMap) {
@@ -50,7 +36,7 @@ public class Game {
 		move = false;
 
 		// Deixando o usuário escolher colocar um nome no heroi dele
-		System.out.println("Escolha um nome para o seu heroi:");
+		System.out.print("Choose a name for your hero:");
 
 		// Lendo o nome colocado
 		String name = stringScanner();
@@ -59,45 +45,54 @@ public class Game {
 		boolean loopChoose = true;
 
 		while (loopChoose) {
-			
-			System.out.printf("Escolha um heroi -----\n1 - Barbaro\n2 - Anão\n3 - Elfo\n4 - Mago");
-			
+
+			System.out.println("Heros on quest:" +
+					"\n1 - Barbaro" +
+					"\n2 - Anão" +
+					"\n3 - Elfo" +
+					"\n4 - Mago");
+
+			System.out.print("Choose a hero: ");
+			System.out.println();
+
 			int heroNumber = Integer.parseInt(stringScanner());
 
 			try {
-
 				// Escolhendo o heroi
 				switch (heroNumber) {
+					// Barbaro
+					case 1:
+						this.hero = new Barbarian(name);
+						loopChoose = false;
+						break;
 
-				// Barbaro
-				case 1:
-					this.hero = new Barbarian(name);
-					loopChoose = false;
-					break;
-				// Anão
-				case 2:
-					this.hero = new Dwarf(name);
-					loopChoose = false;
-					break;
-				// Elfo
-				case 3:
-					this.hero = new Elf(name);
-					loopChoose = false;
-					break;
-				// Mago
-				case 4:
-					this.hero = new Wizard(name);
-					loopChoose = false;
-					break;
-				default:
-					break;
+					// Anão
+					case 2:
+						this.hero = new Dwarf(name);
+						loopChoose = false;
+						break;
+
+					// Elfo
+					case 3:
+						this.hero = new Elf(name);
+						loopChoose = false;
+						break;
+
+					// Mago
+					case 4:
+						this.hero = new Wizard(name);
+						loopChoose = false;
+						break;
+
+					default:
+						break;
 
 				}
 
 				// Criando o mapa
 				map = new Map(hero, xMaxMap, yMaxMap);
 			} catch (NullPointerException e) {
-				System.out.println("Entrada inválida, tente novamente!");
+				System.out.println("Invalid input, try again!");
 				loopChoose = true;
 			}
 		}
@@ -108,9 +103,9 @@ public class Game {
 
 		try {
 
-			while (!exitSelected) { /// tem que fazer as exceções que param o jogo
+			while (!exitSelected) {
 
-				new Coordinator(this).start();
+				new Timer(this).start();
 				while (wave) {
 					starWave();
 					readCommandFromKeyboard();
@@ -133,31 +128,39 @@ public class Game {
 
 	}
 
-	public void starWave() {
-		synchronized (this) {
-			map.refreshMap();
-			map.printMap();
-			System.out.println("Moves allowed: " + hero.getMoveAllowed() + " | Equipped right hand: "
-					+ hero.getRightHand() + " | Equipped left hand: " + hero.getLeftHand() + " | Life points: "
-					+ hero.getLifePoints()); // fazer if pra caso item seja de suas mãos e para não ficar aparecendo o
-												// null
-		}
+	public boolean isWave() {
+		return wave;
 	}
 
-	public void endWave() {
+	public void setWave(boolean wave) {
 		synchronized (this) {
-			System.out.println("\n||| WAVE ENDED |||");
-			hero.generateMoveAllowed();
-			wave = true;
-			action = false;
-			move = false;
-			System.out.println();
-			System.out.println("||| NEW WAVE |||");
-			System.out.println();
+			this.wave = wave;
 		}
+
 	}
 
-	public void readCommandFromKeyboard() {
+	private void starWave() {
+		map.refreshMap();
+		map.printMap();
+		System.out.println("Moves allowed: " + hero.getMoveAllowed() + " | Equipped right hand: "
+				+ hero.getRightHand() + " | Equipped left hand: " + hero.getLeftHand() + " | Life points: "
+				+ hero.getLifePoints() + " | Is both hands item? " + hero.isBothHandItem()); // fazer if pra caso item seja de uas mãos e para não ficar aparecendo o null
+
+	}
+
+	private void endWave() {
+		System.out.println("\n||| WAVE ENDED |||");
+		hero.generateMoveAllowed();
+		wave = true;
+		action = false;
+		move = false;
+		System.out.println();
+		System.out.println("||| NEW WAVE |||");
+		System.out.println();
+
+	}
+
+	private void readCommandFromKeyboard() {
 		Direction walking = null;
 		String command = "";
 
@@ -181,8 +184,9 @@ public class Game {
 			else if (command.compareTo("h") == 0) { // busca armadilha
 				map.searchForTrap();
 				System.out.println("Search for traps has been made!");
+
 			} else if (command.compareTo("p") == 0) { // abrir porta
-				int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX();
+				int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); //pega posição da porta a frente do herói
 				int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
 				Point point = new Point(x, y);
 				map.openDoor(point);
@@ -192,13 +196,16 @@ public class Game {
 				int choice = choosingItem();
 				if (choice != -1)
 					equipBackpack(choice);
+
 			} else if (command.compareTo("g") == 0) { // coletar tesouro
 				Treasure treasure = map.getTreasure();
 				boolean loop = true;
 				Item item;
 
-				System.out.println("To store, type: " + "\n the number of the item" + "\n e - store all items"
-						+ "\n quit - to close treasure");
+				System.out.println("To store, type: " +
+						"\n the number of the item" +
+						"\n e - store all items" +
+						"\n quit - to close treasure");
 
 				while (loop) {
 					treasure.printTreasure(); // por enquanto ainda tá vazio os tesouros
@@ -241,8 +248,7 @@ public class Game {
 				action = true;
 			}
 
-			else if (command.compareTo("u") == 0) { // ataque/feitiço (falta colocar os pontos que afetam o ataque para
-													// o usuario ver)
+			else if (command.compareTo("u") == 0) { // ataque/feitiço (falta colocar os pontos que afetam o ataque para o usuario ver)
 				Monster monster = null;
 				MysticHero mysticHero = null;
 
@@ -255,7 +261,7 @@ public class Game {
 					} else {
 
 						if (!hero.emptyHands() && hero.isBothHandItem()) { // se mãos não vazias e item ocupar as duas
-																			// mãos
+							// mãos
 							monster = allowAttack(null);
 							hero.hit(monster); // ataque
 
@@ -337,9 +343,9 @@ public class Game {
 					System.out.println("No target on the sight.");
 				}
 			}
+
 		} else {
-			System.out.println(
-					"Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
+			System.out.println( "Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
 			if (move) // se herói tiver se movimentado e realizou ação wave finaliza
 				wave = false;
 		}
@@ -393,8 +399,7 @@ public class Game {
 		}
 	}
 
-	private Monster allowAttack(Hand hand) { // permite ataque do ao monstro que está dentro da mira e de menor
-												// distancia (primeiro monstro a frente)
+	private Monster allowAttack(Hand hand) { // permite ataque do ao monstro que está dentro da mira e de menor distancia (primeiro monstro a frente)
 		ArrayList<Monster> isInSight = new ArrayList();
 		for (Monster m : map.getMonstersOnMap())
 			if (hand != null) {

@@ -2,7 +2,6 @@ package br.unicamp.aluno.models.Character.Monster;
 
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Character.Hero.Hero;
-import br.unicamp.aluno.models.Dice;
 import br.unicamp.aluno.models.Item.MagicMissile;
 import br.unicamp.aluno.models.Item.Spell;
 import br.unicamp.aluno.models.Item.Weapon;
