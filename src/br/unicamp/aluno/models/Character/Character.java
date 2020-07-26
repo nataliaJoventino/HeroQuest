@@ -81,6 +81,9 @@ public abstract class Character extends Traceable {
         totalHit = value - this.hitDefence; // remove hits de defesa
         if (totalHit > 0)
             removeLifePoints(totalHit);
+        else if(totalHit == 0) {
+        	System.out.println("Sua defesa foi implacável e você não sofreu dano algum!");
+        }
 
     }
 

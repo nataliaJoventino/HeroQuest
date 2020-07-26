@@ -150,6 +150,7 @@ public class Game {
 		return wave;
 	}
 
+	//Altera a wave através da thread
 	public void setWave(boolean wave) {
 		synchronized (this) {
 			System.out.println("\n||| WAVE ENDED |||");
@@ -185,7 +186,7 @@ public class Game {
 			}
 			//Se não o monstro anda
 			else {
-				//Caso for um goblin
+				//Caso for um goblin anda se aproximando do player
 				try {
 					Goblin goblin = (Goblin)monster;
 					goblin.move(hero);
@@ -201,6 +202,7 @@ public class Game {
 		
 	}
 
+	//Fim da wave do heroi
 	private void endWave() {
 		System.out.println("\n||| WAVE ENDED |||");
 		hero.generateMoveAllowed();
@@ -216,6 +218,7 @@ public class Game {
 
 	}
 
+	//Lendo os comandos do teclado
 	private void readCommandFromKeyboard() {
 		Direction walking = null;
 		String command = "";
