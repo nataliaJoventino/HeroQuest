@@ -1,14 +1,12 @@
 package br.unicamp.aluno;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class Coordinator extends Thread {
-    private TextEngine engine;
-    public Coordinator(TextEngine textEngine) {
-        engine = textEngine;
+    private Game engine;
+    public Coordinator(Game game) {
+        engine = game;
     }
 
 

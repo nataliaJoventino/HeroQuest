@@ -2,10 +2,7 @@ package br.unicamp.aluno.models.Character.Hero;
 
 import java.util.ArrayList;
 
-import br.unicamp.aluno.models.Enum.Direction;
-import br.unicamp.aluno.models.Point;
 import br.unicamp.aluno.models.SquareVision;
-import br.unicamp.aluno.models.Traceable;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Enum.Hand;
 import br.unicamp.aluno.models.Enum.SideDice;
@@ -26,9 +23,9 @@ public abstract class Hero extends Character {
 	//Construtor de Heroi
 	public Hero(String name, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
 		//O heroi sempre nasce no (18,2)
-		super(8, 18, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
+		super(2, 18, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
 		this.name = name;
-		this.backpack = new ArrayList();
+		this.backpack = new ArrayList<Item>();
 		firstSquareVision = new SquareVision();
 		secondSquareVision = new SquareVision();
 	}

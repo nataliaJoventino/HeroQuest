@@ -1,1099 +1,559 @@
 package br.unicamp.aluno;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
+import java.util.concurrent.TimeoutException;
 
-import br.unicamp.aluno.models.*;
-import br.unicamp.aluno.models.Exceptions.YouWonException;
+import br.unicamp.aluno.models.Exceptions.*;
+import br.unicamp.aluno.models.Item.*;
+import br.unicamp.aluno.models.Point;
+import br.unicamp.aluno.models.Treasure;
+import br.unicamp.aluno.models.Character.Hero.Barbarian;
+import br.unicamp.aluno.models.Character.Hero.Dwarf;
+import br.unicamp.aluno.models.Character.Hero.Elf;
 import br.unicamp.aluno.models.Character.Hero.Hero;
-import br.unicamp.aluno.models.Character.Monster.Goblin;
-import br.unicamp.aluno.models.Character.Monster.MageSkeleton;
+import br.unicamp.aluno.models.Character.Hero.MysticHero;
+import br.unicamp.aluno.models.Character.Hero.Wizard;
 import br.unicamp.aluno.models.Character.Monster.Monster;
-import br.unicamp.aluno.models.Character.Monster.Skeleton;
 import br.unicamp.aluno.models.Enum.Direction;
-import br.unicamp.aluno.models.Exceptions.CantMoveException;
-import br.unicamp.aluno.models.Exceptions.TrapsHurtMeException;
-import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
-import br.unicamp.aluno.models.Exceptions.YouWonException;
+import br.unicamp.aluno.models.Enum.Hand;
 
 public class Game {
-
-	private String[][] map;
-
-	private ArrayList<Traceable> traceablesOnMap;
-	private ArrayList<Monster> monstersOnMap;
-	private TextEngine keyboard;
-	private int xMapSize;
-	private int yMapSize;
+	private boolean exitSelected;
+	private Map map;
 	private Hero hero;
-	private boolean created;
+	private boolean wave; // controle de truno
+	private boolean action; // controle de ação (só pode ser realizada uma vez por turno)
+	private boolean move;
+	private Scanner scanner;
+	ArrayList<String> buffer;
 
-	// Construtor do Jogo
-	public Game(Hero player, int ySize, int xSize) {
-
-		// guardando o tamanho do mapa
-		this.map = new String[ySize][xSize];
-		this.xMapSize = xSize;
-		this.yMapSize = ySize;
-		this.hero = player;
-		this.keyboard = new TextEngine(this);
-
-		// Iniciando a variável de localizaveis no mapa
-		this.traceablesOnMap = new ArrayList<Traceable>();
-		this.monstersOnMap = new ArrayList<Monster>();
-
-		// criando o mapa
-		refreshMap();
-
-		// --------------------------------------------
-
-		// Adicionando inimigos em lugares aleatórios do mapa
-		Random generator = new Random();
-
-		// Adicionando 6 Goblins no mapa
-		for (int i = 0; i < 6; i++) {
-
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Quantidade de adagas aleatorizada
-			int randomQtdDaggers = generator.nextInt(10);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo os goblins
-			Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
-			monstersOnMap.add(goblin);
-		}
-
-		// Adicionando 2 esqueletos magos no mapa
-		for (int i = 0; i < 2; i++) {
-
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Quantidade de adagas aleatorizada
-			int randomQtdDaggers = generator.nextInt(10);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo os esqueletos magos
-			MageSkeleton mageSkeleton = new MageSkeleton(randomX, randomY, randomQtdDaggers);
-
-			monstersOnMap.add(mageSkeleton);
-		}
-
-		// Adicionando 4 esqueletos no mapa
-		for (int i = 0; i < 4; i++) {
-
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo os esqueletos
-			Skeleton skeleton = new Skeleton(randomX, randomY);
-			monstersOnMap.add(skeleton);
-		}
-
-		// ---------------------------------
-
-		// Adicionando uma quantidade entre 4 e 6 tesouros no mapa
-		int randomQtdTreasures = ThreadLocalRandom.current().nextInt(4, 7);
-		for (int i = 0; i < randomQtdTreasures; i++) {
-
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals(">>") && !map[randomY][randomX].equals("--")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo os tesouros
-			Treasure treasure = new Treasure(randomX, randomY);
-			addTraceablesOnGame(treasure);
-		}
-		// Adicionando 8 armadilhas no mapa
-		for (int i = 0; i < 8; i++) {
-
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo as armadilhas
-			Trap trap = new Trap(randomX, randomY);
-			addTraceablesOnGame(trap);
-		}
-
-		// inserindo as portas no mapa:
-		for (int i = 0; i < xSize; i++) {
-
-			// gerando um numero aleatório para ser posto como distância entre as portas
-			int randomSpace = ThreadLocalRandom.current().nextInt(3, 5);
-
-			// Percorrendo todas as colunas do mapa
-			for (int j = 0; j < ySize; j += randomSpace) {
-				// Sempre mudando esse espaço para ser mais aleatório ainda
-				randomSpace = ThreadLocalRandom.current().nextInt(3, 5);
-				try {
-					// Verificando se a porta não ficará na quina da parede das salas
-					if (map[i][j].equals("##") && map[i][j - 1].equals("##") && map[i][j + 1].equals("##")
-							&& !map[i + 1][j].equals("##") && !map[i - 1][j].equals("##")) {
-
-						// Adicionando a porta no mapa
-						traceablesOnMap.add(new Door(j, i));
-					}
-				}
-				// Caso a coluna j-1 ou j+1 esteja fora da nossa tabela
-				catch (IndexOutOfBoundsException e) {
-					continue;
-				}
-			}
-		}
-		// Atualizando o mapa com a posição dos personagens
-		refreshMap();
-
+	public Game() {
+		this.scanner = new Scanner(System.in);
+		buffer = new ArrayList<>();
 	}
 
-	public ArrayList<Monster> getMonstersOnMap() {
-		return monstersOnMap;
+	public boolean isWave() {
+		return wave;
 	}
 
-	public Hero getHero() {
-		return hero;
-	}
-
-	// Adiciona localizaveis no nosso mapa
-	public void addTreaceables(Traceable traceable) {
-		// Obtendo a localização do localizavel
-		int traceableX = traceable.getPositionX();
-		int traceableY = traceable.getPositionY();
-
-		// Adicionando o localizavel no mapa
-		this.map[traceableX][traceableY] = traceable.toString();
-
-		// Registrando o localizavel nos traceables no jogo atual
-		this.addTraceablesOnGame(traceable);
-
-	}
-
-	// Registra os traceables que estão no mapa
-	private void addTraceablesOnGame(Traceable traceable) {
-		this.traceablesOnMap.add(traceable);
-	}
-
-	// Remove os localizaveis que estão no jogo (Sem uso por enquanto, mas usaremos
-	// para matar monstros, etc depois)
-//		private void removeTraceablesOnGame(Traceable traceable) {
-//			this.traceablesOnMap.remove(traceable);
-//		}
-
-	// verifica a possibilidade e caminha com o player para a posição
-	// xNow e yNow dizem a posição atual do player
-	// xRequested e yRequested dizem a posiçao solicitada pelo usuário
-	public boolean canIWalk(Direction direction) {
-		int xRequested = hero.getPositionX() + direction.getPoint().getPositionX();
-		int yRequested = hero.getPositionY() + direction.getPoint().getPositionY();
-
-		// caso tiver o espaço desejado caminharemos com o player
-		if (this.map[yRequested][xRequested].equals("--") || this.map[yRequested][xRequested].equals(">>")
-				|| this.map[yRequested][xRequested].equals("//")) {
-
-			// Verificando se irá pisar em alguma armadilha
-			amIOnSomeTrap(xRequested, yRequested);
-
-			return true;
-		} else {
-			Traceable traceable = null;
-			for (Traceable t : traceablesOnMap)
-				if (t.getPositionX() == xRequested && t.getPositionY() == yRequested) {
-					traceable = t;
-					break;
-				}
-			throw new CantMoveException(traceable);
-		}
-	}
-
-	// Printa todo conteúdo do mapa
-	public void printAllMap() {
-		for (int i = 0; i < this.yMapSize; i++) {
-			for (int j = 0; j < this.xMapSize; j++) {
-				System.out.print(this.map[i][j] + " ");
-			}
-			System.out.println("");
-		}
-	}
-
-	// Printa todo conteúdo do mapa que é visível ao player
-	public void printMap() {
-
-		// Os limites do primeiro quadrado da visão do player são:
-		int firstLowerX = hero.getFirstSquareVision().getLowerX();
-		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
-
-		int firstLowerY = hero.getFirstSquareVision().getLowerY();
-		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
-
-		// Os limites do segundo quadrado são
-		int secondLowerX = hero.getSecondSquareVision().getLowerX();
-		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
-
-		int secondLowerY = hero.getSecondSquareVision().getLowerY();
-		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
-
-		// Mostrando somente o primeiro quadrado que o player tem visão
-		for (int i = 0; i < this.yMapSize; i++) {
-			for (int j = 0; j < this.xMapSize; j++) {
-
-				// Caso esteja dentro do campo de visão dele
-				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY)
-						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
-
-					// Printando a posição do mapa
-					System.out.print(this.map[i][j] + " ");
-				}
-
-				else {
-					System.out.print("^^ ");
-				}
-
-			}
-			System.out.println("");
-		}
-	}
-
-	public void searchForTreasure() {
-		// Buscando somente pelo campo de visão do heroi
-
-		// Os limites do primeiro quadrado são:
-		int firstLowerX = hero.getFirstSquareVision().getLowerX();
-		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
-
-		int firstLowerY = hero.getFirstSquareVision().getLowerY();
-		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
-
-		// Os limites do segundo quadrado são
-		int secondLowerX = hero.getSecondSquareVision().getLowerX();
-		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
-
-		int secondLowerY = hero.getSecondSquareVision().getLowerY();
-		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
-
-		// Verificando a lista de traceables
-		for (Traceable traceable : traceablesOnMap) {
-			// Caso esteja dentro do campo de visão dele
-			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
-					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
-					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
-
-				try {
-					Treasure treasure = (Treasure) traceable;
-					treasure.turnVisible();
-
-					// Verificando a possibilidade de nascer um monstro:
-					boolean willBorn = generateARandomBoolean();
-
-					// Caso vá nascer
-					if (willBorn) {
-						maybeARandomMonster(treasure);
-					}
-
-					refreshMap();
-
-				} catch (ClassCastException e) {
-					continue;
-				}
-			}
-		}
-	}
-
-	// Talvez um monstro nasça perto do baú, como no enunciado
-	private void maybeARandomMonster(Treasure treasure) {
-
-		int xTreasure = treasure.getPositionX();
-		int yTreasure = treasure.getPositionY();
-
-		// Verificando se as posições adjacentes ao tesouro estão livres e pegando uma
-		Point adjacentPosition = new Point(0, 0);
-
-		if (map[yTreasure][xTreasure + 1].contentEquals("--") || map[yTreasure][xTreasure + 1].contentEquals(">>")) {
-			adjacentPosition.updatePosition(xTreasure + 1, yTreasure);
-		} else if (map[yTreasure][xTreasure - 1].contentEquals("--")
-				|| map[yTreasure][xTreasure - 1].contentEquals(">>")) {
-			adjacentPosition.updatePosition(xTreasure - 1, yTreasure);
-		} else if (map[yTreasure + 1][xTreasure].contentEquals("--")
-				|| map[yTreasure + 1][xTreasure].contentEquals(">>")) {
-			adjacentPosition.updatePosition(xTreasure, yTreasure + 1);
-		} else if (map[yTreasure - 1][xTreasure].contentEquals("--")
-				|| map[yTreasure - 1][xTreasure].contentEquals(">>")) {
-			adjacentPosition.updatePosition(xTreasure, yTreasure - 1);
-		}
-
-		int adjacentX = adjacentPosition.getPositionX();
-		int adjacentY = adjacentPosition.getPositionY();
-
-		// Gerando um monstro aleatório:
-		Random random = new Random();
-
-		// Gera um numero aleatório entre 0 e 2
-		switch (random.nextInt(3)) {
-		// caso 0 criaremos um esqueleto
-		case 0:
-			monstersOnMap.add(new Skeleton(adjacentX, adjacentY));
-			break;
-
-		// caso 1 criamos um Esqueleto Mago
-		case 1:
-			// Quantidade de adagas aleatorizada
-			int randomQtdDaggers = random.nextInt(10);
-
-			// inserindo os esqueletos magos
-			MageSkeleton mageSkeleton = new MageSkeleton(adjacentX, adjacentY, randomQtdDaggers);
-			monstersOnMap.add(mageSkeleton);
-
-		case 2:
-			// Quantidade de adagas aleatorizada
-			randomQtdDaggers = random.nextInt(10);
-			// inserindo os goblins
-			Goblin goblin = new Goblin(adjacentX, adjacentY, randomQtdDaggers);
-			monstersOnMap.add(goblin);
-		default:
-			break;
+	public void setWave(boolean wave) {
+		synchronized (this) {
+			this.wave = wave;
 		}
 
 	}
 
-	private boolean generateARandomBoolean() {
-		Random random = new Random();
-		return random.nextBoolean();
-	}
+	public void start(int xMaxMap, int yMaxMap) {
+		exitSelected = false;
+		wave = true;
+		action = false;
+		move = false;
 
-	public void searchForTrap() {
-		// Buscando somente pelo campo de visão do heroi
+		// Deixando o usuário escolher colocar um nome no heroi dele
+		System.out.println("Escolha um nome para o seu heroi:");
 
-		// Os limites do primeiro quadrado são:
-		int firstLowerX = hero.getFirstSquareVision().getLowerX();
-		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
+		// Lendo o nome colocado
+		String name = stringScanner();
 
-		int firstLowerY = hero.getFirstSquareVision().getLowerY();
-		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
 
-		// Os limites do segundo quadrado são
-		int secondLowerX = hero.getSecondSquareVision().getLowerX();
-		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
+		boolean loopChoose = true;
 
-		int secondLowerY = hero.getSecondSquareVision().getLowerY();
-		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
+		while (loopChoose) {
+			
+			System.out.printf("Escolha um heroi -----\n1 - Barbaro\n2 - Anão\n3 - Elfo\n4 - Mago");
+			
+			int heroNumber = Integer.parseInt(stringScanner());
 
-		// Verificando a lista de traceables
-		for (Traceable traceable : traceablesOnMap) {
-			// Caso esteja dentro do campo de visão dele
-			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
-					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
-					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
-
-				try {
-					Trap trap = (Trap) traceable;
-					trap.turnVisible();
-					refreshMap();
-
-				} catch (ClassCastException e) {
-					continue;
-				}
-			}
-		}
-	}
-
-	// Verifica se o heroi pisou em alguma armadilha e retira vida dele
-	private void amIOnSomeTrap(int xRequested, int yRequested) {
-		for (Traceable traceable : traceablesOnMap) {
-			// Caso a posição do herói seja a mesma que a da armadilha:
-			if (xRequested == traceable.getPositionX() && yRequested == traceable.getPositionY()) {
-
-				try {
-					//Cast - Verificando se é uma armadilha
-					Trap trap = (Trap) traceable;
-
-					// Ativando a armadilha
-					trap.active(hero);
-
-					// Encerrando o turno do jogador com uma mensagem de erro
-					throw new TrapsHurtMeException();
-
-				} catch (ClassCastException e) {
-					continue;
-				}
-
-			}
-		}
-	}
-
-	// Iniciando o jogo/turno
-	public void start() {
-
-		keyboard.gameLoop();
-//		Enter enter = new Enter();
-//		boolean exit = false;
-//		System.out.println("Game started!");
-//
-//
-//
-//		// Ciclo do jogo
-//		while (!keyboard.isExitSelected()) {
-//
-//			// Acontecimentos do jogo
-//
-//
-//			// Tratamento de excessões que possam surgir
-//		}catch (TrapsHurtMeException e) {
-//				System.out.println(e.getMessage());
-//			} catch (YouAreDeadException e1) {
-//				System.out.println(e1.getMessage());
-//				exit = true;
-//			} catch (YouWonException e2) {
-//				System.out.println(e2.getMessage());
-//				exit = true;
-//			}
-//
-//		}
-//
-//		System.out.println("Game termined. Bye!");
-
-	}
-
-	public void refreshMap() {
-
-		// resetando o mapa (é mais performático do que ficar mudando cada personagem)
-		// Lendo arquivo do mapa
-		try {
-			// Recebendo o arquivo de texto do mapa
-			FileReader arq = new FileReader("map.txt");
-			BufferedReader br = new BufferedReader(arq);
-
-			// lê a linha do arquivo
-			String line = br.readLine();
-
-			String[] formatedLine = line.strip().split(" ");
-
-			// iterando sobre as colunas
-			for (int j = 0; j < xMapSize; j++) {
-				this.map[0][j] = formatedLine[j];
-			}
-
-			// Setando para continuar a partir da segunda linha
-			int i = 1;
-			// Lendo as outras linhas
-			while (line != null) {
-
-				// Formatando assim como feito acima
-				line = br.readLine();
-
-				if (line == null) {
-					break;
-				}
-
-				formatedLine = line.strip().split(" ");
-
-				// Iterando por colunaa
-				for (int j = 0; j < this.xMapSize; j++) {
-					this.map[i][j] = formatedLine[j];
-				}
-
-				i++;
-			}
-			arq.close();
-		} catch (IOException e) {
-			System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
-		}
-
-		// Caso não tenham monstros no mapa o player vence
-		if (monstersOnMap.isEmpty() && created) {
-			throw new YouWonException();
-		}
-
-		// Atualizando os monstros
-		for (Monster monster : monstersOnMap) {
-			int newX, newY;
-			if (monster.getLifePoints() > 0) {
-				newX = monster.getPositionX();
-				newY = monster.getPositionY();
-				map[newY][newX] = monster.toString();
-			}
-		}
-
-		// Atualizando os outros traceables
-		for (Traceable traceable : traceablesOnMap) {
-
-			// Caso for armadilha iremos verificar se está ativa para que possamos
-			// camuflá-la
 			try {
-				Trap trap = (Trap) traceable;
-				if (trap.isVisible()) {
-					int x = trap.getPositionX();
-					int y = trap.getPositionY();
-					map[y][x] = traceable.toString();
-				} else {
-					// Mantendo a armadilha escondida
-					continue;
+
+				// Escolhendo o heroi
+				switch (heroNumber) {
+
+				// Barbaro
+				case 1:
+					this.hero = new Barbarian(name);
+					loopChoose = false;
+					break;
+				// Anão
+				case 2:
+					this.hero = new Dwarf(name);
+					loopChoose = false;
+					break;
+				// Elfo
+				case 3:
+					this.hero = new Elf(name);
+					loopChoose = false;
+					break;
+				// Mago
+				case 4:
+					this.hero = new Wizard(name);
+					loopChoose = false;
+					break;
+				default:
+					break;
+
 				}
+
+				// Criando o mapa
+				map = new Map(hero, xMaxMap, yMaxMap);
+			} catch (NullPointerException e) {
+				System.out.println("Entrada inválida, tente novamente!");
+				loopChoose = true;
 			}
-			// Fluxo normal
-			catch (ClassCastException e) {
+		}
+
+		hero.generateMoveAllowed();
+
+		System.out.println("Game started!");
+
+		try {
+
+			while (!exitSelected) { /// tem que fazer as exceções que param o jogo
+
+				new Coordinator(this).start();
+				while (wave) {
+					starWave();
+					readCommandFromKeyboard();
+				}
+				endWave();
+			}
+		} catch (TrapsHurtMeException e) {
+			System.out.println(e.getMessage());
+		} catch (YouAreDeadException e1) {
+			System.out.println(e1.getMessage());
+			exitSelected = true;
+		} catch (YouWonException e2) {
+			System.out.println(e2.getMessage());
+			exitSelected = true;
+		}
+
+		map.printMap();
+		System.out.println("Game terminated. Bye!");
+		scanner.close();
+
+	}
+
+	public void starWave() {
+		synchronized (this) {
+			map.refreshMap();
+			map.printMap();
+			System.out.println("Moves allowed: " + hero.getMoveAllowed() + " | Equipped right hand: "
+					+ hero.getRightHand() + " | Equipped left hand: " + hero.getLeftHand() + " | Life points: "
+					+ hero.getLifePoints()); // fazer if pra caso item seja de suas mãos e para não ficar aparecendo o
+												// null
+		}
+	}
+
+	public void endWave() {
+		synchronized (this) {
+			System.out.println("\n||| WAVE ENDED |||");
+			hero.generateMoveAllowed();
+			wave = true;
+			action = false;
+			move = false;
+			System.out.println();
+			System.out.println("||| NEW WAVE |||");
+			System.out.println();
+		}
+	}
+
+	public void readCommandFromKeyboard() {
+		Direction walking = null;
+		String command = "";
+
+		System.out.print("Enter the command : ");
+		command = stringScanner();
+
+		if (wave) {
+
+			if (command.compareTo("w") == 0) // andar para cima
+				walking = Direction.UP;
+
+			else if (command.compareTo("a") == 0) // andar para esquerda
+				walking = Direction.LEFT;
+
+			else if (command.compareTo("d") == 0) // andar para direita
+				walking = Direction.RIGHT;
+
+			else if (command.compareTo("s") == 0) // andar para baixo
+				walking = Direction.DOWN;
+
+			else if (command.compareTo("h") == 0) { // busca armadilha
+				map.searchForTrap();
+				System.out.println("Search for traps has been made!");
+			} else if (command.compareTo("p") == 0) { // abrir porta
+				int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX();
+				int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
+				Point point = new Point(x, y);
+				map.openDoor(point);
+
+			} else if (command.compareTo("b") == 0) { // abrir mochila
+				hero.printBackpack(); // por enquanto tá vazia
+				int choice = choosingItem();
+				if (choice != -1)
+					equipBackpack(choice);
+			} else if (command.compareTo("g") == 0) { // coletar tesouro
+				Treasure treasure = map.getTreasure();
+				boolean loop = true;
+				Item item;
+
+				System.out.println("To store, type: " + "\n the number of the item" + "\n e - store all items"
+						+ "\n quit - to close treasure");
+
+				while (loop) {
+					treasure.printTreasure(); // por enquanto ainda tá vazio os tesouros
+					System.out.print("Enter the command : ");
+					command = stringScanner();
+
+					if (command.compareTo("e") == 0) { // coletar todos os itens
+						storeAll(treasure);
+						loop = false;
+					} else if (command.compareTo("quit") == 0) // andar para esquerda
+						loop = false;
+					else {
+						item = treasure.removeTreasure(toInteger(command));
+						hero.storeInBackpack(item);
+					}
+				}
+
+			} else
+				action(command);
+
+			try {
+				if (walking != null && map.canIWalk(walking))
+					hero.move(walking);
+			} catch (CantMoveException e) {
+				System.out.println(e.getMessage());
+			}
+
+			if (hero.getMoveAllowed() == 0)
+				wave = false;
+
+			System.out.println();
+		}
+	}
+
+	private void action(String command) {
+		if (!action) {
+			if (command.compareTo("t") == 0) { // busca tesouro
+				map.searchForTreasure();
+				System.out.println("Search for treasure has been made!");
+				action = true;
+			}
+
+			else if (command.compareTo("u") == 0) { // ataque/feitiço (falta colocar os pontos que afetam o ataque para
+													// o usuario ver)
+				Monster monster = null;
+				MysticHero mysticHero = null;
+
+				Hand hand = hero.isBothHandsUsed(); // retorna nulo se as duas mãos estão ocupadas ou vazias
 				try {
-					Treasure treasure = (Treasure) traceable;
-					if (treasure.isVisible()) {
-						int x = treasure.getPositionX();
-						int y = treasure.getPositionY();
-						map[y][x] = traceable.toString();
+					if (hand != null) { // segurando um unico item
+						monster = allowAttack(hand);
+						hero.hit(monster, hand); // fazer erro se item não for arma
+
 					} else {
-						// Mantendo o tesouro escondido
-						continue;
-					}
-				} catch (ClassCastException ex) {
-					int newX = traceable.getPositionX();
-					int newY = traceable.getPositionY();
-					map[newY][newX] = traceable.toString();
-				}
-			}
 
-		}
-
-		// Adicionando o Player no mapa
-		this.map[hero.getPositionY()][hero.getPositionX()] = hero.toString();
-
-		calculateHeroVision();
-		this.created = true;
-	}
-
-	private void calculateHeroVision() {
-		int heroX = hero.getPositionX();
-		int heroY = hero.getPositionY();
-
-		// Variáveis que irão verificar até onde nosso personagem consegue ver
-		int yVision = heroY;
-		int xVision = heroX;
-
-		// Para a visão efetuaremos uma dupla checagem
-		// Isso está melhor desenhado e explicadp no nosso relatório
-
-		// Primeiro quadrado de visão Y -> X
-		SquareVision firstSquare = hero.getFirstSquareVision();
-
-		// Buscando o canto superior esquerdo -------------------------
-
-		// Verificando o máximo que conseguimos ver acima do personagem
-		while (map[yVision][heroX].equals("--") || map[yVision][heroX].equals(">>")
-				|| map[yVision][heroX].equals(hero.toString())) {
-			yVision--;
-		}
-		// Verificando no maximoY qual seria o menor X visível
-		while (map[yVision + 1][xVision].equals("--") || map[yVision + 1][xVision].equals(">>")
-				|| map[yVision + 1][xVision].equals(hero.toString())) {
-			xVision--;
-		}
-
-		// Guardando a coordenada X e Y do canto superior esquerdo
-		firstSquare.setTopLeftCorner(xVision, yVision);
-
-		// Buscando o canto superior direito -------------------------
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Verificando o máximo que conseguimos ver acima do personagem
-		while (map[yVision][heroX].equals("--") || map[yVision][heroX].equals(">>")
-				|| map[yVision][heroX].equals(hero.toString())) {
-			yVision--;
-		}
-
-		// Verificando no maximoY qual seria o menor X visível
-		while (map[yVision + 1][xVision].equals("--") || map[yVision + 1][xVision].equals(">>")
-				|| map[yVision + 1][xVision].equals(hero.toString())) {
-			xVision++;
-		}
-
-		// Guardando o ponto superior direito
-		firstSquare.setTopRightCorner(xVision, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o maximo central do eixo X -------------------------
-		while (map[heroY][xVision].equals("--") || map[heroY][xVision].equals(">>")
-				|| map[heroY][xVision].equals(hero.toString())) {
-			xVision++;
-		}
-
-		// Guardando o ponto maximo central da direita
-		firstSquare.setMiddleRightCorner(xVision, heroY);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o máximo central -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			yVision--;
-		}
-
-		// Guardando o ponto maximo central
-		firstSquare.setTopCenter(heroX, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o minimo central -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			yVision++;
-		}
-
-		// Guardando o ponto maximo central
-		firstSquare.setBottomCenter(heroX, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o minimo central do eixo X -------------------------
-		while (map[heroY][xVision].equals("--") || map[heroY][xVision].equals(">>")
-				|| map[heroY][xVision].equals(hero.toString())) {
-			xVision--;
-		}
-
-		// Guardando o ponto minimo central do eixo X
-		firstSquare.setMiddleLeftCorner(xVision, heroY);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o canto inferior esquerdo ---------------------------
-		while (map[yVision][heroX].equals("--") || map[yVision][heroX].equals(">>")
-				|| map[yVision][heroX].equals(hero.toString())) {
-			yVision++;
-		}
-		// Verificando no maximoY qual seria o menor X visível
-		while (map[yVision - 1][xVision].equals("--") || map[yVision - 1][xVision].equals(">>")
-				|| map[yVision - 1][xVision].equals(hero.toString())) {
-			xVision--;
-		}
-
-		firstSquare.setBottomLeftCorner(xVision, yVision);
-
-		// Buscando o canto inferior direito ---------------------------
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Verificando o máximo que conseguimos ver abaixo do personagem
-		while (map[yVision][heroX].equals("--") || map[yVision][heroX].equals(">>")
-				|| map[yVision][heroX].equals(hero.toString())) {
-			yVision++;
-		}
-
-		// Verificando no maximoY qual seria o maior X visível
-		while (map[yVision - 1][xVision].equals("--") || map[yVision - 1][xVision].equals(">>")
-				|| map[yVision - 1][xVision].equals(hero.toString())) {
-			xVision++;
-		}
-
-		firstSquare.setBottomRightCorner(xVision, yVision);
-
-		// Segundo quadrado de visão X -> Y
-		// --------------------------------------------------
-		SquareVision secondSquare = new SquareVision();
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o canto superior esquerdo -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			xVision--;
-		}
-
-		while (map[yVision][xVision + 1].equals("--") || map[yVision][xVision + 1].equals(">>")
-				|| map[yVision][xVision + 1].equals(hero.toString())) {
-			yVision--;
-		}
-
-		// Guardando o dado
-		secondSquare.setTopLeftCorner(xVision, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o canto superior direito -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			xVision++;
-		}
-
-		while (map[yVision][xVision - 1].equals("--") || map[yVision][xVision - 1].equals(">>")
-				|| map[yVision][xVision - 1].equals(hero.toString())) {
-			yVision--;
-		}
-
-		secondSquare.setTopRightCorner(xVision, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o centro superior -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			yVision--;
-		}
-		// Guardando o dado
-		secondSquare.setTopCenter(xVision, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o minimo do eixo X -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			xVision--;
-		}
-		// Guardando o dado
-		secondSquare.setMiddleLeftCorner(xVision, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o centro maximo do eixo X -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			xVision++;
-		}
-		// Guardando o dado
-		secondSquare.setMiddleRightCorner(xVision, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o canto inferior esquerdo -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			xVision--;
-		}
-
-		while (map[yVision][xVision + 1].equals("--") || map[yVision][xVision + 1].equals(">>")
-				|| map[yVision][xVision + 1].equals(hero.toString())) {
-			yVision++;
-		}
-
-		// Guardando o dado
-		secondSquare.setBottomLeftCorner(xVision, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o canto inferior direito -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			xVision++;
-		}
-
-		while (map[yVision][xVision - 1].equals("--") || map[yVision][xVision - 1].equals(">>")
-				|| map[yVision][xVision - 1].equals(hero.toString())) {
-			yVision++;
-		}
-
-		// Guardando o dado
-		secondSquare.setBottomRightCorner(xVision, yVision);
-
-		// Resetando
-		yVision = heroY;
-		xVision = heroX;
-
-		// Buscando o centro inferior do eixo Y -------------------------
-		while (map[yVision][xVision].equals("--") || map[yVision][xVision].equals(">>")
-				|| map[yVision][xVision].equals(hero.toString())) {
-			yVision++;
-		}
-		// Guardando o dado
-		secondSquare.setBottomCenter(xVision, yVision);
-
-		hero.updateVision(firstSquare, secondSquare);
-	}
-
-	// Para o personagem teleportar dentro dos limites de sua visão
-	public void printTeleportArea() {
-
-		// Os limites do primeiro quadrado da visão do player são:
-		int firstLowerX = hero.getFirstSquareVision().getLowerX();
-		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
-
-		int firstLowerY = hero.getFirstSquareVision().getLowerY();
-		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
-
-		// Os limites do segundo quadrado são
-		int secondLowerX = hero.getSecondSquareVision().getLowerX();
-		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
-
-		int secondLowerY = hero.getSecondSquareVision().getLowerY();
-		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
-
-		// Preparando os index que o personagem irá ver
-		int index = 0;
-
-		// Mostrando somente o primeiro quadrado que o player tem visão
-		for (int i = 0; i < this.yMapSize; i++) {
-			for (int j = 0; j < this.xMapSize; j++) {
-
-				// Caso esteja dentro do campo de visão dele
-				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY)
-						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
-
-					// Trocando os espaços livres do mapa por indexes que o heroi escolherá
-					if (this.map[i][j].equals("--") || this.map[i][j].equals(">>")) {
-						// Adicionando o index com o 0 à esquerda caso seja menor que 10
-						if (index < 10) {
-							this.map[i][j] = "0" + Integer.toString(index);
-							System.out.print(map[i][j] + " ");
-						} else {
-							this.map[i][j] = Integer.toString(index);
-							System.out.print(map[i][j] + " ");
-						}
-						index++;
-					} else {
-						System.out.print(map[i][j] + " ");
-					}
-				}
-
-				else {
-					System.out.print("^^ ");
-				}
-
-			}
-			System.out.println();
-		}
-
-	}
-
-	public Point teleport(int index) {
-
-		for (int i = 0; i < this.yMapSize; i++) {
-			for (int j = 0; j < this.xMapSize; j++) {
-				if (this.map[i][j].equals(Integer.toString(index))
-						|| this.map[i][j].equals("0" + Integer.toString(index))) {
-					refreshMap(); // volta o mapa para o que era antes
-					return new Point(j, i);
-//					hero.updatePosition(j, i);
-				}
-			}
-		}
-
-		refreshMap();
-		return null;
-	}
-
-	// Para o personagem teleportar dentro dos limites de sua visão
-	public void printTarget() {
-
-		// Os limites do primeiro quadrado da visão do player são:
-		int firstLowerX = hero.getFirstSquareVision().getLowerX();
-		int firstUpperX = hero.getFirstSquareVision().getGreaterX();
-
-		int firstLowerY = hero.getFirstSquareVision().getLowerY();
-		int firstUpperY = hero.getFirstSquareVision().getGreaterY();
-
-		// Os limites do segundo quadrado são
-		int secondLowerX = hero.getSecondSquareVision().getLowerX();
-		int secondUpperX = hero.getSecondSquareVision().getGreaterX();
-
-		int secondLowerY = hero.getSecondSquareVision().getLowerY();
-		int secondUpperY = hero.getSecondSquareVision().getGreaterY();
-
-		// Preparando os index que o personagem irá ver
-		int index = 0;
-
-		ArrayList<String> monsterToString = monsterToString();
-		boolean print = false;
-
-		// Mostrando somente o primeiro quadrado que o player tem visão
-		for (int i = 0; i < this.yMapSize; i++) {
-			for (int j = 0; j < this.xMapSize; j++) {
-
-				// Caso esteja dentro do campo de visão dele
-				if ((j >= firstLowerX && j <= firstUpperX && i <= firstLowerY && i >= firstUpperY)
-						|| (j >= secondLowerX && j <= secondUpperX && i <= secondLowerY && i >= secondUpperY)) {
-
-					for (String monster : monsterToString) { // usa lista de monstros que estão no mapa
-
-						// Trocando os espaços livres do mapa por indexes que o heroi escolherá
-						if (this.map[i][j].equals(monster)) {
-							// Adicionando o index com o 0 à esquerda caso seja menor que 10
-							if (index < 10) {
-								this.map[i][j] = "0" + Integer.toString(index);
-								System.out.print(map[i][j]);
-							} else {
-								this.map[i][j] = Integer.toString(index);
-								System.out.print(map[i][j]);
+						if (!hero.emptyHands() && hero.isBothHandItem()) { // se mãos não vazias e item ocupar as duas
+																			// mãos
+							monster = allowAttack(null);
+							hero.hit(monster); // ataque
+
+						} else if (!hero.emptyHands()) {
+							String comm = "";
+							System.out.println("Choose weapon to attack:" + "\nr- right hand" + "\nl - left hand");
+							System.out.print("Enter the command : ");
+							comm = stringScanner();
+
+							if (comm.compareTo("r") == 0) {
+								monster = allowAttack(Hand.RIGHT);
+								hero.hit(monster, Hand.RIGHT);
+
+							} else if (comm.compareTo("l") == 0) {
+								monster = allowAttack(Hand.LEFT);
+								hero.hit(monster, Hand.LEFT);
 							}
-							index++;
-							print = false;
-							break;
-						} else {
-							print = true;
+
+						} else { // mãos ficam vazias se equipadas com feitiço
+							mysticHero = isMysticHero(hero);
+
+							if (mysticHero != null && mysticHero.getSpell() != null) { // se herói mistico, usa feitiço
+
+								try {
+									Teleport teleport = (Teleport) mysticHero.getSpell(); // converte para teleport
+									teleport(teleport); // imprime mapa e recebe numero da noca posição
+									mysticHero.throwSpell(mysticHero);
+
+								} catch (ClassCastException e) {
+
+									try {
+										SimpleHeal simpleHeal = (SimpleHeal) mysticHero.getSpell();
+										mysticHero.throwSpell(mysticHero);
+
+									} catch (ClassCastException m) {
+
+										try {
+											Fireball fireball = (Fireball) mysticHero.getSpell();
+											fireball.setPossibleTarget(map.getMonstersOnMap());
+											mysticHero.throwSpell(mysticHero);
+
+										} catch (ClassCastException c) {
+											monster = target();
+											mysticHero.throwSpell(monster); // vai ser magicMissile
+
+										}
+
+									}
+								}
+
+							} else {
+								if (hero.emptyHands())
+									throw new NoItemEquippedException();
+								else if (mysticHero == null)
+									throw new CantThrowSpellException();
+							}
 						}
 					}
 
-					if (print)
-						System.out.print(map[i][j]);
+					if (mysticHero != null) {
+						System.out.println(" | Monster's defense: " + monster.getHitDefence());
+						System.out.println("Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY())
+								+ "' life points after hit: " + monster.getLifePoints());
+					} else {
+						map.printTarget();
+						System.out.println("Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY())
+								+ "' life points: " + monster.getLifePoints());
+						System.out.println("Hero's hit: " + hero.getHitAttack() + " | Monster's defense: "
+								+ monster.getHitDefence());
+						System.out.println("Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY())
+								+ "' life points after hit: " + monster.getLifePoints());
+					}
+					action = true;
+				} catch (NoItemEquippedException m) {
+					System.out.println(m.getMessage());
+				} catch (CantThrowSpellException n) {
+					System.out.println(n.getMessage());
+				} catch (NullPointerException e) {
+					System.out.println("No target on the sight.");
 				}
-
-				else {
-					System.out.print("^^ ");
-				}
-
 			}
+		} else {
+			System.out.println(
+					"Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
+			if (move) // se herói tiver se movimentado e realizou ação wave finaliza
+				wave = false;
+		}
+	}
+
+	private void teleport(Teleport teleport) {
+		boolean loop = true;
+
+		while (loop == true) {
+			// Printando a area que o teleporte pode ser feito
 			System.out.println();
-		}
+			map.printTeleportArea();
 
+			// Recebendo as coordenadas
+			System.out.print(":");
+			try {
+
+				try {
+					int number = Integer.parseInt(stringScanner());
+
+					// Teleportando
+					Point position = map.teleport(number);
+					teleport.positionToMove(position);
+
+					// saindo do loop
+					loop = false;
+				} catch (NumberFormatException ex) {
+					throw new OnlyNumbersException();
+				}
+			} catch (OnlyNumbersException e) {
+				System.out.println(e.getMessage());
+				loop = true;
+			}
+		}
 	}
 
-	public Monster target(int index) {
+	private Monster target() {
+		while (true) {
+			// Printando a area que o teleporte pode ser feito
+			map.printTarget();
 
-		for (int i = 0; i < this.yMapSize; i++) {
-			for (int j = 0; j < this.xMapSize; j++) {
-				if (this.map[i][j].equals(Integer.toString(index))
-						|| this.map[i][j].equals("0" + Integer.toString(index))) {
-					refreshMap();
-					return getPosition(j, i);
+			try {
+				// Recebendo as coordenadas
+				System.out.print("Enter item number:");
+				int number = Integer.parseInt(stringScanner());
+
+				return map.target(number); // retorna alvo
+			} catch (ClassCastException e) {
+				System.out.println("Por favor, as coordenadas devem ser números!");
+			}
+		}
+	}
+
+	private Monster allowAttack(Hand hand) { // permite ataque do ao monstro que está dentro da mira e de menor
+												// distancia (primeiro monstro a frente)
+		ArrayList<Monster> isInSight = new ArrayList();
+		for (Monster m : map.getMonstersOnMap())
+			if (hand != null) {
+				if (hero.isOnSight(m, hand)) // verifica se monstro está na mira da arma da mçao selecionada
+					isInSight.add(m);
+			} else if (hero.isOnSight(m)) // verifica se monstro esta na mira de arma que ocupa as duas mãos
+				isInSight.add(m);
+
+		return shortDistance(isInSight);
+	}
+
+	private Monster shortDistance(ArrayList<Monster> monsters) { // calcula qual monstro é o primeiro na mira
+		Monster shortMonster;
+		try {
+			int toCompare;
+			shortMonster = monsters.get(0);
+			int shorter = distance(hero.getPositionX(), hero.getPositionY(), shortMonster.getPositionX(),
+					shortMonster.getPositionY());
+
+			for (Monster m : monsters) {
+				toCompare = distance(hero.getPositionX(), hero.getPositionY(), m.getPositionX(), m.getPositionY());
+				if (shorter >= toCompare) {
+					shortMonster = m;
+					shorter = toCompare;
 				}
 			}
+
+			System.out.println("Monster life points: " + shortMonster.getLifePoints());
+		} catch (IndexOutOfBoundsException e) {
+			shortMonster = null;
 		}
-
-		refreshMap();
-		return null;
+		return shortMonster;
 	}
 
-	private Monster getPosition(int x, int y) {
-		for (Monster m : monstersOnMap)
-			if (m.getPositionX() == x && m.getPositionY() == y)
-				return m;
-		return null; // tratar retorno nulo
+	private int distance(int x0, int y0, int x1, int y1) { // distancia entre dois pontos (geometria taxi)
+		int absX = Math.abs((x0 - x1)); // guarda valor absoluto da diferença x
+		int absY = Math.abs((y0 - y1));// guarda valor absoluto da diferença y
+
+		return absX + absY;
 	}
 
-	private ArrayList<String> monsterToString() { // se forem criados novos monstros não precisará mudar nada
-		ArrayList<String> monsters = new ArrayList();
+	private String stringScanner() { // lê entrada do teclado tipo string
+		String command = "";
+		boolean loop = true;
 
-		for (Monster m : monstersOnMap) {
-			if (!monsters.contains(m.toString()))
-				monsters.add(m.toString());
-		}
-		return monsters;
-	}
+		while (loop) {
+			try {
+				command = scanner.nextLine();
+				loop = false;
 
-	public Treasure getTreasure() {
-		int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega item na frente da
-																							// direção que herói está
-		int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
-		Treasure treasure = null;
+			} catch (InputMismatchException e) {
+				System.out.println(e.getCause());
+				System.out.println("Input Mismatch, try again");
+				loop = true;
 
-		for (Traceable traceable : traceablesOnMap) {
-			treasure = isTreasure(traceable);
-			// se for tesouro verifica posição
-			if (traceable.getPositionX() == x && traceable.getPositionY() == y && treasure.isVisible()) {// está em
-																											// frente ao
-																											// tesouro e
-																											// verifica
-																											// só se
-																											// tesour
-																											// visivel
-				return treasure;
+			} catch (NullPointerException e) {
+				System.out.println(e.getCause());
+				System.out.print("Null Pointer, try a valid input");
+				loop = true;
+			} catch (IndexOutOfBoundsException b) {
+				continue;
 			}
 		}
 
-		return null;
+		return command;
 	}
 
-	private Treasure isTreasure(Traceable traceable) {
+	private int choosingItem() {
+		String command;
+		boolean loop = true;
+
+		System.out.print("Enter item number to equip it or type 'quit' to close backpack: ");
+		command = stringScanner();
+
+		if (command.compareTo("quit") == 0)
+			return -1;
+		else {
+			return toInteger(command);
+		}
+	}
+
+	private Weapon isWeapon(Item item) {
 		try {
-			Treasure treasure = (Treasure) traceable;
-			return treasure;
+			Weapon weapon = (Weapon) item;
+			return weapon;
 		} catch (ClassCastException e) {
 			return null;
 		}
 	}
 
-	public boolean openDoor(Traceable traceable) {
-		int x = traceable.getPositionX();
-		int y = traceable.getPositionY();
-		Door door;
-
-		for (Traceable t : traceablesOnMap) {
-			door = isDoor(t);
-			if (t.getPositionX() == x && t.getPositionY() == y && door != null) {
-				door.open();
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private Door isDoor(Traceable traceable) {
+	private Spell isSpell(Item item) {
 		try {
-			Door door = (Door) traceable;
-			return door;
+			Spell spell = (Spell) item;
+			return spell;
 		} catch (ClassCastException e) {
 			return null;
 		}
 	}
 
-	public String getFromMap(int x, int y) {
-		return map[y][x];
+	private MysticHero isMysticHero(Hero hero) {
+		try {
+			MysticHero mysticHero = (MysticHero) hero;
+			return mysticHero;
+		} catch (ClassCastException e) {
+			return null;
+		}
+	}
+
+	private void equipBackpack(int command) {
+		String comm = "";
+
+		try {
+			Weapon weapon = isWeapon(map.getHero().getInBackpack(command)); // verifica se é arma
+
+			if (weapon != null) // se for equipa
+
+				if (weapon.isBothHands()) // se é de duas mãos
+					hero.equip(weapon);
+
+				else { // se não precisa receber comando de qual mão carregar
+					System.out.println("Choose hand to equip:" + "\nr- right hand" + "\nl - left hand");
+					System.out.print("Enter the command : ");
+					comm = stringScanner();
+
+					if (comm.compareTo("r") == 0)
+						hero.equip(weapon, Hand.RIGHT);
+
+					else if (comm.compareTo("l") == 0)
+						hero.equip(weapon, Hand.LEFT);
+				}
+
+			else
+				throw new NotEquippableException();
+
+		} catch (NotEquippableException e) {
+			if (isMysticHero(hero) != null) { // só equipa feitiço se héroi é mistico
+				Spell spell = isSpell(hero.getInBackpack(command));
+
+				if (spell != null) // spell deve ser equipado sozinho
+					hero.equip(spell);
+				else
+					throw new NotEquippableException();
+			} else
+				System.out.println("Herói não pode usar feitiço"); // fazer exception
+		}
+	}
+
+	private int toInteger(String command) {
+		try {
+			int integer = Integer.parseInt(command);
+			return integer;
+		} catch (NumberFormatException e) {
+			return -1; // não conseguiu converter
+		}
+	}
+
+	private void storeAll(Treasure treasure) {
+		for (int i = 0; i < treasure.size(); i++)
+			hero.storeInBackpack(treasure.removeTreasure(i));
 	}
 
 }
