@@ -82,7 +82,7 @@ public abstract class Character extends Traceable {
         if (totalHit > 0)
             removeLifePoints(totalHit);
         else if(totalHit == 0) {
-        	System.out.println("Sua defesa foi implacável e você não sofreu dano algum!");
+        	System.out.println("Your defense was relentless and you took no damage!");
         }
 
     }
@@ -177,7 +177,7 @@ public abstract class Character extends Traceable {
             return new Point(x, y);
 
         } catch (NullPointerException e) {
-            System.out.println("Item equipado não é arma com alcance");
+            System.out.println("Equipped item is not weapon with range");
             return null;
         }
     }

@@ -179,22 +179,28 @@ public class Game {
 
 	//despertando o monstro
 	private void awakeningMonsters() {
-		for (Monster monster : map.getMonstersOnMap()) {
+		
+		ArrayList<Monster> monsters = map.getMonstersOnMap();
+		
+		for (Monster monster : monsters) {
 			//Caso o heroi esteja perto o monstro ataca
 			if(monster.isHeroAround(hero)) {
 				monster.hit(hero);
 			}
 			//Se não o monstro anda
 			else {
+				monster.generateMoveAllowed();
 				//Caso for um goblin anda se aproximando do player
 				try {
 					Goblin goblin = (Goblin)monster;
-					goblin.move(hero);
+					goblin.move(hero, map);
 					
 				}catch(ClassCastException e){
 					//Caso não for um goblin prosseguiremos andaremos em posições aleatórias
-					monster.move(monster.randomMonsterDirection());
-					
+					Direction randomDirection = monster.randomMonsterDirection();
+					if(map.canIWalk(monster, randomDirection)) {
+						monster.move(randomDirection);						
+					}
 				}
 			
 			}
@@ -462,7 +468,7 @@ public class Game {
 
 				return map.target(number); // retorna alvo
 			} catch (ClassCastException e) {
-				System.out.println("Por favor, as coordenadas devem ser números!");
+				System.out.println("Please, the coordinates must be numbers!");
 			}
 		}
 	}
@@ -611,7 +617,7 @@ public class Game {
 				else
 					throw new NotEquippableException();
 			} else
-				System.out.println("Herói não pode usar feitiço"); // fazer exception
+				System.out.println("Hero can't use spell"); // fazer exception
 		}
 	}
 

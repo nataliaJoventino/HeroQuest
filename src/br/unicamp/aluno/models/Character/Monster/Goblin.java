@@ -2,6 +2,7 @@ package br.unicamp.aluno.models.Character.Monster;
 
 import java.util.ArrayList;
 
+import br.unicamp.aluno.Map;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Character.Hero.Hero;
 import br.unicamp.aluno.models.EngineComponents.Traceable;
@@ -43,7 +44,7 @@ public class Goblin extends Monster {
         return false;
     }
 
-    public void move(Hero hero){
+    public void move(Hero hero, Map map){
         int distUp = distAdjacent(hero, Direction.UP), distDown = distAdjacent(hero, Direction.DOWN);
         int distRight = distAdjacent(hero, Direction.RIGHT), distLeft = distAdjacent(hero, Direction.LEFT);
 

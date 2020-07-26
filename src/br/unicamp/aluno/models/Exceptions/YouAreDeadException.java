@@ -7,7 +7,7 @@ public class YouAreDeadException extends RuntimeException {
 
 	//Construtor e mensagem
 	public YouAreDeadException() {
-		super("Seus Pontos de vida chegaram a zero, você está morto!");
+		super("Your lifepoints now is zero, congratulations you are dead!");
 	}
 
 
