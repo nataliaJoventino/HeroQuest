@@ -227,12 +227,14 @@ public class Game {
 	public boolean canIWalk(Direction direction) {
 		int xRequested = hero.getPositionX() + direction.getPoint().getPositionX();
 		int yRequested = hero.getPositionY() + direction.getPoint().getPositionY();
-		int xNow = hero.getPositionX();
-		int yNow = hero.getPositionY();
 
 		// caso tiver o espaço desejado caminharemos com o player
 		if (this.map[yRequested][xRequested].equals("--") || this.map[yRequested][xRequested].equals(">>")
 				|| this.map[yRequested][xRequested].equals("//")) {
+
+			// Verificando se irá pisar em alguma armadilha
+			amIOnSomeTrap(xRequested, yRequested);
+
 			return true;
 		} else {
 			Traceable traceable = null;
@@ -438,19 +440,24 @@ public class Game {
 	}
 
 	// Verifica se o heroi pisou em alguma armadilha e retira vida dele
-	private void amIOnSomeTrap() {
+	private void amIOnSomeTrap(int xRequested, int yRequested) {
 		for (Traceable traceable : traceablesOnMap) {
 			// Caso a posição do herói seja a mesma que a da armadilha:
-			if (hero.getPositionX() == traceable.getPositionX() && hero.getPositionY() == traceable.getPositionY()
-					&& traceable instanceof Trap) {
-				// Cast
-				Trap trap = (Trap) traceable;
+			if (xRequested == traceable.getPositionX() && yRequested == traceable.getPositionY()) {
 
-				// Ativando a armadilha
-				trap.active(hero);
+				try {
+					//Cast - Verificando se é uma armadilha
+					Trap trap = (Trap) traceable;
 
-				// Encerrando o turno do jogador com uma mensagem de erro
-				throw new TrapsHurtMeException();
+					// Ativando a armadilha
+					trap.active(hero);
+
+					// Encerrando o turno do jogador com uma mensagem de erro
+					throw new TrapsHurtMeException();
+
+				} catch (ClassCastException e) {
+					continue;
+				}
 
 			}
 		}
@@ -536,7 +543,6 @@ public class Game {
 
 		// Caso não tenham monstros no mapa o player vence
 		if (monstersOnMap.isEmpty() && created) {
-		if(monstersOnMap.isEmpty() && created) {
 			throw new YouWonException();
 		}
 
@@ -592,7 +598,6 @@ public class Game {
 
 		calculateHeroVision();
 		this.created = true;
-		}
 	}
 
 	private void calculateHeroVision() {
