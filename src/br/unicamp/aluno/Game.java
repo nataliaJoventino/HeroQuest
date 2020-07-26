@@ -281,6 +281,7 @@ public class Game {
 
 			try {
 				if (walking != null && map.canIWalk(hero, walking))
+				if (walking != null && map.canIWalk(walking))
 					hero.move(walking);
 					move = true;
 			} catch (CantMoveException e) {

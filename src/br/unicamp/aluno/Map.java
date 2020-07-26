@@ -7,23 +7,33 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import br.unicamp.aluno.models.Item.*;
-import br.unicamp.aluno.models.MapObjects.Door;
-import br.unicamp.aluno.models.EngineComponents.Point;
-import br.unicamp.aluno.models.EngineComponents.SquareVision;
-import br.unicamp.aluno.models.EngineComponents.Traceable;
-import br.unicamp.aluno.models.MapObjects.Trap;
-import br.unicamp.aluno.models.MapObjects.Treasure;
+import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Character.Hero.Hero;
 import br.unicamp.aluno.models.Character.Monster.Goblin;
 import br.unicamp.aluno.models.Character.Monster.MageSkeleton;
 import br.unicamp.aluno.models.Character.Monster.Monster;
 import br.unicamp.aluno.models.Character.Monster.Skeleton;
+import br.unicamp.aluno.models.EngineComponents.Point;
+import br.unicamp.aluno.models.EngineComponents.SquareVision;
+import br.unicamp.aluno.models.EngineComponents.Traceable;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Exceptions.CantMoveException;
 import br.unicamp.aluno.models.Exceptions.TrapsHurtMeException;
 import br.unicamp.aluno.models.Exceptions.YouWonException;
-import br.unicamp.aluno.models.Character.Character;
+import br.unicamp.aluno.models.Item.Armor;
+import br.unicamp.aluno.models.Item.Dagger;
+import br.unicamp.aluno.models.Item.Fireball;
+import br.unicamp.aluno.models.Item.IronArmor;
+import br.unicamp.aluno.models.Item.LongSword;
+import br.unicamp.aluno.models.Item.MagicMissile;
+import br.unicamp.aluno.models.Item.ShortSword;
+import br.unicamp.aluno.models.Item.SimpleHeal;
+import br.unicamp.aluno.models.Item.Spell;
+import br.unicamp.aluno.models.Item.Teleport;
+import br.unicamp.aluno.models.Item.Weapon;
+import br.unicamp.aluno.models.MapObjects.Door;
+import br.unicamp.aluno.models.MapObjects.Trap;
+import br.unicamp.aluno.models.MapObjects.Treasure;
 
 public class Map {
 
@@ -318,6 +328,8 @@ public class Map {
 			}catch(ClassCastException e) {
 				//Caso for monstro seguirá normalmente
 			}
+			// Verificando se irá pisar em alguma armadilha
+			amIOnSomeTrap(xRequested, yRequested);
 
 			return true;
 		} else {
