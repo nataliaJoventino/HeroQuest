@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import br.unicamp.aluno.models.Item.*;
 import br.unicamp.aluno.models.MapObjects.Door;
 import br.unicamp.aluno.models.EngineComponents.Point;
 import br.unicamp.aluno.models.EngineComponents.SquareVision;
@@ -33,6 +34,10 @@ public class Map {
 	private int yMapSize;
 	private Hero hero;
 	private boolean created;
+	private final int QTD_ITEM_TYPE = 3;
+	private final int QTD_SUBCLASS_SPELL = 4;
+	private final int QTD_SUBCLASS_WEAPON = 3;
+	private final int QTD_SUBCLASS_ARMOR = 1;
 
 	// Construtor do Jogo
 	public Map(Hero player, int ySize, int xSize) {
@@ -138,7 +143,14 @@ public class Map {
 
 			// inserindo os tesouros
 			Treasure treasure = new Treasure(randomX, randomY);
+
+			int randomQtdItem = ThreadLocalRandom.current().nextInt(5, 10); // gera de 5 a 10 itens para adicionar no tesouro
+			for (int m = 0; m < randomQtdItem; m++)
+				addItemInTreasure(treasure);
+
 			addTraceablesOnGame(treasure);
+
+
 		}
 		// Adicionando 8 armadilhas no mapa
 		for (int i = 0; i < 8; i++) {
@@ -187,6 +199,70 @@ public class Map {
 		// Atualizando o mapa com a posição dos personagens
 		refreshMap();
 
+	}
+
+	private void addItemInTreasure(Treasure treasure){ // gera item aleatorio em bau
+		Random random = new Random();
+
+		switch (random.nextInt(QTD_ITEM_TYPE)){
+			case 0:
+				treasure.addTresure(randomSpell());
+			case 2:
+				treasure.addTresure(randomWeapon());
+			case 3:
+				treasure.addTresure(randomArmor());
+		}
+	}
+
+	private Spell randomSpell(){ // gera instancia alatória de spell
+		Random generator = new Random();
+
+		switch (generator.nextInt(QTD_SUBCLASS_SPELL)){
+			case 0:
+				return new Fireball();
+
+			case 1:
+				return new Teleport();
+
+			case 2:
+				return new SimpleHeal();
+
+			case 3:
+				return new MagicMissile();
+
+			default:
+				return null;
+		}
+	}
+
+	private Weapon randomWeapon(){ // gera instancia alatória de weapon
+		Random generator = new Random();
+
+		switch (generator.nextInt(QTD_SUBCLASS_WEAPON)){
+			case 0:
+				return new Dagger();
+
+			case 1:
+				return new ShortSword();
+
+			case 2:
+				return new LongSword();
+
+			default:
+				return null;
+		}
+	}
+
+	public Armor randomArmor(){ // gera instancia alatória de armor
+		Random generator = new Random();
+
+		switch (generator.nextInt(QTD_SUBCLASS_ARMOR)){
+			case 0:
+				return new IronArmor();
+
+			default:
+				return null;
+		}
 	}
 
 	public ArrayList<Monster> getMonstersOnMap() {
@@ -319,7 +395,7 @@ public class Map {
 			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
 					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
 					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+					&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
 
 				try {
 					Treasure treasure = (Treasure) traceable;
@@ -372,28 +448,28 @@ public class Map {
 
 		// Gera um numero aleatório entre 0 e 2
 		switch (random.nextInt(3)) {
-		// caso 0 criaremos um esqueleto
-		case 0:
-			monstersOnMap.add(new Skeleton(adjacentX, adjacentY));
-			break;
+			// caso 0 criaremos um esqueleto
+			case 0:
+				monstersOnMap.add(new Skeleton(adjacentX, adjacentY));
+				break;
 
-		// caso 1 criamos um Esqueleto Mago
-		case 1:
-			// Quantidade de adagas aleatorizada
-			int randomQtdDaggers = random.nextInt(10);
+			// caso 1 criamos um Esqueleto Mago
+			case 1:
+				// Quantidade de adagas aleatorizada
+				int randomQtdDaggers = random.nextInt(10);
 
-			// inserindo os esqueletos magos
-			MageSkeleton mageSkeleton = new MageSkeleton(adjacentX, adjacentY, randomQtdDaggers);
-			monstersOnMap.add(mageSkeleton);
+				// inserindo os esqueletos magos
+				MageSkeleton mageSkeleton = new MageSkeleton(adjacentX, adjacentY, randomQtdDaggers);
+				monstersOnMap.add(mageSkeleton);
 
-		case 2:
-			// Quantidade de adagas aleatorizada
-			randomQtdDaggers = random.nextInt(10);
-			// inserindo os goblins
-			Goblin goblin = new Goblin(adjacentX, adjacentY, randomQtdDaggers);
-			monstersOnMap.add(goblin);
-		default:
-			break;
+			case 2:
+				// Quantidade de adagas aleatorizada
+				randomQtdDaggers = random.nextInt(10);
+				// inserindo os goblins
+				Goblin goblin = new Goblin(adjacentX, adjacentY, randomQtdDaggers);
+				monstersOnMap.add(goblin);
+			default:
+				break;
 		}
 
 	}
@@ -426,7 +502,7 @@ public class Map {
 			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
 					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
 					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+					&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
 
 				try {
 					Trap trap = (Trap) traceable;
@@ -1005,7 +1081,7 @@ public class Map {
 
 	public Treasure getTreasure() {
 		int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega item na frente da
-																							// direção que herói está
+		// direção que herói está
 		int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
 		Treasure treasure = null;
 
@@ -1013,12 +1089,12 @@ public class Map {
 			treasure = isTreasure(traceable);
 			// se for tesouro verifica posição
 			if (traceable.getPositionX() == x && traceable.getPositionY() == y && treasure.isVisible()) {// está em
-																											// frente ao
-																											// tesouro e
-																											// verifica
-																											// só se
-																											// tesour
-																											// visivel
+				// frente ao
+				// tesouro e
+				// verifica
+				// só se
+				// tesour
+				// visivel
 				return treasure;
 			}
 		}

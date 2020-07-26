@@ -27,7 +27,6 @@ public abstract class Character extends Traceable {
         this.intelligencePoints = intelligencePoints;
         dice = new Dice();
         moveAllowed = 0;
-
     }
 
     protected void addAttackDice(int value){ // adiciona x dados de ataque

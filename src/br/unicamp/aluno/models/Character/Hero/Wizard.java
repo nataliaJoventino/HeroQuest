@@ -19,7 +19,7 @@ public class Wizard extends MysticHero {
 		storeInBackpack(new Fireball());
 		storeInBackpack(new Teleport());
 	}
-	
+
 	@Override
 	public String toString() {
 		return "WZ";

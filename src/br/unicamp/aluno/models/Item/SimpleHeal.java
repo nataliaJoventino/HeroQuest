@@ -15,9 +15,9 @@ public class SimpleHeal extends Spell {
     public void cast(Character character) {
         character.addLifePoints(dice.normalDice());
     }
-    
+
     @Override
     public String toString() {
-    	return "Simple Heal";
+        return "Simple Heal";
     }
 }

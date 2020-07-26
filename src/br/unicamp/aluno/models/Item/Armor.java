@@ -1,6 +1,8 @@
 package br.unicamp.aluno.models.Item;
 
-public class Armor implements Item {
+import java.util.Random;
+
+public abstract class Armor implements Item {
 	private int defenseBonus;
 	private boolean isDestroyed;
 
@@ -23,18 +25,5 @@ public class Armor implements Item {
 		return "Armor";
 	}
 
-
-	//	//Equipando a armadura
-//	@Override
-//	public Item equipTheHero(Hero hero) {
-//		hero.wearArmor(this);
-//		return this;
-//	}
-//
-//	//Desequipando a armadura
-//	@Override
-//	public void unequipTheHero(Hero hero) {
-//		hero.wearArmor(null);
-//	}
 
 }

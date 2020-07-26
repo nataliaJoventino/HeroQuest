@@ -18,9 +18,9 @@ public class Teleport extends Spell {
     public void cast(Character character) {
         character.move(newPosition);
     }
-    
+
     @Override
     public String toString() {
-    	return "Teleport";
+        return "Teleport";
     }
 }

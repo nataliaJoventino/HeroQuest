@@ -4,7 +4,7 @@ package br.unicamp.aluno.models.Exceptions;
 public class YouAreDeadException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	//Construtor e mensagem
 	public YouAreDeadException() {
 		super("Seus Pontos de vida chegaram a zero, você está morto!");

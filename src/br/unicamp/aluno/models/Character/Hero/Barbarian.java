@@ -11,10 +11,10 @@ public class Barbarian extends Hero {
 		//Adicionar arma segundo as regras do jogo
 		storeInBackpack(new LongSword());
 	}
-	
+
 	@Override
 	public String toString() {
 		return "BA";
 	}
-	
+
 }

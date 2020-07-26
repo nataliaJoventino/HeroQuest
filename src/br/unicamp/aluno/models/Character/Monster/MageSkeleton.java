@@ -2,6 +2,7 @@ package br.unicamp.aluno.models.Character.Monster;
 
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Character.Hero.Hero;
+import br.unicamp.aluno.models.Item.Dagger;
 import br.unicamp.aluno.models.Item.MagicMissile;
 import br.unicamp.aluno.models.Item.Spell;
 import br.unicamp.aluno.models.Item.Weapon;
@@ -17,12 +18,7 @@ public class MageSkeleton extends Monster {
         spell = magicMissile;
         daggers = new ArrayList();
         for (int i = 0; i < numDagger; i++)
-            daggers.add(instanciaPunhal());
-    }
-
-    private Weapon instanciaPunhal(){
-        // retorna punha
-        return null;
+            daggers.add(new Dagger());
     }
 
     public void throwSpell(Hero hero) {
@@ -48,8 +44,8 @@ public class MageSkeleton extends Monster {
     }
 
     @Override
-	public String toString() {
-		return "MS";
-	}
+    public String toString() {
+        return "MS";
+    }
 
 }

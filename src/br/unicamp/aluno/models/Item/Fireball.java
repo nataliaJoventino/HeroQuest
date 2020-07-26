@@ -18,6 +18,8 @@ public class Fireball extends Spell{
 
     public Fireball() { // vai precisar receber o mapa para encontrar adjacentes
         super(true);
+        adjacent = new ArrayList<>();
+        possibleTarget = new ArrayList<>();
     }
 
     public void setPossibleTarget(ArrayList<Monster> characters){
@@ -57,9 +59,9 @@ public class Fireball extends Spell{
         Point point = new Point(x,y);
         adjacent.add(point);
     }
-    
+
     @Override
     public String toString() {
-    	return "Fire Ball";
+        return "Fire Ball";
     }
 }

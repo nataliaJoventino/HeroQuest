@@ -5,7 +5,7 @@ import br.unicamp.aluno.models.EngineComponents.Traceable;
 
 //Armadilha
 public class Trap extends Traceable {
-	
+
 	//A armadilha está visivel?
 	public boolean visible;
 
@@ -16,12 +16,12 @@ public class Trap extends Traceable {
 		//Removendo vida do heroi
 		hero.removeLifePoints(1);
 	}
-	
+
 	//Verifica se está ativa
 	public boolean isVisible() {
 		return this.visible;
 	}
-	
+
 	//Construtor da classe
 	public Trap(int x, int y) {
 		super(x, y);
@@ -30,11 +30,11 @@ public class Trap extends Traceable {
 	//ToString
 	@Override
 	public String toString() {
-			return "§§";			
+		return "§§";
 	}
 
 	public void turnVisible() {
 		this.visible = true;
-		
+
 	}
 }

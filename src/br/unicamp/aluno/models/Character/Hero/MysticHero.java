@@ -61,8 +61,8 @@ public class MysticHero extends Hero {
 				removeFromBackpack(spell);
 			}
 		} catch (NullPointerException e){
-			System.out.println("Não há feitiço equipado");
+			System.out.println("No spell equipped");
 		}
 	}
-	
+
 }

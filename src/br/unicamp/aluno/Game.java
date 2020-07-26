@@ -53,9 +53,9 @@ public class Game {
 					"\n4 - Mago");
 
 			System.out.print("Choose a hero: ");
-			System.out.println();
-
 			int heroNumber = Integer.parseInt(stringScanner());
+
+			System.out.println();
 
 			try {
 				// Escolhendo o heroi
@@ -100,26 +100,27 @@ public class Game {
 		hero.generateMoveAllowed();
 
 		System.out.println("Game started!");
+		while (!exitSelected) {
 
-		try {
-
-			while (!exitSelected) {
-
+			try {
 				new Timer(this).start();
 				while (wave) {
 					starWave();
 					readCommandFromKeyboard();
 				}
 				endWave();
+
+			} catch (TrapsHurtMeException e) {
+				System.out.println(e.getMessage());
+				wave = false;
+			} catch (YouAreDeadException e1) {
+				System.out.println(e1.getMessage());
+				exitSelected = true;
+			} catch (YouWonException e2) {
+				System.out.println(e2.getMessage());
+				exitSelected = true;
 			}
-		} catch (TrapsHurtMeException e) {
-			System.out.println(e.getMessage());
-		} catch (YouAreDeadException e1) {
-			System.out.println(e1.getMessage());
-			exitSelected = true;
-		} catch (YouWonException e2) {
-			System.out.println(e2.getMessage());
-			exitSelected = true;
+
 		}
 
 		map.printMap();
@@ -142,9 +143,10 @@ public class Game {
 	private void starWave() {
 		map.refreshMap();
 		map.printMap();
-		System.out.println("Moves allowed: " + hero.getMoveAllowed() + " | Equipped right hand: "
-				+ hero.getRightHand() + " | Equipped left hand: " + hero.getLeftHand() + " | Life points: "
-				+ hero.getLifePoints() + " | Is both hands item? " + hero.isBothHandItem()); // fazer if pra caso item seja de uas mãos e para não ficar aparecendo o null
+		System.out.println("Life points: "	+ hero.getLifePoints()
+						+ "\nMoves allowed: " + hero.getMoveAllowed() + " | Armor: " + hero.getArmor()
+						+ "\nIs both hands item? " + hero.isBothHandItem()
+						+"\nEquipped right hand: " + hero.getRightHand() + " | Equipped left hand: " + hero.getLeftHand()); // fazer if pra caso item seja de uas mãos e para não ficar aparecendo o null
 
 	}
 
@@ -208,7 +210,7 @@ public class Game {
 						"\n quit - to close treasure");
 
 				while (loop) {
-					treasure.printTreasure(); // por enquanto ainda tá vazio os tesouros
+					treasure.printTreasure();
 					System.out.print("Enter the command : ");
 					command = stringScanner();
 
@@ -229,6 +231,7 @@ public class Game {
 			try {
 				if (walking != null && map.canIWalk(walking))
 					hero.move(walking);
+					move = true;
 			} catch (CantMoveException e) {
 				System.out.println(e.getMessage());
 			}
@@ -344,11 +347,12 @@ public class Game {
 				}
 			}
 
+			if (move && action) // se herói tiver se movimentado e realizou ação wave finaliza
+				wave = false;
 		} else {
 			System.out.println( "Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
-			if (move) // se herói tiver se movimentado e realizou ação wave finaliza
-				wave = false;
 		}
+
 	}
 
 	private void teleport(Teleport teleport) {

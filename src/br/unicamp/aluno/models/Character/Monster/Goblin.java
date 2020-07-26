@@ -80,7 +80,6 @@ public class Goblin extends Monster {
         return  onSight(character, dagger);
     }
 
-
     @Override
     public String toString() {
         return "GO";

@@ -11,10 +11,11 @@ import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.SideDice;
 
 public abstract class Monster extends Character {
-	private ArrayList<Traceable> adjacent;
+	private ArrayList<Point> adjacent;
 
 	public Monster(int x, int y, int quantityOfAttackDices, int quantityOfDefenceDices, int lifePoints, int inteligencePoints) {
 		super(x, y, quantityOfAttackDices, quantityOfDefenceDices, lifePoints, inteligencePoints);
+		adjacent = new ArrayList<>();
 	}
 
 	public int hitDefence(){
@@ -44,8 +45,8 @@ public abstract class Monster extends Character {
 	public boolean isHeroAround(Hero hero){ // verifica se heroi está nas adjacencias
 		listAdjacent(this);
 
-		for (Traceable traceable : adjacent){
-			if (hero.getPositionX() == traceable.getPositionX() && hero.getPositionY() == traceable.getPositionY())
+		for (Point point : adjacent){
+			if (hero.getPositionX() == point.getPositionX() && hero.getPositionY() == point.getPositionY())
 				return true;
 		}
 		return false;

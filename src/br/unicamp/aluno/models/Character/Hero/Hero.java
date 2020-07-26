@@ -30,15 +30,6 @@ public abstract class Hero extends Character {
 		secondSquareVision = new SquareVision();
 	}
 
-	@Override
-	public void removeLifePoints(int value) { //Remove uma certa quantidade de vida do personagem
-		super.removeLifePoints(value);
-
-		if (getLifePoints() == 0)
-			throw new YouAreDeadException();
-
-	}
-
 	public Hand isBothHandsUsed(){ // retorna qual mão está com item, se as duas estiverem ocupadas ou vazias retorna nulo
 		if (leftHand != null && rightHand == null)
 			return Hand.LEFT;
@@ -66,9 +57,11 @@ public abstract class Hero extends Character {
 		firstSquareVision = vision1;
 		secondSquareVision = vision2;
 	}
+
 	public SquareVision getFirstSquareVision() {
 		return firstSquareVision;
 	}
+
 	public SquareVision getSecondSquareVision() {
 		return secondSquareVision;
 	}
@@ -165,7 +158,7 @@ public abstract class Hero extends Character {
 
 		//Verifica se o heroi possui o item que está querendo usar
 		if(!isInBackpack(item)) {
-			System.out.println("Você não possui esse item!");
+			System.out.println("Item is not in backpack!");
 			return;
 		}
 
@@ -184,7 +177,7 @@ public abstract class Hero extends Character {
 	protected void holdWithLeftHand(Item item) {
 		//Verifica se o heroi possui o item que está querendo usar
 		if(!isInBackpack(item)) {
-			System.out.println("Você não possui esse item!");
+			System.out.println("Item is not in backpack!");
 			return;
 		}
 
@@ -226,7 +219,7 @@ public abstract class Hero extends Character {
 				Armor armor = (Armor) item; // converte para tipo armor e pega bonus de defesa
 				super.addDefenceDice(armor.getDefenseBonus());
 			}catch (ClassCastException m){
-				System.out.println("Item não possui bonus");
+				return; // item sem bonus
 			}
 		}
 	}
@@ -240,11 +233,10 @@ public abstract class Hero extends Character {
 				Armor armor = (Armor) item; // converte para tipo armor e pega bonus de defesa
 				super.removeDefenceDice(armor.getDefenseBonus());
 			}catch (ClassCastException m){
-				System.out.println("Item não possui bonus");
+				return; // item sem bonus
 			}
 		}
 	}
-
 
 	public void hit(Character character){ //quanto de lifepoints vai ser tirado do inimigo dado dados (1 caveira = 1 hit)
 		int cont = 0;
@@ -299,6 +291,15 @@ public abstract class Hero extends Character {
 	}
 
 	@Override
+	public void removeLifePoints(int value) { //Remove uma certa quantidade de vida do personagem
+		super.removeLifePoints(value);
+
+		if (getLifePoints() == 0)
+			throw new YouAreDeadException();
+
+	}
+
+	@Override
 	public boolean isOnSight(Character character) { // para arma que ocupa duas mãos
 		Weapon weapon = isWeapon(leftHand);
 		return onSight(character, weapon);
@@ -306,7 +307,6 @@ public abstract class Hero extends Character {
 
 	public boolean isOnSight(Character character, Hand hand) { //verifica arma da mão direita ou esquerda
 		Weapon weapon;
-		int x, y;
 
 		if (hand == Hand.LEFT)
 			weapon = isWeapon(leftHand);

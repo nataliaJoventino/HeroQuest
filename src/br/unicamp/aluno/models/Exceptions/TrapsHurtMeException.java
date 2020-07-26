@@ -7,7 +7,7 @@ public class TrapsHurtMeException extends RuntimeException {
 
 	//Mensagem lançada
 	public TrapsHurtMeException() {
-		super("Seu turno acaba por aqui, você foi pego por uma armadilha!");
+		super("Hurt by trap!");
 	}
 
 
