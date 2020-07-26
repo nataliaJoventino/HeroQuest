@@ -12,22 +12,16 @@ public class Timer extends Thread {
     }
 
     @Override
-    public void run() {
+    public void run() { // timer é chamado e se wave não tiver finalizado até ela terminar termina
         try {
-            if (System.in.available() < 1) { // apenas se não houver entrada entrada
-                Thread.sleep(TIMER_SEG * 1000);
-                throw new TimeoutException("||| TIMEOUT |||"); // quando timer passar joga excessão
-            } else {
-                Thread.yield();
-            }
+            Thread.sleep(TIMER_SEG * 1000);
+            throw new TimeoutException("||| TIMEOUT |||"); // quando timer passar joga excessão
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            return;
         } catch (TimeoutException e) {
             engine.setWave(false); // sinaliza final da wave
             System.out.print(e.getMessage());
             Thread.interrupted();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
     }

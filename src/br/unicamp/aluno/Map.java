@@ -8,6 +8,13 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import br.unicamp.aluno.models.Character.Character;
+import br.unicamp.aluno.models.Item.*;
+import br.unicamp.aluno.models.MapObjects.Door;
+import br.unicamp.aluno.models.EngineComponents.Point;
+import br.unicamp.aluno.models.EngineComponents.SquareVision;
+import br.unicamp.aluno.models.EngineComponents.Traceable;
+import br.unicamp.aluno.models.MapObjects.Trap;
+import br.unicamp.aluno.models.MapObjects.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Hero;
 import br.unicamp.aluno.models.Character.Monster.Goblin;
 import br.unicamp.aluno.models.Character.Monster.MageSkeleton;
@@ -1045,10 +1052,10 @@ public class Map {
 							// Adicionando o index com o 0 à esquerda caso seja menor que 10
 							if (index < 10) {
 								this.map[i][j] = "0" + Integer.toString(index);
-								System.out.print(map[i][j]);
+								System.out.print(map[i][j] + " ");
 							} else {
 								this.map[i][j] = Integer.toString(index);
-								System.out.print(map[i][j]);
+								System.out.print(map[i][j] + " ");
 							}
 							index++;
 							print = false;
@@ -1059,7 +1066,7 @@ public class Map {
 					}
 
 					if (print)
-						System.out.print(map[i][j]);
+						System.out.print(map[i][j] + " ");
 				}
 
 				else {
@@ -1106,8 +1113,7 @@ public class Map {
 	}
 
 	public Treasure getTreasure() {
-		int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega item na frente da
-		// direção que herói está
+		int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega item na frente dadireção que herói está
 		int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
 		Treasure treasure = null;
 

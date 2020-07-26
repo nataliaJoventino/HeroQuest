@@ -33,9 +33,20 @@ public class Treasure extends Traceable {
 			System.out.println(""+ i +" "+ items.get(i).toString());
 	}
 
+	public Item removeTreasure(){
+		Item item = null;
+		if (items.size() != 0) {
+			item = items.get(items.size() - 1);
+			items.remove(item);
+
+		}
+		return item;
+	}
+
 	public Item removeTreasure(int index){
 		Item item = items.get(index);
 		items.remove(item);
+
 		return item;
 	}
 
