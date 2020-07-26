@@ -51,6 +51,25 @@ public abstract class Monster extends Character {
 		}
 		return false;
 	}
+	
+	// gera uma direção aleatória
+    public Direction randomMonsterDirection() { // no mapa verifica se posição está livre
+        Random randomDirection = new Random();
+
+        switch (randomDirection.nextInt(4)) {
+            case 0:
+                return Direction.UP;
+            case 1:
+                return Direction.DOWN;
+            case 2:
+                return Direction.RIGHT;
+            case 3:
+                return Direction.LEFT;
+
+        }
+
+        return null;
+    }
 
 
 }

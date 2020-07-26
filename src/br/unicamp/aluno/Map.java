@@ -318,7 +318,7 @@ public class Map {
 
 		// caso tiver o espaço desejado caminharemos com o player
 		if (this.map[yRequested][xRequested].equals("--") || this.map[yRequested][xRequested].equals(">>")
-				|| this.map[yRequested][xRequested].equals("//")) {
+				|| this.map[yRequested][xRequested].equals("//") || this.map[yRequested][xRequested].equals("TS") || this.map[yRequested][xRequested].equals("§§")) {
 
 			//Caso for heroi e pisar em armadilha sofrerá dano
 			try {
@@ -339,7 +339,14 @@ public class Map {
 					traceable = t;
 					break;
 				}
-			throw new CantMoveException(traceable);
+			//Lançaremos a excessão somente caso seja o heroi fazendo coisa errada
+			try {
+				Hero hero = (Hero)character;
+				throw new CantMoveException(traceable);
+			}catch(ClassCastException e) {
+				//Caso for monstro
+				return false;
+			}
 		}
 	}
 

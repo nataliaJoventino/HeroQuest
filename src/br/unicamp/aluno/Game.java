@@ -134,6 +134,8 @@ public class Game {
 			} catch (YouWonException e2) {
 				System.out.println(e2.getMessage());
 				exitSelected = true;
+			} catch(CantMoveException e3) {
+				System.out.println(e3.getMessage());
 			}
 
 		}
@@ -151,14 +153,14 @@ public class Game {
 	public void setWave(boolean wave) {
 		synchronized (this) {
 			System.out.println("\n||| WAVE ENDED |||");
+			awakeningMonsters();
 			hero.generateMoveAllowed();
 			wave = true;
 			action = false;
 			move = false;
-			awakeningMonsters();
-			System.out.println();
+			System.out.println("");
 			System.out.println("||| NEW WAVE |||");
-			System.out.println();
+			map.printMap();
 			this.wave = wave;
 		}
 
@@ -190,8 +192,7 @@ public class Game {
 					
 				}catch(ClassCastException e){
 					//Caso não for um goblin prosseguiremos andaremos em posições aleatórias
-					Direction random;
-					monster.move(random.randomDirection());
+					monster.move(monster.randomMonsterDirection());
 					
 				}
 			
@@ -206,6 +207,9 @@ public class Game {
 		wave = true;
 		action = false;
 		move = false;
+		awakeningMonsters();
+		map.refreshMap();
+		map.printMap();
 		System.out.println();
 		System.out.println("||| NEW WAVE |||");
 		System.out.println();
@@ -250,38 +254,43 @@ public class Game {
 					equipBackpack(choice);
 
 			} else if (command.compareTo("g") == 0) { // coletar tesouro
-				Treasure treasure = map.getTreasure();
-				boolean loop = true;
-				Item item;
-
-				System.out.println("To store, type: " +
-						"\n the number of the item" +
-						"\n e - store all items" +
-						"\n quit - to close treasure");
-				System.out.println();
-
-				while (loop) {
-					treasure.printTreasure();
-					System.out.print("Enter the command : ");
-					command = stringScanner();
-
-					if (command.compareTo("e") == 0) { // coletar todos os itens
-						storeAll(treasure);
-						loop = false;
-					} else if (command.compareTo("quit") == 0) // andar para esquerda
-						loop = false;
-					else {
-						item = treasure.removeTreasure(toInteger(command));
-						hero.storeInBackpack(item);
+				try {
+					Treasure treasure = map.getTreasure();					
+					boolean loop = true;
+					Item item;
+					
+					System.out.println("To store, type: " +
+							"\n the number of the item" +
+							"\n e - store all items" +
+							"\n quit - to close treasure");
+					System.out.println();
+					
+					//Usuário visualizando os itens dentro do tesouro
+					while (loop) {
+						treasure.printTreasure();
+						System.out.print("Enter the command : ");
+						command = stringScanner();
+						
+						if (command.compareTo("e") == 0) { // coletar todos os itens
+							storeAll(treasure);
+							loop = false;
+						} else if (command.compareTo("quit") == 0) // andar para esquerda
+							loop = false;
+						else {
+							item = treasure.removeTreasure(toInteger(command));
+							hero.storeInBackpack(item);
+						}
 					}
+				}catch(NullPointerException e) {
+					System.out.println("Não há nenhum tesouro por perto ou você não está de frente para ele");
 				}
+				
 
 			} else
 				action(command);
 
 			try {
 				if (walking != null && map.canIWalk(hero, walking))
-				if (walking != null && map.canIWalk(walking))
 					hero.move(walking);
 					move = true;
 			} catch (CantMoveException e) {
