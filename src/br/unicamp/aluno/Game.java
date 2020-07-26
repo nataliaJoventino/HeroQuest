@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import br.unicamp.aluno.models.Exceptions.*;
+import br.unicamp.aluno.models.Item.*;
+import br.unicamp.aluno.models.EngineComponents.Point;
+import br.unicamp.aluno.models.MapObjects.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Barbarian;
 import br.unicamp.aluno.models.Character.Hero.Dwarf;
 import br.unicamp.aluno.models.Character.Hero.Elf;
@@ -51,7 +55,7 @@ public class Game {
 		move = false;
 
 		// Deixando o usuário escolher colocar um nome no heroi dele
-		System.out.print("Choose a name for your hero:");
+		System.out.print("Choose a name for your hero: ");
 
 		// Lendo o nome colocado
 		String name = stringScanner();
@@ -118,10 +122,13 @@ public class Game {
 		while (!exitSelected) {
 
 			try {
-				new Timer(this).start();
+
 				while (wave) {
+					Timer timer = new Timer(this);
+					timer.start();
 					starWave();
 					readCommandFromKeyboard();
+					timer.interrupt();
 				}
 				endWave();
 
@@ -286,12 +293,16 @@ public class Game {
 						} else if (command.compareTo("quit") == 0) // andar para esquerda
 							loop = false;
 						else {
-							item = treasure.removeTreasure(toInteger(command));
-							hero.storeInBackpack(item);
+							try {
+								item = treasure.removeTreasure(toInteger(command));
+								hero.storeInBackpack(item);
+							} catch (IndexOutOfBoundsException e){
+								System.out.println("Invalid item index");
+							}
 						}
 					}
 				}catch(NullPointerException e) {
-					System.out.println("Não há nenhum tesouro por perto ou você não está de frente para ele");
+					System.out.println("No treasures near or hero isn't frontal with it");
 				}
 				
 
@@ -374,7 +385,8 @@ public class Game {
 										try {
 											Fireball fireball = (Fireball) mysticHero.getSpell();
 											fireball.setPossibleTarget(map.getMonstersOnMap());
-											mysticHero.throwSpell(mysticHero);
+											monster = target();
+											mysticHero.throwSpell(monster);
 
 										} catch (ClassCastException c) {
 											monster = target();
@@ -395,9 +407,15 @@ public class Game {
 					}
 
 					if (mysticHero != null) {
-						System.out.println(" | Monster's defense: " + monster.getHitDefence());
-						System.out.println("Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY())
-								+ "' life points after hit: " + monster.getLifePoints());
+						if (isHeal(mysticHero.getSpell()))
+							System.out.println(" New life bar: " + mysticHero.getLifePoints());
+						else if(!isTeleport(mysticHero.getSpell()))
+							System.out.println("Hero has been moved");
+						else {
+							System.out.println(" | Monster's defense: " + monster.getHitDefence());
+							System.out.println("Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY())
+									+ "' life points after hit: " + monster.getLifePoints());
+						}
 					} else {
 						map.printTarget();
 						System.out.println("Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY())
@@ -414,6 +432,7 @@ public class Game {
 					System.out.println(n.getMessage());
 				} catch (NullPointerException e) {
 					System.out.println("No target on the sight.");
+
 				}
 			}
 
@@ -434,7 +453,7 @@ public class Game {
 			map.printTeleportArea();
 
 			// Recebendo as coordenadas
-			System.out.print(":");
+			System.out.print("Enter position number:");
 			try {
 
 				try {
@@ -573,6 +592,24 @@ public class Game {
 		}
 	}
 
+	private boolean isTeleport(Item item) {
+		try {
+			Teleport teleport = (Teleport) item;
+			return true;
+		} catch (ClassCastException e) {
+			return false;
+		}
+	}
+
+	private boolean isHeal(Item item) {
+		try {
+			SimpleHeal teleport = (SimpleHeal) item;
+			return true;
+		} catch (ClassCastException e) {
+			return false;
+		}
+	}
+
 	private MysticHero isMysticHero(Hero hero) {
 		try {
 			MysticHero mysticHero = (MysticHero) hero;
@@ -631,8 +668,18 @@ public class Game {
 	}
 
 	private void storeAll(Treasure treasure) {
-		for (int i = 0; i < treasure.size(); i++)
-			hero.storeInBackpack(treasure.removeTreasure(i));
+		Item item = treasure.removeTreasure();
+
+		if (item != null) {
+
+			do {
+				hero.storeInBackpack(item);
+				item = treasure.removeTreasure();
+
+			} while (item != null);
+		} else
+			System.out.println("No item to be stored.");
+
 	}
 
 }
