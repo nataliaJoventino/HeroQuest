@@ -208,6 +208,7 @@ public class Game {
 						"\n the number of the item" +
 						"\n e - store all items" +
 						"\n quit - to close treasure");
+				System.out.println();
 
 				while (loop) {
 					treasure.printTreasure();
