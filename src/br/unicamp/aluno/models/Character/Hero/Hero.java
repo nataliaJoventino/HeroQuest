@@ -239,7 +239,6 @@ public abstract class Hero extends Character {
 	}
 
 	public void hit(Character character){ //quanto de lifepoints vai ser tirado do inimigo dado dados (1 caveira = 1 hit)
-		int cont = 0;
 		addBonus(leftHand); // para quando item ocupa duas mãos
 		super.hit(character);
 		removeBonus(leftHand);
@@ -252,7 +251,6 @@ public abstract class Hero extends Character {
 
 	public void hit(Character character, Hand hand){ //quanto de lifepoints vai ser tirado do inimigo dado dados (1 caveira = 1 hit)
 		Item item = null;
-		int cont = 0;
 
 		if (hand == Hand.LEFT)
 			item = leftHand;
@@ -295,7 +293,7 @@ public abstract class Hero extends Character {
 		super.removeLifePoints(value);
 
 		if (getLifePoints() == 0)
-			throw new YouAreDeadException();
+			throw new YouAreDeadException(getName());
 
 	}
 

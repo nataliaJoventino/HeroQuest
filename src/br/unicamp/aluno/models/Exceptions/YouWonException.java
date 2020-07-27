@@ -8,15 +8,8 @@ public class YouWonException extends RuntimeException {
 		super("Congratulations, you won the game!");
 	}
 
-	public YouWonException(String message) {
-		super(message);
+	public YouWonException(String name) {
+		super("Congratulations, you won the game!" + name + "you won the game!");
 	}
 
-	public YouWonException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public YouWonException(Throwable cause) {
-		super(cause);
-	}
 }

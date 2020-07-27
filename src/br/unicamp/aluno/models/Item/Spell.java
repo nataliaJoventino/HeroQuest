@@ -2,8 +2,6 @@ package br.unicamp.aluno.models.Item;
 
 import br.unicamp.aluno.models.Character.Character;
 
-import java.util.Random;
-
 //Classe mãe dos feitiços
 public abstract class Spell implements Item {
 	private boolean isDestroyed;

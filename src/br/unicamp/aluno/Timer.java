@@ -1,6 +1,5 @@
 package br.unicamp.aluno;
 
-import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class Timer extends Thread {

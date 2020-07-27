@@ -1,7 +1,5 @@
 package br.unicamp.aluno.models.Item;
 
-import java.util.Random;
-
 public abstract class Armor implements Item {
 	private int defenseBonus;
 	private boolean isDestroyed;

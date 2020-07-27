@@ -4,7 +4,9 @@ import java.util.concurrent.ExecutionException;
 
 public class NoItemEquippedException extends ExecutionException {
 
-    public NoItemEquippedException() {
+	private static final long serialVersionUID = 1L;
+
+	public NoItemEquippedException() {
         super("No item equipped");
     }
 

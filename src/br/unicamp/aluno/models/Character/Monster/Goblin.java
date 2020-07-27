@@ -48,18 +48,29 @@ public class Goblin extends Monster {
         int distUp = distAdjacent(hero, Direction.UP), distDown = distAdjacent(hero, Direction.DOWN);
         int distRight = distAdjacent(hero, Direction.RIGHT), distLeft = distAdjacent(hero, Direction.LEFT);
 
+        
+        //Calcula a menor distancia e anda para lá caso possível
         if (smallest(distUp, distDown) && smallest(distUp, distRight) && smallest(distUp, distLeft)){ //verifica se direção para cima é menor distancia de todas
-            move(Direction.UP);
-            setCurrentDirection(Direction.UP);
+        	if(map.canIWalk(this, Direction.UP)) {
+        		move(Direction.UP);
+        		setCurrentDirection(Direction.UP);            	
+            };
         } else if (smallest(distDown, distUp) && smallest(distDown, distRight) && smallest(distDown, distLeft)){ //verifica se direção para baixo é menor distancia de todas
-            move(Direction.DOWN);
-            setCurrentDirection(Direction.DOWN);
+        	if(map.canIWalk(this, Direction.DOWN)) {
+        		move(Direction.DOWN);
+        		setCurrentDirection(Direction.DOWN);            	
+            };
         } else if (smallest(distRight, distLeft) && smallest(distRight, distUp) && smallest(distRight, distDown)) { //verifica se direção para direita é menor distancia de todas
-            move(Direction.RIGHT);
-            setCurrentDirection(Direction.RIGHT);
+        	if(map.canIWalk(this, Direction.RIGHT)) {
+        		move(Direction.RIGHT);
+        		setCurrentDirection(Direction.RIGHT);            	
+            };
         } else { // caso nenhuma anterior seja verdadeira resta a esquerda como menor
-            move(Direction.LEFT);
-            setCurrentDirection(Direction.LEFT);
+        	if(map.canIWalk(this, Direction.LEFT)) {
+        		move(Direction.LEFT);
+        		setCurrentDirection(Direction.LEFT);            	
+            };
+
         }
     }
 

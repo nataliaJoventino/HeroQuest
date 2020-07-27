@@ -2,7 +2,9 @@ package br.unicamp.aluno.models.Exceptions;
 
 public class NotEquippableException extends NullPointerException{
 
-    public NotEquippableException() {
+	private static final long serialVersionUID = 1L;
+
+	public NotEquippableException() {
         super("Item não pode ser equipado!");
     }
 

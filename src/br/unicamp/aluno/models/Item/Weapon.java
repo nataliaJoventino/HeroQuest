@@ -1,7 +1,5 @@
 package br.unicamp.aluno.models.Item;
 
-import java.util.Random;
-
 public abstract class Weapon implements Item {
 	private boolean isDestroyed;
 	private boolean bothHands;

@@ -2,8 +2,6 @@ package br.unicamp.aluno.models.Enum;
 
 import br.unicamp.aluno.models.EngineComponents.Point;
 
-import java.util.Random;
-
 public enum Direction {
     UP,DOWN,RIGHT,LEFT;
 

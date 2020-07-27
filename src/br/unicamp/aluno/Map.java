@@ -8,13 +8,6 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import br.unicamp.aluno.models.Character.Character;
-import br.unicamp.aluno.models.Item.*;
-import br.unicamp.aluno.models.MapObjects.Door;
-import br.unicamp.aluno.models.EngineComponents.Point;
-import br.unicamp.aluno.models.EngineComponents.SquareVision;
-import br.unicamp.aluno.models.EngineComponents.Traceable;
-import br.unicamp.aluno.models.MapObjects.Trap;
-import br.unicamp.aluno.models.MapObjects.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Hero;
 import br.unicamp.aluno.models.Character.Monster.Goblin;
 import br.unicamp.aluno.models.Character.Monster.MageSkeleton;
@@ -73,130 +66,49 @@ public class Map {
 		// criando o mapa
 		refreshMap();
 
-		// --------------------------------------------
-
-		// Adicionando inimigos em lugares aleatórios do mapa
-		Random generator = new Random();
-
 		// Adicionando 6 Goblins no mapa
 		for (int i = 0; i < 6; i++) {
-
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Quantidade de adagas aleatorizada
-			int randomQtdDaggers = generator.nextInt(10);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo os goblins
-			Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
-			monstersOnMap.add(goblin);
+			putRandomGoblin();
 		}
 
 		// Adicionando 2 esqueletos magos no mapa
 		for (int i = 0; i < 2; i++) {
-
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Quantidade de adagas aleatorizada
-			int randomQtdDaggers = generator.nextInt(10);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo os esqueletos magos
-			MageSkeleton mageSkeleton = new MageSkeleton(randomX, randomY, randomQtdDaggers);
-
-			monstersOnMap.add(mageSkeleton);
+			putRandomMageSkeleton();
 		}
 
 		// Adicionando 4 esqueletos no mapa
 		for (int i = 0; i < 4; i++) {
-
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo os esqueletos
-			Skeleton skeleton = new Skeleton(randomX, randomY);
-			monstersOnMap.add(skeleton);
+			putRandomSkeleton();
 		}
-
-		// ---------------------------------
 
 		// Adicionando uma quantidade entre 4 e 6 tesouros no mapa
 		int randomQtdTreasures = ThreadLocalRandom.current().nextInt(4, 7);
 		for (int i = 0; i < randomQtdTreasures; i++) {
-
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals(">>") && !map[randomY][randomX].equals("--")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo os tesouros
-			Treasure treasure = new Treasure(randomX, randomY);
-
-			int randomQtdItem = ThreadLocalRandom.current().nextInt(5, 10); // gera de 5 a 10 itens para adicionar no tesouro
-			for (int m = 0; m < randomQtdItem; m++)
-				addItemInTreasure(treasure);
-
-			addTraceablesOnGame(treasure);
-
-
+			putRandomTreasures();
 		}
+		
 		// Adicionando 8 armadilhas no mapa
 		for (int i = 0; i < 8; i++) {
+			putRandomTrap();
 
-			// gerando x e y aleatórios dentro do mapa
-			int randomX = generator.nextInt(xSize);
-			int randomY = generator.nextInt(ySize);
-
-			// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
-			// número aleatório
-			while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
-				randomX = generator.nextInt(xSize);
-				randomY = generator.nextInt(ySize);
-			}
-
-			// inserindo as armadilhas
-			Trap trap = new Trap(randomX, randomY);
-			addTraceablesOnGame(trap);
 		}
 
 		// inserindo as portas no mapa:
-		for (int i = 0; i < xSize; i++) {
+		putRandomDoors();
+		
+		// Atualizando o mapa com a posição dos personagens
+		refreshMap();
+
+	}
+
+	private void putRandomDoors() {
+		for (int i = 0; i < xMapSize; i++) {
 
 			// gerando um numero aleatório para ser posto como distância entre as portas
 			int randomSpace = ThreadLocalRandom.current().nextInt(3, 5);
 
 			// Percorrendo todas as colunas do mapa
-			for (int j = 0; j < ySize; j += randomSpace) {
+			for (int j = 0; j < yMapSize; j += randomSpace) {
 				// Sempre mudando esse espaço para ser mais aleatório ainda
 				randomSpace = ThreadLocalRandom.current().nextInt(3, 5);
 				try {
@@ -214,72 +126,179 @@ public class Map {
 				}
 			}
 		}
-		// Atualizando o mapa com a posição dos personagens
-		refreshMap();
+	}
+
+	private void putRandomTreasures() {
+		Random generator = new Random();
+		// gerando x e y aleatórios dentro do mapa
+		int randomX = generator.nextInt(xMapSize);
+		int randomY = generator.nextInt(yMapSize);
+
+		// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
+		// número aleatório
+		while (!map[randomY][randomX].equals(">>") && !map[randomY][randomX].equals("--")) {
+			randomX = generator.nextInt(xMapSize);
+			randomY = generator.nextInt(yMapSize);
+		}
+
+		// inserindo os tesouros
+		Treasure treasure = new Treasure(randomX, randomY);
+
+		int randomQtdItem = ThreadLocalRandom.current().nextInt(5, 10); // gera de 5 a 10 itens para adicionar no
+																		// tesouro
+		for (int m = 0; m < randomQtdItem; m++)
+			addItemInTreasure(treasure);
+
+		addTraceablesOnGame(treasure);
 
 	}
 
-	private void addItemInTreasure(Treasure treasure){ // gera item aleatorio em bau
+	private void putRandomTrap() {
+		Random generator = new Random();
+		// gerando x e y aleatórios dentro do mapa
+		int randomX = generator.nextInt(xMapSize);
+		int randomY = generator.nextInt(yMapSize);
+
+		// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
+		// número aleatório
+		while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
+			randomX = generator.nextInt(xMapSize);
+			randomY = generator.nextInt(yMapSize);
+		}
+
+		// inserindo as armadilhas
+		Trap trap = new Trap(randomX, randomY);
+		addTraceablesOnGame(trap);
+
+	}
+
+	// Coloca um esqueleto em algum local aleatório do mapa
+	private void putRandomSkeleton() {
+		Random generator = new Random();
+		// gerando x e y aleatórios dentro do mapa
+		int randomX = generator.nextInt(xMapSize);
+		int randomY = generator.nextInt(yMapSize);
+
+		// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
+		// número aleatório
+		while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
+			randomX = generator.nextInt(xMapSize);
+			randomY = generator.nextInt(yMapSize);
+		}
+
+		// inserindo os esqueletos
+		Skeleton skeleton = new Skeleton(randomX, randomY);
+		monstersOnMap.add(skeleton);
+
+	}
+
+	// Coloca um esqueleto mago em alguma posição aleatória do mapa
+	private void putRandomMageSkeleton() {
+		Random generator = new Random();
+		// gerando x e y aleatórios dentro do mapa
+		int randomX = generator.nextInt(xMapSize);
+		int randomY = generator.nextInt(yMapSize);
+
+		// Quantidade de adagas aleatorizada
+		int randomQtdDaggers = generator.nextInt(10);
+
+		// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
+		// número aleatório
+		while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
+			randomX = generator.nextInt(xMapSize);
+			randomY = generator.nextInt(yMapSize);
+		}
+
+		// inserindo os esqueletos magos
+		MageSkeleton mageSkeleton = new MageSkeleton(randomX, randomY, randomQtdDaggers);
+
+		monstersOnMap.add(mageSkeleton);
+
+	}
+
+	private void putRandomGoblin() {
+		Random generator = new Random();
+
+		// gerando x e y aleatórios dentro do mapa
+		int randomX = generator.nextInt(xMapSize);
+		int randomY = generator.nextInt(yMapSize);
+
+		// Quantidade de adagas aleatorizada
+		int randomQtdDaggers = generator.nextInt(10);
+
+		// Caso o numero gerado não seja uma coordenada livre tentaremos gerar outro
+		// número aleatório
+		while (!map[randomY][randomX].equals("--") && !map[randomY][randomX].equals(">>")) {
+			randomX = generator.nextInt(xMapSize);
+			randomY = generator.nextInt(yMapSize);
+		}
+
+		// inserindo os goblins
+		Goblin goblin = new Goblin(randomX, randomY, randomQtdDaggers);
+		monstersOnMap.add(goblin);
+	}
+
+	private void addItemInTreasure(Treasure treasure) { // gera item aleatorio em bau
 		Random random = new Random();
 
-		switch (random.nextInt(QTD_ITEM_TYPE)){
-			case 0:
-				treasure.addTresure(randomSpell());
-			case 2:
-				treasure.addTresure(randomWeapon());
-			case 3:
-				treasure.addTresure(randomArmor());
+		switch (random.nextInt(QTD_ITEM_TYPE)) {
+		case 0:
+			treasure.addTresure(randomSpell());
+		case 2:
+			treasure.addTresure(randomWeapon());
+		case 3:
+			treasure.addTresure(randomArmor());
 		}
 	}
 
-	private Spell randomSpell(){ // gera instancia alatória de spell
+	private Spell randomSpell() { // gera instancia alatória de spell
 		Random generator = new Random();
 
-		switch (generator.nextInt(QTD_SUBCLASS_SPELL)){
-			case 0:
-				return new Fireball();
+		switch (generator.nextInt(QTD_SUBCLASS_SPELL)) {
+		case 0:
+			return new Fireball();
 
-			case 1:
-				return new Teleport();
+		case 1:
+			return new Teleport();
 
-			case 2:
-				return new SimpleHeal();
+		case 2:
+			return new SimpleHeal();
 
-			case 3:
-				return new MagicMissile();
+		case 3:
+			return new MagicMissile();
 
-			default:
-				return null;
+		default:
+			return null;
 		}
 	}
 
-	private Weapon randomWeapon(){ // gera instancia alatória de weapon
+	private Weapon randomWeapon() { // gera instancia alatória de weapon
 		Random generator = new Random();
 
-		switch (generator.nextInt(QTD_SUBCLASS_WEAPON)){
-			case 0:
-				return new Dagger();
+		switch (generator.nextInt(QTD_SUBCLASS_WEAPON)) {
+		case 0:
+			return new Dagger();
 
-			case 1:
-				return new ShortSword();
+		case 1:
+			return new ShortSword();
 
-			case 2:
-				return new LongSword();
+		case 2:
+			return new LongSword();
 
-			default:
-				return null;
+		default:
+			return null;
 		}
 	}
 
-	public Armor randomArmor(){ // gera instancia alatória de armor
+	public Armor randomArmor() { // gera instancia alatória de armor
 		Random generator = new Random();
 
-		switch (generator.nextInt(QTD_SUBCLASS_ARMOR)){
-			case 0:
-				return new IronArmor();
+		switch (generator.nextInt(QTD_SUBCLASS_ARMOR)) {
+		case 0:
+			return new IronArmor();
 
-			default:
-				return null;
+		default:
+			return null;
 		}
 	}
 
@@ -291,79 +310,48 @@ public class Map {
 		return hero;
 	}
 
-	// Adiciona localizaveis no nosso mapa
-	public void addTreaceables(Traceable traceable) {
-		// Obtendo a localização do localizavel
-		int traceableX = traceable.getPositionX();
-		int traceableY = traceable.getPositionY();
-
-		// Adicionando o localizavel no mapa
-		this.map[traceableX][traceableY] = traceable.toString();
-
-		// Registrando o localizavel nos traceables no jogo atual
-		this.addTraceablesOnGame(traceable);
-
-	}
-
 	// Registra os traceables que estão no mapa
 	private void addTraceablesOnGame(Traceable traceable) {
 		this.traceablesOnMap.add(traceable);
 	}
 
-	// Remove os localizaveis que estão no jogo (Sem uso por enquanto, mas usaremos
-	// para matar monstros, etc depois)
-//		private void removeTraceablesOnGame(Traceable traceable) {
-//			this.traceablesOnMap.remove(traceable);
-//		}
-
-	// verifica a possibilidade e caminha com o player para a posição
-	// xNow e yNow dizem a posição atual do player
-	// xRequested e yRequested dizem a posiçao solicitada pelo usuário
+	// verifica a possibilidade e caminha com personagem para a posição solicitada
 	public boolean canIWalk(Character character, Direction direction) {
+		//Posiçao solicitada pelo usuário:
 		int xRequested = character.getPositionX() + direction.getPoint().getPositionX();
 		int yRequested = character.getPositionY() + direction.getPoint().getPositionY();
 
 		// caso tiver o espaço desejado caminharemos com o player
 		if (this.map[yRequested][xRequested].equals("--") || this.map[yRequested][xRequested].equals(">>")
-				|| this.map[yRequested][xRequested].equals("//") || this.map[yRequested][xRequested].equals("TS") || this.map[yRequested][xRequested].equals("§§")) {
+				|| this.map[yRequested][xRequested].equals("//") || this.map[yRequested][xRequested].equals("TS")){
 
-			//Caso for heroi e pisar em armadilha sofrerá dano
+			// Caso for heroi e pisar em armadilha sofrerá dano
 			try {
-				Hero hero = (Hero)character;
+				Hero hero = (Hero) character;
 				// Verificando se irá pisar em alguma armadilha
-				amIOnSomeTrap(xRequested, yRequested);				
-			}catch(ClassCastException e) {
-				//Caso for monstro seguirá normalmente
+				amIOnSomeTrap(xRequested, yRequested);
+			} catch (ClassCastException e) {
+				// Caso for monstro prosseguiremos com o código
 			}
-			// Verificando se irá pisar em alguma armadilha
-			amIOnSomeTrap(xRequested, yRequested);
 
 			return true;
-		} else {
+		}
+		//Caso não tenha espaço
+		else {
 			Traceable traceable = null;
 			for (Traceable t : traceablesOnMap)
 				if (t.getPositionX() == xRequested && t.getPositionY() == yRequested) {
 					traceable = t;
 					break;
 				}
-			//Lançaremos a excessão somente caso seja o heroi fazendo coisa errada
+			// Lançaremos a excessão somente caso seja o heroi fazendo coisa errada
 			try {
-				Hero hero = (Hero)character;
+				Hero hero = (Hero) character;
 				throw new CantMoveException(traceable);
-			}catch(ClassCastException e) {
-				//Caso for monstro
+			} catch (ClassCastException e) {
+				// Caso for monstro
 				return false;
 			}
-		}
-	}
-
-	// Printa todo conteúdo do mapa
-	public void printAllMap() {
-		for (int i = 0; i < this.yMapSize; i++) {
-			for (int j = 0; j < this.xMapSize; j++) {
-				System.out.print(this.map[i][j] + " ");
-			}
-			System.out.println("");
 		}
 	}
 
@@ -428,7 +416,7 @@ public class Map {
 			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
 					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
 					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-					&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
 
 				try {
 					Treasure treasure = (Treasure) traceable;
@@ -451,7 +439,7 @@ public class Map {
 		}
 	}
 
-	// Talvez um monstro nasça perto do baú, como no enunciado
+	// Talvez um monstro nasça perto do baú quando procurar-mos por baús
 	private void maybeARandomMonster(Treasure treasure) {
 
 		int xTreasure = treasure.getPositionX();
@@ -481,28 +469,28 @@ public class Map {
 
 		// Gera um numero aleatório entre 0 e 2
 		switch (random.nextInt(3)) {
-			// caso 0 criaremos um esqueleto
-			case 0:
-				monstersOnMap.add(new Skeleton(adjacentX, adjacentY));
-				break;
+		// caso 0 criaremos um esqueleto
+		case 0:
+			monstersOnMap.add(new Skeleton(adjacentX, adjacentY));
+			break;
 
-			// caso 1 criamos um Esqueleto Mago
-			case 1:
-				// Quantidade de adagas aleatorizada
-				int randomQtdDaggers = random.nextInt(10);
+		// caso 1 criamos um Esqueleto Mago
+		case 1:
+			// Quantidade de adagas aleatorizada
+			int randomQtdDaggers = random.nextInt(10);
 
-				// inserindo os esqueletos magos
-				MageSkeleton mageSkeleton = new MageSkeleton(adjacentX, adjacentY, randomQtdDaggers);
-				monstersOnMap.add(mageSkeleton);
+			// inserindo os esqueletos magos
+			MageSkeleton mageSkeleton = new MageSkeleton(adjacentX, adjacentY, randomQtdDaggers);
+			monstersOnMap.add(mageSkeleton);
 
-			case 2:
-				// Quantidade de adagas aleatorizada
-				randomQtdDaggers = random.nextInt(10);
-				// inserindo os goblins
-				Goblin goblin = new Goblin(adjacentX, adjacentY, randomQtdDaggers);
-				monstersOnMap.add(goblin);
-			default:
-				break;
+		case 2:
+			// Quantidade de adagas aleatorizada
+			randomQtdDaggers = random.nextInt(10);
+			// inserindo os goblins
+			Goblin goblin = new Goblin(adjacentX, adjacentY, randomQtdDaggers);
+			monstersOnMap.add(goblin);
+		default:
+			break;
 		}
 
 	}
@@ -535,7 +523,7 @@ public class Map {
 			if ((traceable.getPositionX() >= firstLowerX && traceable.getPositionX() <= firstUpperX
 					&& traceable.getPositionY() <= firstLowerY && traceable.getPositionY() >= firstUpperY)
 					|| (traceable.getPositionX() >= secondLowerX && traceable.getPositionX() <= secondUpperX
-					&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
+							&& traceable.getPositionY() <= secondLowerY && traceable.getPositionY() >= secondUpperY)) {
 
 				try {
 					Trap trap = (Trap) traceable;
@@ -556,7 +544,7 @@ public class Map {
 			if (xRequested == traceable.getPositionX() && yRequested == traceable.getPositionY()) {
 
 				try {
-					//Cast - Verificando se é uma armadilha
+					// Cast - Verificando se é uma armadilha
 					Trap trap = (Trap) traceable;
 
 					// Ativando a armadilha
@@ -1113,7 +1101,8 @@ public class Map {
 	}
 
 	public Treasure getTreasure() {
-		int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega item na frente dadireção que herói está
+		int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega item na frente
+																							// dadireção que herói está
 		int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
 		Treasure treasure = null;
 

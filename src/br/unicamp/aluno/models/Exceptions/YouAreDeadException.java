@@ -11,15 +11,8 @@ public class YouAreDeadException extends RuntimeException {
 	}
 
 
-	public YouAreDeadException(String message) {
-		super(message);
+	public YouAreDeadException(String name) {
+		super("Your lifepoints now is zero. Congratulations "+ name + " you are dead!");
 	}
 
-	public YouAreDeadException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public YouAreDeadException(Throwable cause) {
-		super(cause);
-	}
 }

@@ -1,7 +1,10 @@
 package br.unicamp.aluno.models.Exceptions;
 
 public class CantThrowSpellException extends ClassCastException {
-    public CantThrowSpellException() {
+
+	private static final long serialVersionUID = 1L;
+
+	public CantThrowSpellException() {
         super("Only mystic hero can cast spell!");
     }
 

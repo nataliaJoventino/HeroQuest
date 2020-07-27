@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import br.unicamp.aluno.models.Exceptions.*;
-import br.unicamp.aluno.models.Item.*;
-import br.unicamp.aluno.models.EngineComponents.Point;
-import br.unicamp.aluno.models.MapObjects.Treasure;
 import br.unicamp.aluno.models.Character.Hero.Barbarian;
 import br.unicamp.aluno.models.Character.Hero.Dwarf;
 import br.unicamp.aluno.models.Character.Hero.Elf;
@@ -27,6 +23,7 @@ import br.unicamp.aluno.models.Exceptions.OnlyNumbersException;
 import br.unicamp.aluno.models.Exceptions.TrapsHurtMeException;
 import br.unicamp.aluno.models.Exceptions.YouAreDeadException;
 import br.unicamp.aluno.models.Exceptions.YouWonException;
+import br.unicamp.aluno.models.Item.Armor;
 import br.unicamp.aluno.models.Item.Fireball;
 import br.unicamp.aluno.models.Item.Item;
 import br.unicamp.aluno.models.Item.SimpleHeal;
@@ -60,57 +57,55 @@ public class Game {
 		// Lendo o nome colocado
 		String name = stringScanner();
 
-
 		boolean loopChoose = true;
 
 		while (loopChoose) {
 
-			System.out.println("Heros on quest:" +
-					"\n1 - Barbaro" +
-					"\n2 - Anão" +
-					"\n3 - Elfo" +
-					"\n4 - Mago");
-
-			System.out.print("Choose a hero: ");
-			int heroNumber = Integer.parseInt(stringScanner());
-
-			System.out.println();
-
 			try {
+				System.out.println("Heros on quest:" + "\n1 - Barbaro" + "\n2 - Anão" + "\n3 - Elfo" + "\n4 - Mago");
+
+				System.out.print("Choose a hero: ");
+				int heroNumber = toInteger(stringScanner());
+
+				System.out.println();
+
 				// Escolhendo o heroi
 				switch (heroNumber) {
-					// Barbaro
-					case 1:
-						this.hero = new Barbarian(name);
-						loopChoose = false;
-						break;
+				// Barbaro
+				case 1:
+					this.hero = new Barbarian(name);
+					loopChoose = false;
+					break;
 
-					// Anão
-					case 2:
-						this.hero = new Dwarf(name);
-						loopChoose = false;
-						break;
+				// Anão
+				case 2:
+					this.hero = new Dwarf(name);
+					loopChoose = false;
+					break;
 
-					// Elfo
-					case 3:
-						this.hero = new Elf(name);
-						loopChoose = false;
-						break;
+				// Elfo
+				case 3:
+					this.hero = new Elf(name);
+					loopChoose = false;
+					break;
 
-					// Mago
-					case 4:
-						this.hero = new Wizard(name);
-						loopChoose = false;
-						break;
+				// Mago
+				case 4:
+					this.hero = new Wizard(name);
+					loopChoose = false;
+					break;
 
-					default:
-						break;
+				default:
+					break;
 
 				}
 
 				// Criando o mapa
 				map = new Map(hero, xMaxMap, yMaxMap);
 			} catch (NullPointerException e) {
+				System.out.println("Invalid input, try again!");
+				loopChoose = true;
+			} catch (NumberFormatException e) {
 				System.out.println("Invalid input, try again!");
 				loopChoose = true;
 			}
@@ -126,7 +121,7 @@ public class Game {
 				while (wave) {
 					Timer timer = new Timer(this);
 					timer.start();
-					starWave();
+					startWave();
 					readCommandFromKeyboard();
 					timer.interrupt();
 				}
@@ -141,7 +136,7 @@ public class Game {
 			} catch (YouWonException e2) {
 				System.out.println(e2.getMessage());
 				exitSelected = true;
-			} catch(CantMoveException e3) {
+			} catch (CantMoveException e3) {
 				System.out.println(e3.getMessage());
 			}
 
@@ -153,15 +148,10 @@ public class Game {
 
 	}
 
-	public boolean isWave() {
-		return wave;
-	}
-
-	//Altera a wave através da thread
+	// Altera a wave através da thread
 	public void setWave(boolean wave) {
 		synchronized (this) {
 			System.out.println("\n||| WAVE ENDED |||");
-			awakeningMonsters();
 			hero.generateMoveAllowed();
 			wave = true;
 			action = false;
@@ -174,48 +164,48 @@ public class Game {
 
 	}
 
-	private void starWave() {
+	// Printa informações da wave
+	private void startWave() {
 		map.refreshMap();
 		map.printMap();
-		System.out.println("Life points: "	+ hero.getLifePoints()
-						+ "\nMoves allowed: " + hero.getMoveAllowed() + " | Armor: " + hero.getArmor()
-						+ "\nIs both hands item? " + hero.isBothHandItem()
-						+"\nEquipped right hand: " + hero.getRightHand() + " | Equipped left hand: " + hero.getLeftHand()); // fazer if pra caso item seja de uas mãos e para não ficar aparecendo o null
-
+		System.out.println("Life points: " + hero.getLifePoints() + "\nMoves allowed: " + hero.getMoveAllowed()
+				+ " | Armor: " + hero.getArmor() + "\nIs both hands item? " + hero.isBothHandItem()
+				+ "\nEquipped right hand: " + hero.getRightHand() + " | Equipped left hand: " + hero.getLeftHand());
 	}
 
-	//despertando o monstro
+	// despertando o monstro
 	private void awakeningMonsters() {
-		
+
 		ArrayList<Monster> monsters = map.getMonstersOnMap();
-		
+
 		for (Monster monster : monsters) {
-			//Caso o heroi esteja perto o monstro ataca
-			if(monster.isHeroAround(hero)) {
+			// Caso o heroi esteja perto o monstro ataca
+			if (monster.isHeroAround(hero)) {
+				System.out.println("you've been attacked by a monster!");
 				monster.hit(hero);
 			}
-			//Se não o monstro anda
+			// Se não o monstro anda
 			else {
 				monster.generateMoveAllowed();
-				//Caso for um goblin anda se aproximando do player
+				// Caso for um goblin anda se aproximando do player
 				try {
-					Goblin goblin = (Goblin)monster;
+					Goblin goblin = (Goblin) monster;
 					goblin.move(hero, map);
-					
-				}catch(ClassCastException e){
-					//Caso não for um goblin prosseguiremos andaremos em posições aleatórias
+
+				} catch (ClassCastException e) {
+					// Caso não for um goblin prosseguiremos andaremos em posições aleatórias
 					Direction randomDirection = monster.randomMonsterDirection();
-					if(map.canIWalk(monster, randomDirection)) {
-						monster.move(randomDirection);						
+					if (map.canIWalk(monster, randomDirection)) {
+						monster.move(randomDirection);
 					}
 				}
-			
+
 			}
 		}
-		
+
 	}
 
-	//Fim da wave do heroi
+	// Fim da wave do heroi
 	private void endWave() {
 		System.out.println("\n||| WAVE ENDED |||");
 		hero.generateMoveAllowed();
@@ -231,7 +221,7 @@ public class Game {
 
 	}
 
-	//Lendo os comandos do teclado
+	// Lendo os comandos do teclado
 	private void readCommandFromKeyboard() {
 		Direction walking = null;
 		String command = "";
@@ -258,7 +248,9 @@ public class Game {
 				System.out.println("Search for traps has been made!");
 
 			} else if (command.compareTo("p") == 0) { // abrir porta
-				int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); //pega posição da porta a frente do herói
+				int x = hero.getPositionX() + hero.getCurrentDirection().getPoint().getPositionX(); // pega posição da
+																									// porta a frente do
+																									// herói
 				int y = hero.getPositionY() + hero.getCurrentDirection().getPoint().getPositionY();
 				Point point = new Point(x, y);
 				map.openDoor(point);
@@ -271,22 +263,20 @@ public class Game {
 
 			} else if (command.compareTo("g") == 0) { // coletar tesouro
 				try {
-					Treasure treasure = map.getTreasure();					
+					Treasure treasure = map.getTreasure();
 					boolean loop = true;
 					Item item;
-					
-					System.out.println("To store, type: " +
-							"\n the number of the item" +
-							"\n e - store all items" +
-							"\n quit - to close treasure");
+
+					System.out.println("To store, type: " + "\n the number of the item" + "\n e - store all items"
+							+ "\n quit - to close treasure");
 					System.out.println();
-					
-					//Usuário visualizando os itens dentro do tesouro
+
+					// Usuário visualizando os itens dentro do tesouro
 					while (loop) {
 						treasure.printTreasure();
 						System.out.print("Enter the command : ");
 						command = stringScanner();
-						
+
 						if (command.compareTo("e") == 0) { // coletar todos os itens
 							storeAll(treasure);
 							loop = false;
@@ -296,15 +286,14 @@ public class Game {
 							try {
 								item = treasure.removeTreasure(toInteger(command));
 								hero.storeInBackpack(item);
-							} catch (IndexOutOfBoundsException e){
+							} catch (IndexOutOfBoundsException e) {
 								System.out.println("Invalid item index");
 							}
 						}
 					}
-				}catch(NullPointerException e) {
+				} catch (NullPointerException e) {
 					System.out.println("No treasures near or hero isn't frontal with it");
 				}
-				
 
 			} else
 				action(command);
@@ -312,7 +301,7 @@ public class Game {
 			try {
 				if (walking != null && map.canIWalk(hero, walking))
 					hero.move(walking);
-					move = true;
+				move = true;
 			} catch (CantMoveException e) {
 				System.out.println(e.getMessage());
 			}
@@ -332,7 +321,8 @@ public class Game {
 				action = true;
 			}
 
-			else if (command.compareTo("u") == 0) { // ataque/feitiço (falta colocar os pontos que afetam o ataque para o usuario ver)
+			else if (command.compareTo("u") == 0) { // ataque/feitiço (falta colocar os pontos que afetam o ataque para
+													// o usuario ver)
 				Monster monster = null;
 				MysticHero mysticHero = null;
 
@@ -355,13 +345,20 @@ public class Game {
 							System.out.print("Enter the command : ");
 							comm = stringScanner();
 
-							if (comm.compareTo("r") == 0) {
-								monster = allowAttack(Hand.RIGHT);
-								hero.hit(monster, Hand.RIGHT);
+							boolean loop = true;
 
-							} else if (comm.compareTo("l") == 0) {
-								monster = allowAttack(Hand.LEFT);
-								hero.hit(monster, Hand.LEFT);
+							while (loop) {
+								if (comm.compareTo("r") == 0) {
+									monster = allowAttack(Hand.RIGHT);
+									hero.hit(monster, Hand.RIGHT);
+									loop = false;
+
+								} else if (comm.compareTo("l") == 0) {
+									monster = allowAttack(Hand.LEFT);
+									hero.hit(monster, Hand.LEFT);
+									loop = false;
+
+								}
 							}
 
 						} else { // mãos ficam vazias se equipadas com feitiço
@@ -407,14 +404,18 @@ public class Game {
 					}
 
 					if (mysticHero != null) {
-						if (isHeal(mysticHero.getSpell()))
+						if (isHeal(mysticHero.getSpell())) {
 							System.out.println(" New life bar: " + mysticHero.getLifePoints());
-						else if(!isTeleport(mysticHero.getSpell()))
+							
+						}
+						
+						else if (isTeleport(mysticHero.getSpell()))
 							System.out.println("Hero has been moved");
 						else {
 							System.out.println(" | Monster's defense: " + monster.getHitDefence());
-							System.out.println("Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY())
-									+ "' life points after hit: " + monster.getLifePoints());
+							System.out.println(
+									"Monster '" + map.getFromMap(monster.getPositionX(), monster.getPositionY())
+											+ "' life points after hit: " + monster.getLifePoints());
 						}
 					} else {
 						map.printTarget();
@@ -439,7 +440,8 @@ public class Game {
 			if (move && action) // se herói tiver se movimentado e realizou ação wave finaliza
 				wave = false;
 		} else {
-			System.out.println( "Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
+			System.out.println(
+					"Action has already been performed. Actions like attack and search for treasure can be made just once per wave!");
 		}
 
 	}
@@ -492,8 +494,9 @@ public class Game {
 		}
 	}
 
-	private Monster allowAttack(Hand hand) { // permite ataque do ao monstro que está dentro da mira e de menor distancia (primeiro monstro a frente)
-		ArrayList<Monster> isInSight = new ArrayList();
+	private Monster allowAttack(Hand hand) { // permite ataque do ao monstro que está dentro da mira e de menor
+												// distancia (primeiro monstro a frente)
+		ArrayList<Monster> isInSight = new ArrayList<Monster>();
 		for (Monster m : map.getMonstersOnMap())
 			if (hand != null) {
 				if (hero.isOnSight(m, hand)) // verifica se monstro está na mira da arma da mçao selecionada
@@ -530,7 +533,6 @@ public class Game {
 	private int distance(int x0, int y0, int x1, int y1) { // distancia entre dois pontos (geometria taxi)
 		int absX = Math.abs((x0 - x1)); // guarda valor absoluto da diferença x
 		int absY = Math.abs((y0 - y1));// guarda valor absoluto da diferença y
-
 		return absX + absY;
 	}
 
@@ -562,7 +564,6 @@ public class Game {
 
 	private int choosingItem() {
 		String command;
-		boolean loop = true;
 
 		System.out.print("Enter item number to equip it or type 'quit' to close backpack: ");
 		command = stringScanner();
@@ -603,7 +604,7 @@ public class Game {
 
 	private boolean isHeal(Item item) {
 		try {
-			SimpleHeal teleport = (SimpleHeal) item;
+			SimpleHeal simpleHeal = (SimpleHeal) item;
 			return true;
 		} catch (ClassCastException e) {
 			return false;
@@ -624,6 +625,7 @@ public class Game {
 
 		try {
 			Weapon weapon = isWeapon(map.getHero().getInBackpack(command)); // verifica se é arma
+			Armor armor = isArmor(map.getHero().getInBackpack(command));
 
 			if (weapon != null) // se for equipa
 
@@ -642,7 +644,9 @@ public class Game {
 						hero.equip(weapon, Hand.LEFT);
 				}
 
-			else
+			else if (armor != null) {
+				hero.equip(armor);
+			} else
 				throw new NotEquippableException();
 
 		} catch (NotEquippableException e) {
@@ -655,6 +659,15 @@ public class Game {
 					throw new NotEquippableException();
 			} else
 				System.out.println("Hero can't use spell"); // fazer exception
+		}
+	}
+
+	private Armor isArmor(Item item) {
+		try {
+			Armor armor = (Armor) item;
+			return armor;
+		} catch (ClassCastException e) {
+			return null;
 		}
 	}
 

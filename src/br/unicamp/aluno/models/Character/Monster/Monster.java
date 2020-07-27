@@ -3,10 +3,9 @@ package br.unicamp.aluno.models.Character.Monster;
 import java.util.ArrayList;
 import java.util.Random;
 
-import br.unicamp.aluno.models.EngineComponents.Point;
-import br.unicamp.aluno.models.EngineComponents.Traceable;
 import br.unicamp.aluno.models.Character.Character;
 import br.unicamp.aluno.models.Character.Hero.Hero;
+import br.unicamp.aluno.models.EngineComponents.Point;
 import br.unicamp.aluno.models.Enum.Direction;
 import br.unicamp.aluno.models.Enum.SideDice;
 
