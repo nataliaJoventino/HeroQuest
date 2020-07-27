@@ -3,7 +3,7 @@ package br.unicamp.aluno;
 import java.util.concurrent.TimeoutException;
 
 public class Timer extends Thread {
-    private final int TIMER_SEG = 60; // wave tem duração de 1 minuto
+    private final int TIMER_SEG = 15; // wave tem duração de 1 minuto
     private Game engine;
 
     public Timer(Game game) {

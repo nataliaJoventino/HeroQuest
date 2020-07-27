@@ -606,10 +606,6 @@ public class Map {
 			System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
 		}
 
-		// Caso não tenham monstros no mapa o player vence
-		if (monstersOnMap.isEmpty() && created) {
-			throw new YouWonException();
-		}
 
 		// Atualizando os monstros
 		for (Monster monster : monstersOnMap) {
@@ -619,6 +615,18 @@ public class Map {
 				newY = monster.getPositionY();
 				map[newY][newX] = monster.toString();
 			}
+		}
+		
+		//Verifica se algum monstro morreu
+		for(int i = 0; i < monstersOnMap.size(); i++) {
+			if(monstersOnMap.get(i).getLifePoints() <= 0){
+				monstersOnMap.remove(i);
+			}
+		}
+		
+		// Caso não tenham monstros no mapa o player vence
+		if (monstersOnMap.isEmpty() && created) {
+			throw new YouWonException();
 		}
 
 		// Atualizando os outros traceables
